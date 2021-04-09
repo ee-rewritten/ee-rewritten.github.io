@@ -12,7 +12,6 @@ class ItemManager {
   }
   static init() {
     this.blocksBMD = this.baseTexture('blocks');
-    this.backgroundBMD = this.baseTexture('background');
     this.smileysBMD = this.baseTexture('smileys');
 
     this.greyBasicRect = new Rectangle(16, 0, 16, 16);
