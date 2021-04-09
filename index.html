@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+	<title>EE: Rewritten</title>
+	<link rel="icon" href="favicon.ico" type="image/x-icon">
+
+	<meta name="description" content="EE: Rewritten is a revival of Everybody Edits. It's a live, multiplayer platform game, where you can build levels for your friends, or with them!">
+	<meta name="keywords" content="Everybody Edits, Everyone Edits Rewritten, EE, EER, sandbox, online game, real time, minimal">
+
+	<link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700" rel="stylesheet">
+	<style>
+		html {
+			height: 100%;
+		}
+
+		body {
+			height: 100%;
+			min-width: 852px;
+			margin: 0;
+			padding: 0;
+			font-family: 'Open Sans', sans-serif;
+			background: #000 url('background.png') center;
+			color: #fff;
+			display: flex;
+			flex-direction: column;
+			text-align: center;
+		}
+
+		#mid {
+			flex: auto;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+		}
+
+		#logo {
+			height: 120px;
+			margin-bottom: 40px;
+			margin-top: 20px;
+		}
+
+		#spacer {
+			height: 100px;
+		}
+
+		#ee {
+			display: block;
+			border: 1px solid #666;
+			box-shadow: 0px 0px 12px 2px #000;
+			margin: 0 auto;
+			image-rendering: pixelated;
+		}
+
+		#footer {
+			padding: 11px 0;
+		}
+
+		#cn {
+			display: none;
+			position: fixed;
+			left: 0;
+			bottom: 0;
+			width: 100%;
+			background: #121212;
+			text-align: center;
+			padding: 20px 0;
+			font-size: 15px;
+			border-top: 1px solid #333;
+			box-shadow: 0 2px 5px #000;
+		}
+
+		#cn-head {
+			padding: 0 10px 10px;
+			font-weight: bold;
+			font-size: 17px;
+			color: #FBC52E;
+		}
+
+		#cn-body {
+			max-width: 600px;
+			padding: 0 10px 15px;
+			margin: 0 auto;
+		}
+
+		.cn-button {
+			margin: 0 10px;
+		}
+
+		.cn-button div {
+			display: inline-block;
+			padding: 10px;
+			border-radius: 4px;
+			color: #fff;
+		}
+
+		.cn-button #cn-more {
+			background: #333;
+		}
+
+		.cn-button #cn-accept {
+			background: #FBC52E;
+			color: #121212;
+			font-weight: bold;
+		}
+	</style>
+	<script>
+		function setPath(title, path) {
+			if (window.history) {
+				if (location.pathname + location.search == path) {
+					if (window.history.replaceState) {
+						window.history.replaceState({}, title, path);
+					}
+				} else if (window.history.pushState) {
+					window.history.pushState({}, title, path);
+				}
+			}
+			document.title = title;
+		}
+	</script>
+
+	<script src="dist/libs/PlayerIOClient.minified.js"></script>
+	<script src="dist/libs/pixi.min.js"></script>
+
+	<script src="dist/Game.js"></script>
+	<script src="dist/UI.js"></script>
+
+	<script src="dist/Global.js"></script>
+	<script src="dist/Config.js"></script>
+	<script src="dist/Input.js"></script>
+
+	<script src="dist/items/ItemManager.js"></script>
+	<script src="dist/items/ItemLayer.js"></script>
+
+	<script src="dist/World.js"></script>
+	<script src="dist/Player.js"></script>
+
+	<script src="dist/states/State.js"></script>
+	<script src="dist/states/PlayState.js"></script>
+
+	<script src="dist/Start.js"></script>
+	<!-- <script src="Client/states/playstate.js"></script> -->
+
+
+	<style></style>
+</head>
+
+<body>
+	<div id="mid">
+		<img id="logo" src="logo.png">
+		<div id="ee" width="850px" height="500px"></div>
+		<div id="spacer"></div>
+	</div>
+	<div id="footer">Made by Seb135</div>
+	<div id="cn">
+		<div id="cn-head">Our website uses cookies</div>
+		<div id="cn-body">We use services that require the use of cookies to improve user experience. By using our website, you consent to all cookies used in accordance with our policy.</div><a href="https://everybodyedits.com/cookies.html"
+			class="cn-button">
+			<div id="cn-more">Learn More</div>
+		</a><a href="https://everybodyedits.com/#" class="cn-button">
+			<div id="cn-accept" onclick="localStorage.setItem(&#39;hide-cn&#39;, &#39;1&#39;); document.getElementById(&#39;cn&#39;).style.display = &#39;none&#39;; return false;">Close</div>
+		</a>
+	</div>
+	<script>
+		addEventListener("load", function() {
+			if (!localStorage.getItem("hide-cn")) document.getElementById("cn").style.display = "block";
+		})
+	</script>
+</body>
+
+</html>
