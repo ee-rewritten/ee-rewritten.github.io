@@ -1,5 +1,6 @@
 class UI {
   overlayContainer;
+  debugText;
 
   constructor() {
     this.overlayContainer = new Container();
@@ -7,10 +8,14 @@ class UI {
     this.drawUIRect(1, -1, Config.fullWidth-Config.gameWidth, Config.fullHeight+2, Config.gameWidth, 0, 0x000000);
     this.drawUIRect(1, 1, Config.gameWidth, Config.fullHeight-Config.gameHeight-2, 0, Config.gameHeight, 0x323231);
 
-    text = new PIXI.Text('This is a PixiJS text',{fill: 'white', fontSize: 12});
-    this.overlayContainer.addChild(text);
+    this.debugText = new PIXI.Text('FPS: xx',{fill: 'white', fontSize: 12});
+    this.overlayContainer.addChild(this.debugText);
 
     Global.stage.addChild(this.overlayContainer);
+  }
+
+  enterFrame() {
+    this.debugText.text = `FPS: ${Math.round(ticker.FPS)}`;
   }
 
   drawUIRect(localx, localy, width, height, x, y, colour) {

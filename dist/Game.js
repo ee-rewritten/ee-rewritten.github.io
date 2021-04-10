@@ -1,7 +1,7 @@
 let debug = [];
-let text;
 
 class Game {
+  UI;
   _state;
   set state(newState) {
     if(this._state) this._state.stop();
@@ -34,19 +34,19 @@ class Game {
     ItemManager.init();
     Input.init();
     Global.base.state = new PlayState();
-    new UI();
+    Global.base.UI = new UI();
     ticker.add(Global.base.enterFrame);
     ticker.start();
   }
 
   enterFrame() {
-    text.text = `FPS: ${Math.round(ticker.FPS)}`;
     if(Global.base.state != null && !Global.base.state.stoppedRendering) {
       let ticks = ticker.elapsedMS/Config.physics_ms_per_tick;
       for (let i = 0; i < ticks; i++) {
         Global.base.state.tick();
       }
       Global.base.state.enterFrame();
+      Global.base.UI.enterFrame();
     }
     Input.resetJustPressed();
   }
