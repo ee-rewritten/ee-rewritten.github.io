@@ -14,10 +14,10 @@ class PlayState extends State {
     let playerOffset = Math.round(-(Config.smileySize-Config.blockSize)/2);
     this.players.x = this.players.y = playerOffset;
 
-    this.world = new World(this, 19, 10);
+    this.world = new World(this, 40, 30);
 
-    this.player = new Player(true);
-    this.player.frame = 0;
+    this.player = new Player(true, 20*Config.blockSize, 15*Config.blockSize);
+    this.player.smiley = 0;
     this.players.addChild(this.player);
     this.target = this.player;
 
@@ -50,6 +50,7 @@ class PlayState extends State {
     this.players.children.forEach(p => {
       p.tick();
     });
+    this.world.tick();
     if(this.target != null) {
       this.camera.x -= (this.camera.x - (this.target.x - Config.gameWidthCeil/2)) * Config.camera_lag;
       this.camera.y -= (this.camera.y - (this.target.y - Config.gameHeightCeil/2)) * Config.camera_lag;
