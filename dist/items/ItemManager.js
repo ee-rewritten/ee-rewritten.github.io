@@ -1,26 +1,67 @@
 class ItemManager {
   static blocksBMD;
 
-  static greyBasicRect;
-  static blackBasicRect;
-  static blackRect;
+  static blockEmpty;
+  static blockVoid;
 
-  static invisible;
+  static blockTabs = [];
+  static blocks = {};
+  static packs = {};
+
+  static _addingToTab = 0;
 
   static baseTexture(id) {
     return loader.resources[id].texture.baseTexture;
   }
+
+  static loadImages(callback) {
+    //load images and run the callback when it's done
+    loader
+      .add('blocks', './Assets/blocks.png')
+      .add('smileys', './Assets/smileys.png')
+      .load(callback);
+  }
+
   static init() {
     this.blocksBMD = this.baseTexture('blocks');
     this.smileysBMD = this.baseTexture('smileys');
 
-    this.greyBasicRect = new Rectangle(16, 0, 16, 16);
-    this.blackBasicRect = new Rectangle(32, 0, 16, 16);
-    this.blackRect = new Rectangle(0, 7*16, 16, 16);
+    let pack;
 
-    this.invisible = new Array(ItemLayer.LAYERS);
-    this.invisible[ItemLayer.BACKGROUND] = new Rectangle(10*Config.blockSize, 0, Config.blockSize, Config.blockSize);
-    this.invisible[ItemLayer.BELOW] = this.invisible[ItemLayer.BACKGROUND];
-    this.invisible[ItemLayer.ABOVE] = this.invisible[ItemLayer.BACKGROUND];
+    this._addingToTab = ItemTab.BLOCKS;
+
+    pack = this.createBlockPack('game', 'unobtainable');
+    pack.addStaticBlocks(3);
+    this.blockEmpty = pack.blocks[0];
+    this.blockVoid = pack.blocks[1];
+    this.blockInvisible = pack.blocks[2];
+
+    pack = this.createBlockPack('basic');
+    pack.addStaticBlocks(10);
+
+    pack = this.createBlockPack('beta');
+    pack.addStaticBlocks(3);
+    pack.addAnimatedBlock(7, 0.5);
+  }
+
+  static lastYOffset = 0;
+  static createBlockPack(name, payvaultId = '') {
+    let tab = this._addingToTab;
+    if(!this.blockTabs[tab]) this.blockTabs[tab] = [];
+
+    //limit of 2^7 packs per tab because of ID system
+    if(this.blockTabs[tab].length == 128)
+      throw new Error(`Maximum packs in tab ${tab} reached while adding pack '${name}'`);
+
+    let bp = new ItemBlockPack(name, payvaultId, tab, this.blockTabs[tab].length, this.lastYOffset++);
+
+    this.blockTabs[tab].push(bp);
+
+    this.packs[name] = bp;
+    return bp;
+  }
+
+  static calculateId(tab, packId, blockIndex) {
+    return tab << 13 | packId << 6 | blockIndex;
   }
 }

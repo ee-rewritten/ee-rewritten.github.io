@@ -35,7 +35,7 @@ class World {
         //   Global.randomInt(0,9)*Config.blockSize,
         //   Global.randomInt(0,9)*Config.blockSize,
         //   Config.blockSize, Config.blockSize);
-        const texture = new Texture(ItemManager.blocksBMD, ItemManager.greyBasicRect);
+        const texture = new Texture(ItemManager.blocksBMD);
 
         let block = new Sprite(texture);
         block.position.set(x, y);
@@ -52,8 +52,8 @@ class World {
     for (let x = 0; x < width; x++) {
       map[0][x] = new Array(height);
       for (let y = 0; y < height; y++) {
-        if(x == 0 || y == 0 || x == width-1 || y == height-1) map[0][x][y] = 2;
-        else map[0][x][y] = 1;
+        if(x == 0 || y == 0 || x == width-1 || y == height-1) map[0][x][y] = ItemManager.packs['basic'].blocks[1].id;
+        else map[0][x][y] = ItemManager.blockEmpty.id;
       }
     }
     this.setMapArray(map);
@@ -105,8 +105,15 @@ class World {
       layer < 0 || layer >= this.depth ||
       x < 0 || x >= this.width ||
       y < 0 || y >= this.height
-    ) return 0;
-    return this.realmap[layer][x][y]
+    ) return ItemManager.blockVoid.id;
+    return this.realmap[layer][x][y];
+  }
+
+  setTile(id, layer, x, y) {
+    if(!this.realmap[layer] || !this.realmap[layer][x]) return;
+    this.realmap[layer][x][y] = id;
+    this.sortIntoRenderLayer(layer, x, y, id);
+    this.redraw(true);
   }
 
   sortIntoRenderLayer(layer, x, y, id) {
@@ -122,19 +129,35 @@ class World {
       let offscreen = pos.x <= -Config.blockSize || pos.x > Config.gameWidthCeil
                    || pos.y <= -Config.blockSize || pos.y > Config.gameHeightCeil;
 
-      if(offscreen || force) {
+      let id;
+      if(!offscreen) id = this.getTile(0, block.x/Config.blockSize, block.y/Config.blockSize);
+
+      if(offscreen || force || ItemManager.blocks[id] && ItemManager.blocks[id].isAnimated) {
         if(offscreen) {
           if(pos.x <= -Config.blockSize) block.x += Config.gameWidthCeil + Config.blockSize;
           if(pos.x > Config.gameWidthCeil) block.x -= Config.gameWidthCeil + Config.blockSize;
           if(pos.y <= -Config.blockSize) block.y += Config.gameHeightCeil + Config.blockSize;
           if(pos.y > Config.gameHeightCeil) block.y -= Config.gameHeightCeil + Config.blockSize;
         }
-        let id = this.getTile(0, block.x/Config.blockSize, block.y/Config.blockSize);
-        // block.texture.frame = ItemManager.blackBasicRect;
-        if(id == 0) block.texture.frame = ItemManager.blackRect;
-        if(id == 1) block.texture.frame = ItemManager.blackBasicRect;
-        if(id == 2) block.texture.frame = ItemManager.greyBasicRect;
+
+        if(offscreen && !id && id !== 0) {
+          id = this.getTile(0, block.x/Config.blockSize, block.y/Config.blockSize);
+        }
+
+        let blockData = ItemManager.blocks[id]
+        if(!blockData) return;
+
+        if(blockData.isAnimated) {
+          block.texture.frame = blockData.animationFrame(this.offset, block.x/Config.blockSize, block.y/Config.blockSize);
+        }
+        else
+          block.texture.frame = blockData.frame;
       }
     }
+  }
+
+  offset = 0;
+  tick() {
+    this.offset += 0.3;
   }
 }
