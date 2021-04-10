@@ -1,4 +1,5 @@
 let debug = [];
+let text;
 
 class Game {
   _state;
@@ -18,21 +19,20 @@ class Game {
 
     //Add the canvas that Pixi automatically created for you to the HTML document
     window.onload = () => {
+      //negative margin hack because pixi's canvas is 5px taller than specified and I can't fix it
       Global.canvas.style.marginBottom = "-5px";
       document.getElementById('ee').appendChild(Global.canvas);
     }
 
-    //load an image and run the `setup` function when it's done
-    loader
-      .add('blocks', './Assets/blocks.png')
-      .add('smileys', './Assets/smileys.png')
-      .load(this.setup);
+    //moved loading images into ItemManager because that just makes sense
+    //provides the below init function as a callback, to initiate the rest of the game
+    ItemManager.loadImages(this.init);
   }
 
-  //This `setup` function will run when the image has loaded
-  setup() {
-    Input.init();
+  //This `init` function will run when the image has loaded
+  init() {
     ItemManager.init();
+    Input.init();
     Global.base.state = new PlayState();
     new UI();
     ticker.add(Global.base.enterFrame);
@@ -40,6 +40,7 @@ class Game {
   }
 
   enterFrame() {
+    text.text = `FPS: ${Math.round(ticker.FPS)}`;
     if(Global.base.state != null && !Global.base.state.stoppedRendering) {
       let ticks = ticker.elapsedMS/Config.physics_ms_per_tick;
       for (let i = 0; i < ticks; i++) {
