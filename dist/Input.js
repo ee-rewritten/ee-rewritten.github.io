@@ -11,15 +11,19 @@ class Input {
   static middleMouseDown = false;
   static middleMouseJustPressed = false;
 
+  static isGameInFocus = false;
+
   static inited = false;
   static init() {
     if(this.inited) throw new Error('Input is already initialised.');
     window.addEventListener('keydown', e => {
-      if(!this.keys[e.keyCode]) {
-        this.justPressedKeys[e.keyCode] = true;
-        this.keys[e.keyCode] = true;
+      if(this.isGameInFocus) {
+        if(!this.keys[e.keyCode]) {
+          this.justPressedKeys[e.keyCode] = true;
+          this.keys[e.keyCode] = true;
+        }
+        e.preventDefault();
       }
-      e.preventDefault();
     });
     window.addEventListener('keyup', e => {
       if(this.keys[e.keyCode]) {
@@ -29,18 +33,26 @@ class Input {
     });
 
     window.addEventListener('mousedown', e => {
-      this.mouseDown = this.mouseJustPressed = true;
-      this.mouseX = e.offsetX;
-      this.mouseY = e.offsetY;
+      this.isGameInFocus = e.target == Global.canvas;
+      if(this.isGameInFocus) {
+        this.mouseDown = this.mouseJustPressed = true;
+        this.mouseX = e.offsetX;
+        this.mouseY = e.offsetY;
+      }
     });
     window.addEventListener('mousemove', e => {
-      this.mouseX = e.offsetX;
-      this.mouseY = e.offsetY;
+      if(e.target == Global.canvas) {
+        this.mouseX = e.offsetX;
+        this.mouseY = e.offsetY;
+      }
     })
     window.addEventListener('mouseup', e => {
       this.mouseDown = false;
-      this.mouseX = e.offsetX;
-      this.mouseY = e.offsetY;
+      this.isGameInFocus = e.target == Global.canvas;
+        if(this.isGameInFocus) {
+        this.mouseX = e.offsetX;
+        this.mouseY = e.offsetY;
+      }
     });
     this.inited = true;
   }
