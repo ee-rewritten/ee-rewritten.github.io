@@ -46,6 +46,12 @@ class PlayState extends State {
       this.camera.y += 15;
     }
 
+    if(Input.isMouseDown) {
+      let pos = this.world.gameContainer.toLocal({x: Input.mouseX, y: Input.mouseY}, Global.stage);
+      this.world.setTile(ItemManager.packs['beta'].blocks[3].id, 0,
+        Math.floor(pos.x/Config.blockSize), Math.floor(pos.y/Config.blockSize));
+    }
+
 
     this.players.children.forEach(p => {
       p.tick();
