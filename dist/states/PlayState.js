@@ -23,6 +23,7 @@ class PlayState extends State {
 
     this.camera.x = this.target.x - Config.gameWidthCeil/2;
     this.camera.y = this.target.y - Config.gameHeightCeil/2;
+    this.enterFrame();
   }
 
   enterFrame() {
