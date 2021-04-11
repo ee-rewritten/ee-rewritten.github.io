@@ -47,7 +47,7 @@ class PlayState extends State {
     }
 
     if(Input.isMouseDown && Input.mouseX <= Config.gameWidth && Input.mouseY <= Config.gameHeight) {
-      let id = Input.isKeyDown(16) ? ItemManager.blockEmpty[0].id : ItemManager.packs['beta'].blocks[3].id;
+      let id = Input.isKeyDown(16) ? ItemManager.blockEmpty[1].id : ItemManager.packs['beta'].blocks[3].id;
       let pos = this.world.gameContainer.toLocal({x: Input.mouseX, y: Input.mouseY}, Global.stage);
       this.world.setTile(id, 0, Math.floor(pos.x/Config.blockSize), Math.floor(pos.y/Config.blockSize));
     }

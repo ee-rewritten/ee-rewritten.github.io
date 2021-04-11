@@ -50,10 +50,7 @@ class ItemBlockPack {
 
   //class ItemBlockMorphs extends ItemBlockPack?
   addMorph() {
-    //checks if there are any blocks
-    if(this.blocks.length) {
-      //code for adding a morph
-    }
+    //code for adding a morph
   }
 
   hasId(id) {

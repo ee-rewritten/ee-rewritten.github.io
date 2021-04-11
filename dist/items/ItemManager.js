@@ -3,6 +3,7 @@ class ItemManager {
 
   static blockEmpty = [];
   static blockVoid;
+  static blockError = [];
 
   static blockTabs = [];
   static blocks = {};
@@ -32,9 +33,11 @@ class ItemManager {
 
     pack = this.createBlockPack('game', 'unobtainable');
     pack.addStaticBlock(ItemLayer.BACKGROUND);
-    pack.addStaticBlocks(2, ItemLayer.BELOW);
+    pack.addStaticBlocks(3, ItemLayer.BELOW);
+    pack.addStaticBlock(ItemLayer.BACKGROUND, pack.blocks[3].frame.x/Config.blockSize);
     this.blockEmpty = [pack.blocks[2], pack.blocks[0]];
     this.blockVoid = pack.blocks[1];
+    this.blockError = [pack.blocks[3], pack.blocks[4]];
 
     pack = this.createBlockPack('basic');
     pack.addStaticBlocks(10, ItemLayer.BELOW);

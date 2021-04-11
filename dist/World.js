@@ -53,13 +53,13 @@ class World {
       for (let x = 0; x < width; x++) {
         map[layer][x] = new Array(height);
         for (let y = 0; y < height; y++) {
-          map[layer][x][y] = ItemManager.blockEmpty[layer].id;
+          map[layer][x][y] = ItemManager.blockEmpty[1].id;
           if(layer == 0 && (x == 0 || y == 0 || x == width-1 || y == height-1))
             map[layer][x][y] = ItemManager.packs['basic'].blocks[1].id;
         }
       }
     }
-    map[0][20][15] = ItemManager.packs['beta'].blocks[2].id;
+    map[1][20][16] = 5;
     this.setMapArray(map);
 
     Global.stage.addChild(this.gameContainer);
@@ -89,8 +89,10 @@ class World {
       for(let x = 0; x < width; x++) {
         this.realmap[layer][x] = new Array(height);
         for(let y = 0; y < height; y++) {
-          this.realmap[layer][x][y] = map[layer][x][y];
-          this.sortIntoRenderLayer(layer, x, y, map[layer][x][y]);
+          let id = map[layer][x][y];
+          id = ItemManager.blocks[id] ? id : ItemManager.blockError[layer].id
+          this.realmap[layer][x][y] = id;
+          this.sortIntoRenderLayer(layer, x, y, id);
         }
       }
     }
@@ -105,6 +107,15 @@ class World {
     ) return ItemManager.blockVoid.id;
     return this.realmap[layer][x][y];
   }
+  getRenderTile(renderLayer, x, y) {
+    if(
+      renderLayer < 0 || renderLayer >= ItemLayer.LAYERS ||
+      x < 0 || x >= this.width ||
+      y < 0 || y >= this.height
+    ) return ItemManager.blockVoid.id;
+    return this.rendermaps[renderLayer][x][y];
+  }
+
 
   setTile(id, layer, x, y) {
     if(!this.realmap[layer] || !this.realmap[layer][x]) return;
@@ -116,6 +127,7 @@ class World {
   sortIntoRenderLayer(layer, x, y, id) {
     let blockRenderLayer = ItemManager.blocks[id].layer;
     ItemLayer.BLAYER_TO_RLAYER[layer].forEach(renderLayer => {
+      if(id == ItemManager.blockEmpty[1].id) id = ItemManager.blockEmpty[layer].id;
       this.rendermaps[renderLayer][x][y] =
         //if this is the correct render layer, set the ID at this pos to the block ID
         blockRenderLayer == renderLayer ? id :
@@ -136,9 +148,9 @@ class World {
                      || pos.y <= -Config.blockSize || pos.y > Config.gameHeightCeil;
 
         let id;
-        if(!offscreen)
-          id = this.getTile(ItemLayer.RLAYER_TO_BLAYER[renderLayer],
-            block.x/Config.blockSize, block.y/Config.blockSize);
+        if(!offscreen) {
+          id = this.getRenderTile(renderLayer, block.x/Config.blockSize, block.y/Config.blockSize);
+        }
 
         if(offscreen || force || ItemManager.blocks[id] && ItemManager.blocks[id].isAnimated) {
           if(offscreen) {
@@ -149,12 +161,14 @@ class World {
           }
 
           if(offscreen && !id && id !== 0) {
-            id = this.getTile(ItemLayer.RLAYER_TO_BLAYER[renderLayer],
-              block.x/Config.blockSize, block.y/Config.blockSize);
+            id = this.getRenderTile(renderLayer, block.x/Config.blockSize, block.y/Config.blockSize);
           }
 
           let blockData = ItemManager.blocks[id];
-          if(!blockData) return;
+          if(!blockData) {
+            block.texture.frame = ItemManager.blockError.frame;
+            return;
+          }
 
           if(blockData.isAnimated) {
             block.texture.frame = blockData.animationFrame(this.offset, block.x/Config.blockSize, block.y/Config.blockSize);
