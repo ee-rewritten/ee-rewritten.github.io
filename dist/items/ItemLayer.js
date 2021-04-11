@@ -1,9 +1,13 @@
 class ItemLayer {
   //unlike EE's 4 layers, I have 3 and a true/false flag for transparency
-  static BELOW = 0;
-  static ABOVE = 1;
-  static BACKGROUND = 2;
+  static BACKGROUND = 0;
+  static BELOW = 1;
+  static ABOVE = 2;
 
-  static LAYERS = 3;
+  static PLAYER_LAYER = 1.5;
+
+  static NUM_LAYERS = 3;
+  static BLAYER_TO_RLAYER = [[this.BELOW, this.ABOVE], [this.BACKGROUND]];
+  static RLAYER_TO_BLAYER = [1, 0, 0];
 }
 Object.freeze(ItemLayer);

@@ -12,54 +12,55 @@ class World {
   //and the array of containers to display them
   rendermapContainers;
 
-  //temp
-  blockContainer;
-
-  constructor(playstate, width, height) {
+  constructor(playstate, width, height, depth) {
     this.width = width;
     this.height = height;
+    this.depth = depth;
 
     this.gameContainer = new Container();
+    this.gameContainer.sortableChildren = true;
 
+    //init render containers
+    const maxBlocks = (Math.ceil(Global.gameWidth/16) + 1) * (Math.ceil(Global.gameHeight/16) + 1);
+    this.rendermapContainers = new Array(ItemLayer.NUM_LAYERS);
 
+    for (let i = 0; i < ItemLayer.NUM_LAYERS; i++) {
+      let blockContainer = new ParticleContainer(maxBlocks, {uvs:true});
+      this.rendermapContainers[i] = blockContainer;
 
-    //init render container/s
-    const maxBlocks = (Math.ceil(Global.gameWidth/16) + 1) * (Math.ceil(Global.gameHeight/16) + 1)
-    this.blockContainer = new ParticleContainer(maxBlocks, {uvs:true});
+      for (let x = 0; x < Config.gameWidth+Config.blockSize; x+=Config.blockSize) {
+        for (let y = 0; y < Config.gameHeight+Config.blockSize; y+=Config.blockSize) {
+          const texture = new Texture(ItemManager.blocksBMD);
 
-    for (let x = 0; x < Config.gameWidth+Config.blockSize; x+=Config.blockSize) {
-      //temp
-      debug[x/Config.blockSize] = [];
-      for (let y = 0; y < Config.gameHeight+Config.blockSize; y+=Config.blockSize) {
-        // const frame = new Rectangle(
-        //   Global.randomInt(0,9)*Config.blockSize,
-        //   Global.randomInt(0,9)*Config.blockSize,
-        //   Config.blockSize, Config.blockSize);
-        const texture = new Texture(ItemManager.blocksBMD);
+          let block = new Sprite(texture);
+          block.position.set(x, y);
 
-        let block = new Sprite(texture);
-        block.position.set(x, y);
-        // temp
-        debug[x/Config.blockSize][y/Config.blockSize] = texture;
-        this.blockContainer.addChild(block);
+          blockContainer.addChild(block);
+        }
       }
+      blockContainer.zIndex = i;
+      this.gameContainer.addChild(blockContainer);
     }
-    this.gameContainer.addChild(this.blockContainer);
+    playstate.players.zIndex = ItemLayer.PLAYER_LAYER;
+    this.gameContainer.addChild(playstate.players);
+
+    this.gameContainer.sortChildren();
 
     //init realmap
-    let map = new Array(1);
-    map[0] = new Array(width);
-    for (let x = 0; x < width; x++) {
-      map[0][x] = new Array(height);
-      for (let y = 0; y < height; y++) {
-        if(x == 0 || y == 0 || x == width-1 || y == height-1) map[0][x][y] = ItemManager.packs['basic'].blocks[1].id;
-        else map[0][x][y] = ItemManager.blockEmpty.id;
+    let map = new Array(depth);
+    for(let layer = 0; layer < depth; layer++) {
+      map[layer] = new Array(width);
+      for (let x = 0; x < width; x++) {
+        map[layer][x] = new Array(height);
+        for (let y = 0; y < height; y++) {
+          map[layer][x][y] = ItemManager.blockEmpty[layer].id;
+          if(layer == 0 && (x == 0 || y == 0 || x == width-1 || y == height-1))
+            map[layer][x][y] = ItemManager.packs['basic'].blocks[1].id;
+        }
       }
     }
+    map[0][20][15] = ItemManager.packs['beta'].blocks[2].id;
     this.setMapArray(map);
-
-
-    this.gameContainer.addChild(playstate.players);
 
     Global.stage.addChild(this.gameContainer);
   }
@@ -73,15 +74,11 @@ class World {
     this.height = height;
 
     //resets and initialises empty rendermaps
-    this.rendermaps = new Array(ItemLayer.LAYERS);
-    this.rendermapContainers = new Array(ItemLayer.LAYERS);
-    for (let itemlayer = 0; itemlayer < ItemLayer.LAYERS; itemlayer++) {
-      this.rendermaps[itemlayer] = new Array(depth);
-      for(let layer = 0; layer < depth; layer++) {
-        this.rendermaps[itemlayer][layer] = new Array(width);
-        for(let x = 0; x < width; x++) {
-          this.rendermaps[itemlayer][layer][x] = new Array(height);
-        }
+    this.rendermaps = new Array(ItemLayer.NUM_LAYERS);
+    for (let itemlayer = 0; itemlayer < ItemLayer.NUM_LAYERS; itemlayer++) {
+      this.rendermaps[itemlayer] = new Array(width);
+      for(let x = 0; x < width; x++) {
+        this.rendermaps[itemlayer][x] = new Array(height);
       }
     }
 
@@ -91,7 +88,7 @@ class World {
       this.realmap[layer] = new Array(width);
       for(let x = 0; x < width; x++) {
         this.realmap[layer][x] = new Array(height);
-        for(let y = 0; y < width; y++) {
+        for(let y = 0; y < height; y++) {
           this.realmap[layer][x][y] = map[layer][x][y];
           this.sortIntoRenderLayer(layer, x, y, map[layer][x][y]);
         }
@@ -117,41 +114,54 @@ class World {
   }
 
   sortIntoRenderLayer(layer, x, y, id) {
-    //temp put everything into one rendermap
-    this.rendermaps[ItemLayer.BELOW][layer][x][y] = id;
+    let blockRenderLayer = ItemManager.blocks[id].layer;
+    ItemLayer.BLAYER_TO_RLAYER[layer].forEach(renderLayer => {
+      this.rendermaps[renderLayer][x][y] =
+        //if this is the correct render layer, set the ID at this pos to the block ID
+        blockRenderLayer == renderLayer ? id :
+        //otherwise, reset to the empty block for that layer
+        ItemManager.blockEmpty[layer].id;
+    });
   }
 
   redraw(force) {
-    for (let i = 0; i < this.blockContainer.children.length; i++) {
-      let block = this.blockContainer.children[i];
-      let pos = block.getGlobalPosition();
+    for (let renderLayer = 0; renderLayer < this.rendermapContainers.length; renderLayer++) {
+      let blockContainer = this.rendermapContainers[renderLayer];
 
-      let offscreen = pos.x <= -Config.blockSize || pos.x > Config.gameWidthCeil
-                   || pos.y <= -Config.blockSize || pos.y > Config.gameHeightCeil;
+      for (let i = 0; i < blockContainer.children.length; i++) {
+        let block = blockContainer.children[i];
+        let pos = block.getGlobalPosition();
 
-      let id;
-      if(!offscreen) id = this.getTile(0, block.x/Config.blockSize, block.y/Config.blockSize);
+        let offscreen = pos.x <= -Config.blockSize || pos.x > Config.gameWidthCeil
+                     || pos.y <= -Config.blockSize || pos.y > Config.gameHeightCeil;
 
-      if(offscreen || force || ItemManager.blocks[id] && ItemManager.blocks[id].isAnimated) {
-        if(offscreen) {
-          if(pos.x <= -Config.blockSize) block.x += Config.gameWidthCeil + Config.blockSize;
-          if(pos.x > Config.gameWidthCeil) block.x -= Config.gameWidthCeil + Config.blockSize;
-          if(pos.y <= -Config.blockSize) block.y += Config.gameHeightCeil + Config.blockSize;
-          if(pos.y > Config.gameHeightCeil) block.y -= Config.gameHeightCeil + Config.blockSize;
+        let id;
+        if(!offscreen)
+          id = this.getTile(ItemLayer.RLAYER_TO_BLAYER[renderLayer],
+            block.x/Config.blockSize, block.y/Config.blockSize);
+
+        if(offscreen || force || ItemManager.blocks[id] && ItemManager.blocks[id].isAnimated) {
+          if(offscreen) {
+            if(pos.x <= -Config.blockSize) block.x += Config.gameWidthCeil + Config.blockSize;
+            if(pos.x > Config.gameWidthCeil) block.x -= Config.gameWidthCeil + Config.blockSize;
+            if(pos.y <= -Config.blockSize) block.y += Config.gameHeightCeil + Config.blockSize;
+            if(pos.y > Config.gameHeightCeil) block.y -= Config.gameHeightCeil + Config.blockSize;
+          }
+
+          if(offscreen && !id && id !== 0) {
+            id = this.getTile(ItemLayer.RLAYER_TO_BLAYER[renderLayer],
+              block.x/Config.blockSize, block.y/Config.blockSize);
+          }
+
+          let blockData = ItemManager.blocks[id];
+          if(!blockData) return;
+
+          if(blockData.isAnimated) {
+            block.texture.frame = blockData.animationFrame(this.offset, block.x/Config.blockSize, block.y/Config.blockSize);
+          }
+          else
+            block.texture.frame = blockData.frame;
         }
-
-        if(offscreen && !id && id !== 0) {
-          id = this.getTile(0, block.x/Config.blockSize, block.y/Config.blockSize);
-        }
-
-        let blockData = ItemManager.blocks[id]
-        if(!blockData) return;
-
-        if(blockData.isAnimated) {
-          block.texture.frame = blockData.animationFrame(this.offset, block.x/Config.blockSize, block.y/Config.blockSize);
-        }
-        else
-          block.texture.frame = blockData.frame;
       }
     }
   }

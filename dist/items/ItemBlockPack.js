@@ -14,7 +14,7 @@ class ItemBlockPack {
     this.yOffset = yOffset;
   }
 
-  addStaticBlock(artOffset) {
+  addStaticBlock(layer, artOffset) {
     //limit of 2^6 blocks per pack because ID system
     if(this.blocks.length == 64)
       throw new Error(`Maximum blocks reached in pack ${this.name}`);
@@ -24,7 +24,7 @@ class ItemBlockPack {
     //adding a regular block to the pack
     let id = ItemManager.calculateId(this.tab, this.packId, this.blocks.length);
 
-    let block = new ItemBlock(id, artOffset, this.yOffset);
+    let block = new ItemBlock(id, layer, artOffset, this.yOffset);
 
     ItemManager.blocks[id] = block;
     this.blocks.push(block);
@@ -32,15 +32,15 @@ class ItemBlockPack {
     this.usedFrames++;
   }
 
-  addStaticBlocks(amount) {
-    for(let i = 0; i < amount; i++) this.addStaticBlock();
+  addStaticBlocks(amount, layer) {
+    for(let i = 0; i < amount; i++) this.addStaticBlock(layer);
   }
 
-  addAnimatedBlock(frames, speed, artOffset) {
+  addAnimatedBlock(frames, layer, speed = 1, artOffset = null) {
     if(!artOffset) artOffset = this.usedFrames;
     let id = ItemManager.calculateId(this.tab, this.packId, this.blocks.length);
 
-    let block = new ItemBlock(id, artOffset, this.yOffset, frames, speed);
+    let block = new ItemBlock(id, layer, artOffset, this.yOffset, frames, speed);
 
     ItemManager.blocks[id] = block;
     this.blocks.push(block);

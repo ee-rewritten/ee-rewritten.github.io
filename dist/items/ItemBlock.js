@@ -1,10 +1,12 @@
 class ItemBlock {
   id;
+  layer;
   _frames = [];
   speed = 1;
   isAnimated = false;
-  constructor(id, artOffset, yOffset, frames = 1, speed = 1) {
+  constructor(id, layer, artOffset, yOffset, frames = 1, speed = 1) {
     this.id = id;
+    this.layer = layer;
     this.speed = speed;
 
     if(frames > 1) {

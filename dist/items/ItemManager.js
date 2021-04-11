@@ -1,7 +1,7 @@
 class ItemManager {
   static blocksBMD;
 
-  static blockEmpty;
+  static blockEmpty = [];
   static blockVoid;
 
   static blockTabs = [];
@@ -31,17 +31,17 @@ class ItemManager {
     this._addingToTab = ItemTab.BLOCKS;
 
     pack = this.createBlockPack('game', 'unobtainable');
-    pack.addStaticBlocks(3);
-    this.blockEmpty = pack.blocks[0];
+    pack.addStaticBlock(ItemLayer.BACKGROUND);
+    pack.addStaticBlocks(2, ItemLayer.BELOW);
+    this.blockEmpty = [pack.blocks[2], pack.blocks[0]];
     this.blockVoid = pack.blocks[1];
-    this.blockInvisible = pack.blocks[2];
 
     pack = this.createBlockPack('basic');
-    pack.addStaticBlocks(10);
+    pack.addStaticBlocks(10, ItemLayer.BELOW);
 
     pack = this.createBlockPack('beta');
-    pack.addStaticBlocks(3);
-    pack.addAnimatedBlock(7, 0.5);
+    pack.addStaticBlocks(3, ItemLayer.ABOVE);
+    pack.addAnimatedBlock(7, ItemLayer.BELOW, 0.5);
   }
 
   static lastYOffset = 0;

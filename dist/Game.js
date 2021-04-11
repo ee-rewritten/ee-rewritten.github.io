@@ -1,5 +1,3 @@
-let debug = [];
-
 class Game {
   UI;
   _state;

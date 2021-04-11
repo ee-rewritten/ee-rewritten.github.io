@@ -14,7 +14,7 @@ class PlayState extends State {
     let playerOffset = Math.round(-(Config.smileySize-Config.blockSize)/2);
     this.players.x = this.players.y = playerOffset;
 
-    this.world = new World(this, 40, 30);
+    this.world = new World(this, 40, 30, 2);
 
     this.player = new Player(true, 20*Config.blockSize, 15*Config.blockSize);
     this.player.smiley = 0;
@@ -46,10 +46,10 @@ class PlayState extends State {
       this.camera.y += 15;
     }
 
-    if(Input.isMouseDown) {
+    if(Input.isMouseDown && Input.mouseX <= Config.gameWidth && Input.mouseY <= Config.gameHeight) {
+      let id = Input.isKeyDown(16) ? ItemManager.blockEmpty[0].id : ItemManager.packs['beta'].blocks[3].id;
       let pos = this.world.gameContainer.toLocal({x: Input.mouseX, y: Input.mouseY}, Global.stage);
-      this.world.setTile(ItemManager.packs['beta'].blocks[3].id, 0,
-        Math.floor(pos.x/Config.blockSize), Math.floor(pos.y/Config.blockSize));
+      this.world.setTile(id, 0, Math.floor(pos.x/Config.blockSize), Math.floor(pos.y/Config.blockSize));
     }
 
 
