@@ -5,9 +5,12 @@ class UI extends PIXI.Container {
   constructor() {
     super();
     this.drawUIRect(1, -1, Config.fullWidth-Config.gameWidth, Config.fullHeight+2, Config.gameWidth, 0, 0x000000);
-    this.drawUIRect(1, 1, Config.gameWidth, Config.fullHeight-Config.gameHeight-2, 0, Config.gameHeight, 0x323231);
+    this.drawUIRect(1, 0, Config.gameWidth, Config.fullHeight-Config.gameHeight-1, 0, Config.gameHeight, 0x323231);
 
-    this.debugText = new PIXI.Text('FPS: xx',{fill: 'white', fontSize: 12});
+    // this.debugText = new Text('FPS: xx',{fill: 'white', fontSize: 12});
+    // this.debugText = new BMText('FPS: xx',{fontName: 'Nokia', fontSize:13});
+    this.debugText = new ShadowText('FPS: xx',{fontName: 'Nokia', fontSize:13});
+    this.debugText.x = 5;
     this.addChild(this.debugText);
   }
 

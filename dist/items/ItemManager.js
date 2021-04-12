@@ -17,12 +17,15 @@ class ItemManager {
     return loader.resources[id].texture.baseTexture;
   }
 
-  static loadImages(callback) {
-    //load images and run the callback when it's done
+  static loadAssets(callback) {
+    //load assets and run the callback when it's done
     loader
       .add('blocks', './Assets/blocks.png')
       .add('smileys', './Assets/smileys.png')
       .add('godmode', './Assets/godmode.png')
+
+      .add('Nokia', './Assets/Nokia.fnt')
+      .add('Visitor', './Assets/Visitor.fnt')
       .load(callback);
   }
 

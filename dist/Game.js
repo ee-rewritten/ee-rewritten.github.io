@@ -27,9 +27,9 @@ class Game {
       document.getElementById('ee').appendChild(Global.canvas);
     }
 
-    //moved loading images into ItemManager because that just makes sense
+    //moved loading assets into ItemManager because that just makes sense
     //provides the below init function as a callback, to initiate the rest of the game
-    ItemManager.loadImages(this.init);
+    ItemManager.loadAssets(this.init);
   }
 
   //This `init` function will run when the image has loaded

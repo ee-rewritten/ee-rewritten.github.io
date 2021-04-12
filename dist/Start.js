@@ -6,6 +6,11 @@ const ParticleContainer = PIXI.ParticleContainer;
 const Container = PIXI.Container;
 const Texture = PIXI.Texture;
 const Graphics = PIXI.Graphics;
+const Text = PIXI.Text;
+const BMText = PIXI.BitmapText;
+const BlurFilter = PIXI.filters.BlurFilter;
+// PIXI.settings.ROUND_PIXELS = true;
+PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
 
 // http://thenewcode.com/895/JavaScript-Rounding-Recipes
 // http://www.timdown.co.uk/
