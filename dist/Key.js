@@ -8,6 +8,8 @@ class Key {
   static down =              Input.add(2, "Move Down (alt)", new Key(83));                    // S
   static right =             Input.add(3, "Move Right (alt)", new Key(68));                   // D
 
+  static godmode =           Input.add(4, "Toggle God Mode", new Key(71));                    // G
+
 	static lockCamera =        Input.add(19, "Lock Camera", new Key(76, true), null, true);     // Shift + L
   static lookUp =            Input.add(22, "Look Up", new Key(89, true), null, true);         // Shift + Y
   static lookLeft =          Input.add(23, "Look Left", new Key(71, true), null, true);       // Shift + G

@@ -53,6 +53,10 @@ class PlayState extends State {
       this.target = this.target ? null : this.player;
     }
 
+    if(Input.isKeyJustPressed(Key.godmode)) {
+      this.player.toggleGodMode();
+    }
+
     if(Input.isMouseDown && Input.mouseX <= Config.gameWidth && Input.mouseY <= Config.gameHeight) {
       let id = Input.isKeyDown(16) ? ItemManager.blockEmpty[0].id : ItemManager.packs['beta'].blocks[3].id;
       let pos = this.world.toLocal({x: Input.mouseX, y: Input.mouseY}, Global.stage);
