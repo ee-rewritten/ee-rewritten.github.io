@@ -1,5 +1,7 @@
 class ItemManager {
   static blocksBMD;
+  static smileysBMD;
+  static godmodeBMD;
 
   static blockEmpty = [];
   static blockVoid;
@@ -20,31 +22,36 @@ class ItemManager {
     loader
       .add('blocks', './Assets/blocks.png')
       .add('smileys', './Assets/smileys.png')
+      .add('godmode', './Assets/godmode.png')
       .load(callback);
   }
 
   static init() {
     this.blocksBMD = this.baseTexture('blocks');
     this.smileysBMD = this.baseTexture('smileys');
+    this.godmodeBMD = this.baseTexture('godmode');
 
     let pack;
 
     this._addingToTab = ItemTab.BLOCKS;
 
     pack = this.createBlockPack('game', 'unobtainable');
+    pack.addStaticBlock(ItemLayer.BELOW);
     pack.addStaticBlock(ItemLayer.BACKGROUND);
-    pack.addStaticBlocks(3, ItemLayer.BELOW);
-    pack.addStaticBlock(ItemLayer.BACKGROUND, pack.blocks[3].frame.x/Config.blockSize);
-    this.blockEmpty = [pack.blocks[2], pack.blocks[0]];
-    this.blockVoid = pack.blocks[1];
+    pack.addStaticBlocks(2, ItemLayer.BELOW);
+    pack.addStaticBlock(ItemLayer.BACKGROUND);
+    this.blockEmpty = [pack.blocks[0], pack.blocks[1]];
+    this.blockVoid = [pack.blocks[0], pack.blocks[2], pack.blocks[0]];
     this.blockError = [pack.blocks[3], pack.blocks[4]];
 
-    pack = this.createBlockPack('basic');
-    pack.addStaticBlocks(10, ItemLayer.BELOW);
+    this.createBlockPack('basic').addStaticBlocks(10, ItemLayer.BELOW);
 
     pack = this.createBlockPack('beta');
     pack.addStaticBlocks(3, ItemLayer.ABOVE);
     pack.addAnimatedBlock(7, ItemLayer.BELOW, 0.5);
+
+    this.lastYOffset = 15;
+    this.createBlockPack('sci-fi').addStaticBlocks(15, ItemLayer.BELOW);
   }
 
   static lastYOffset = 0;

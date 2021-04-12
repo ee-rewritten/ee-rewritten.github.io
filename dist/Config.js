@@ -1,6 +1,7 @@
 class Config {
   static blockSize = 16;
   static smileySize = 26;
+  static godmodeSize = 64;
 
   static fullWidth = 850;
   static fullHeight = 500;
@@ -15,6 +16,28 @@ class Config {
 
   static camera_lag = 1/16;
 
-  static physics_ms_per_tick = 10;
+  static physics = {
+    ms_per_tick: 10,
+    variable_multiplyer: 7.752,
+
+    base_drag: Math.pow(.9981, 10) * 1.00016093,
+    ice_no_mod_drag: Math.pow(.9993, 10) * 1.00016093,
+    ice_drag: Math.pow(.9998, 10) * 1.00016093,
+    //Multiplyer when not applying force by userkeys
+    no_modifier_drag: Math.pow(.9900, 10) * 1.00016093,
+    water_drag: Math.pow(.9950, 10) * 1.00016093,
+    mud_drag: Math.pow(.9750, 10) * 1.00016093,
+    lava_drag: Math.pow(.9800, 10) * 1.00016093,
+    toxic_drag: Math.pow(.9900, 10) * 1.00016093,
+    jump_height: 26,
+
+    gravity: 2,
+    boost: 16,
+    water_buoyancy: -.5,
+    mud_buoyancy: .4,
+    lava_buoyancy: .2,
+    toxic_buoyancy: -.4,
+  }
 }
+Object.freeze(Config.physics);
 Object.freeze(Config);

@@ -1,6 +1,4 @@
-class World {
-  gameContainer;
-
+class World extends PIXI.Container {
   depth;
   width;
   height;
@@ -13,12 +11,12 @@ class World {
   rendermapContainers;
 
   constructor(playstate, width, height, depth) {
+    super();
     this.width = width;
     this.height = height;
     this.depth = depth;
 
-    this.gameContainer = new Container();
-    this.gameContainer.sortableChildren = true;
+    this.sortableChildren = true;
 
     //init render containers
     const maxBlocks = (Math.ceil(Global.gameWidth/16) + 1) * (Math.ceil(Global.gameHeight/16) + 1);
@@ -39,12 +37,12 @@ class World {
         }
       }
       blockContainer.zIndex = i;
-      this.gameContainer.addChild(blockContainer);
+      this.addChild(blockContainer);
     }
     playstate.players.zIndex = ItemLayer.PLAYER_LAYER;
-    this.gameContainer.addChild(playstate.players);
+    this.addChild(playstate.players);
 
-    this.gameContainer.sortChildren();
+    this.sortChildren();
 
     //init realmap
     let map = new Array(depth);
@@ -53,16 +51,15 @@ class World {
       for (let x = 0; x < width; x++) {
         map[layer][x] = new Array(height);
         for (let y = 0; y < height; y++) {
-          map[layer][x][y] = ItemManager.blockEmpty[1].id;
+          map[layer][x][y] = ItemManager.blockEmpty[0].id;
           if(layer == 0 && (x == 0 || y == 0 || x == width-1 || y == height-1))
             map[layer][x][y] = ItemManager.packs['basic'].blocks[1].id;
         }
       }
     }
-    map[1][20][16] = 5;
     this.setMapArray(map);
 
-    Global.stage.addChild(this.gameContainer);
+    playstate.addChild(this);
   }
 
   setMapArray(map) {
@@ -104,7 +101,7 @@ class World {
       layer < 0 || layer >= this.depth ||
       x < 0 || x >= this.width ||
       y < 0 || y >= this.height
-    ) return ItemManager.blockVoid.id;
+    ) return ItemManager.blockVoid[ItemLayer.BELOW].id;
     return this.realmap[layer][x][y];
   }
   getRenderTile(renderLayer, x, y) {
@@ -112,12 +109,13 @@ class World {
       renderLayer < 0 || renderLayer >= ItemLayer.LAYERS ||
       x < 0 || x >= this.width ||
       y < 0 || y >= this.height
-    ) return ItemManager.blockVoid.id;
+    ) return ItemManager.blockVoid[renderLayer].id;
     return this.rendermaps[renderLayer][x][y];
   }
 
-
-  setTile(id, layer, x, y) {
+  setTile(id, x, y) {
+    if(!ItemManager.blocks[id]) id = ItemManager.blockError[0].id;
+    let layer = ItemLayer.RLAYER_TO_BLAYER[ItemManager.blocks[id].layer];
     if(!this.realmap[layer] || !this.realmap[layer][x]) return;
     this.realmap[layer][x][y] = id;
     this.sortIntoRenderLayer(layer, x, y, id);
@@ -127,7 +125,7 @@ class World {
   sortIntoRenderLayer(layer, x, y, id) {
     let blockRenderLayer = ItemManager.blocks[id].layer;
     ItemLayer.BLAYER_TO_RLAYER[layer].forEach(renderLayer => {
-      if(id == ItemManager.blockEmpty[1].id) id = ItemManager.blockEmpty[layer].id;
+      if(id == ItemManager.blockEmpty[0].id) id = ItemManager.blockEmpty[layer].id;
       this.rendermaps[renderLayer][x][y] =
         //if this is the correct render layer, set the ID at this pos to the block ID
         blockRenderLayer == renderLayer ? id :
@@ -178,6 +176,11 @@ class World {
         }
       }
     }
+  }
+
+  overlaps(player) {
+    if(player.x < 0 || player.y < 0 ||
+      player.x > (this.width-1) * Config.blockSize || player.y > (this.height-1) * Config.blockSize) return true;
   }
 
   offset = 0;
