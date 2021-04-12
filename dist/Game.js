@@ -2,8 +2,13 @@ class Game {
   UI;
   _state;
   set state(newState) {
-    if(this._state) this._state.stop();
+    if(this._state) {
+      this._state.stop();
+      Global.stage.removeChild(this._state);
+    }
     this._state = newState;
+    this._state.zIndex = 0;
+    Global.stage.addChild(this.state);
   }
   get state() {
     return this._state;
@@ -31,21 +36,30 @@ class Game {
   init() {
     ItemManager.init();
     Input.init();
-    Global.base.state = new PlayState();
+
+    Global.stage.sortableChildren = true;
+
+    Global.base.state = new PlayState(100, 100, 2);
+
     Global.base.UI = new UI();
+    Global.base.UI.zIndex = 1;
+    Global.stage.addChild(Global.base.UI);
+
+    Global.stage.sortChildren();
+
     ticker.add(Global.base.enterFrame);
     ticker.start();
   }
 
   enterFrame() {
     if(Global.base.state != null && !Global.base.state.stoppedRendering) {
-      let ticks = ticker.elapsedMS/Config.physics_ms_per_tick;
+      let ticks = ticker.elapsedMS/Config.physics.ms_per_tick;
       for (let i = 0; i < ticks; i++) {
         Global.base.state.tick();
+        Input.resetJustPressed();
       }
       Global.base.state.enterFrame();
       Global.base.UI.enterFrame();
     }
-    Input.resetJustPressed();
   }
 }
