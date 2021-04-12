@@ -3,6 +3,8 @@ class Config {
   static smileySize = 26;
   static godmodeSize = 64;
 
+  static smileyRows = 2;
+
   static fullWidth = 850;
   static fullHeight = 500;
 
