@@ -1,9 +1,12 @@
 class Player extends PIXI.Container {
-  isme;
-  playstate;
-  x; y;
   smileySprite;
   godmodeSprite;
+
+  isme = false;
+  playstate;
+  x = 0; y = 0;
+
+  isInGodMode = false;
 
   speedX = 0; speedY = 0;
   horizontal = 0; vertical = 0; isSpaceDown = false; isSpaceJustPressed = false;
@@ -221,6 +224,52 @@ class Player extends PIXI.Container {
 
       stepX();
       stepY();
+    }
+
+
+    let imx = this.speedX<<8;
+    let imy = this.speedY<<8;
+
+    let moving = false;
+
+    if(imx != 0) {
+      moving = true;
+    }
+    else if(Math.abs(this.modifierX) < 0.1) {
+      let tx = this.x % Config.blockSize;
+      if(tx < Config.autoalign_range) {
+        if(tx < Config.autoalign_snap_range) {
+          this.x >>= 0;
+        }
+        else this.x -= tx/(Config.blockSize-1);
+      }
+      else if(tx > Config.blockSize - Config.autoalign_range) {
+        if(tx > Config.blockSize - Config.autoalign_snap_range) {
+          this.x >>= 0;
+          this.x++;
+        }
+        else this.x += (tx-(Config.blockSize - Config.autoalign_range))/(Config.blockSize-1);
+      }
+    }
+
+    if(imy != 0) {
+      moving = true;
+    }
+    else if(Math.abs(this.modifierY) < 0.1) {
+      let ty = this.y % Config.blockSize;
+      if(ty < Config.autoalign_range) {
+        if(ty < Config.autoalign_snap_range) {
+          this.y >>= 0;
+        }
+        else this.y -= ty/(Config.blockSize-1);
+      }
+      else if(ty > Config.blockSize - Config.autoalign_range) {
+        if(ty > Config.blockSize - Config.autoalign_snap_range) {
+          this.y >>= 0;
+          this.y++;
+        }
+        else this.y += (ty-(Config.blockSize - Config.autoalign_range))/(Config.blockSize-1);
+      }
     }
   }
 

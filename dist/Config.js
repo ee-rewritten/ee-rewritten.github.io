@@ -31,6 +31,9 @@ class Config {
     toxic_drag: Math.pow(.9900, 10) * 1.00016093,
     jump_height: 26,
 
+    autoalign_range: 2,
+    autoalign_snap_range: 0.2,
+
     gravity: 2,
     boost: 16,
     water_buoyancy: -.5,
