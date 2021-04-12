@@ -178,9 +178,41 @@ class World extends PIXI.Container {
     }
   }
 
+  // only checks collisions in foreground (0) layer
   overlaps(player) {
     if(player.x < 0 || player.y < 0 ||
       player.x > (this.width-1) * Config.blockSize || player.y > (this.height-1) * Config.blockSize) return true;
+
+    if(player.isInGodMode) return false;
+
+    //top left of player, in block coords
+    let startX = Math.floor(player.x/Config.blockSize);
+    let startY = Math.floor(player.y/Config.blockSize);
+    //bottom right of player, in block coords
+    let endX = player.x/Config.blockSize + 1;
+    let endY = player.y/Config.blockSize + 1;
+
+    for(let blockX = startX; blockX < endX; blockX++) {
+      let map = this.realmap[0][blockX];
+      if(!map) continue;
+      for(let blockY = startY; blockY < endY; blockY++) {
+        let id = map[blockY];
+
+        if(id == 0) continue;
+        if(!this.intersects(player.x, player.y, blockX, blockY)) continue;
+
+        return true;
+      }
+    }
+
+    return false;
+  }
+  intersects(x1, y1, x2, y2) {
+    return x1 > x2 + Config.blockSize
+        || x2 > x1 + Config.blockSize
+        || y1 > y2 + Config.blockSize
+        || y2 > y1 + Config.blockSize;
+
   }
 
   offset = 0;
