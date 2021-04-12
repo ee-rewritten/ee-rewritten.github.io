@@ -14,6 +14,8 @@ class Player extends PIXI.Container {
   horizontal = 0; vertical = 0; isSpaceDown = false; isSpaceJustPressed = false;
   lastJump = -Date.now(); jumpCount = 0; maxJumps = 1;
 
+  ticks = 0;
+
   static smileyOffset = Math.round(-(Config.smileySize-Config.blockSize)/2);
   static godmodeOffset = Math.round(-(Config.godmodeSize-Config.smileySize)/2) + this.smileyOffset;
 
@@ -363,6 +365,8 @@ class Player extends PIXI.Container {
         else this.y += (ty-(Config.blockSize - Config.physics.autoalign_range))/(Config.blockSize-1);
       }
     }
+
+    this.ticks++;
   }
 
   get speedMult() {
