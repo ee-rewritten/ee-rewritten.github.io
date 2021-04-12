@@ -1,15 +1,18 @@
 class Player extends PIXI.Container {
   smileySprite;
+  _smileyRow = 0;
+  _smiley = 0;
   godmodeSprite;
 
   isme = false;
   playstate;
   x = 0; y = 0;
 
-  isInGodMode = false;
+  _isInGodMode = false;
 
   speedX = 0; speedY = 0;
   horizontal = 0; vertical = 0; isSpaceDown = false; isSpaceJustPressed = false;
+  lastJump = -Date.now(); jumpCount = 0; maxJumps = 1;
 
   static smileyOffset = Math.round(-(Config.smileySize-Config.blockSize)/2);
   static godmodeOffset = Math.round(-(Config.godmodeSize-Config.smileySize)/2) + this.smileyOffset;
@@ -33,15 +36,50 @@ class Player extends PIXI.Container {
     this.godmodeSprite.zIndex = 0;
     this.addChild(this.godmodeSprite);
 
+    this.toggleGodMode(false);
+
     this.sortChildren();
   }
 
   set smiley(id) {
-    this.smileySprite.texture.frame = new Rectangle(id*Config.smileySize, 0,
+    this._smiley = id;
+    let x = id*Config.smileySize;
+    let y = this.smileyRow*Config.smileySize;
+
+    // phones can only load images with sizes less than 4096px
+    // thus the smiley image is 4082px
+    let imgWidth = this.smileySprite.texture.baseTexture.width;
+    if(x >= imgWidth) {
+      let wraps = Math.floor(x/imgWidth);
+      for(let i = 0; i < wraps; i++) {
+        x -= imgWidth;
+        y += Config.smileyRows*Config.smileySize;
+      }
+    }
+
+    this.smileySprite.texture.frame = new Rectangle(x, y,
       Config.smileySize, Config.smileySize);
   }
   get smiley() {
-    return this.smileySprite.texture.frame.x/Config.smileySize;
+    return this._smiley;
+  }
+  set smileyRow(row) {
+    if(row >= 0 && row < Config.smileyRows) {
+      this._smileyRow = row;
+      this.smiley = this.smiley;
+    }
+  }
+  get smileyRow() {
+    return this._smileyRow;
+  }
+
+  toggleGodMode(bool = null) {
+    if(bool == null ) bool = !this.isInGodMode;
+    this._isInGodMode = bool;
+    this.godmodeSprite.visible = bool;
+  }
+  get isInGodMode() {
+    return this._isInGodMode;
   }
 
   enterFrame() {
@@ -52,13 +90,13 @@ class Player extends PIXI.Container {
   tick() {
     if(this.isme) {
       this.horizontal =
-        (Input.isKeyDown(39) || Input.isKeyDown(Key.right))
-       -(Input.isKeyDown(37) || Input.isKeyDown(Key.left));
+        (Input.isKeyDown(39) || Input.isKeyDown(Key.right, true))
+       -(Input.isKeyDown(37) || Input.isKeyDown(Key.left, true));
       this.vertical =
-       (Input.isKeyDown(40) || Input.isKeyDown(Key.down))
-      -(Input.isKeyDown(38) || Input.isKeyDown(Key.up));
-      this.isSpaceDown = Input.isKeyDown(Key.jump);
-      this.isSpaceJustPressed = Input.isKeyJustPressed(Key.jump);
+       (Input.isKeyDown(40) || Input.isKeyDown(Key.down, true))
+      -(Input.isKeyDown(38) || Input.isKeyDown(Key.up, true));
+      this.isSpaceDown = Input.isKeyDown(Key.jump, true);
+      this.isSpaceJustPressed = Input.isKeyJustPressed(Key.jump, true);
     }
 
     let blockX = Math.round(this.x/Config.blockSize);
@@ -68,7 +106,7 @@ class Player extends PIXI.Container {
     let modX = 0, modY = 0;
     let modifierX = 0, modifierY = 0;
 
-    let isFlying = true;
+    let isFlying = this.isInGodMode;
     if(!isFlying) {
       origModX = 0;
       origModY = Config.physics.gravity;
@@ -91,8 +129,10 @@ class Player extends PIXI.Container {
       movementX = this.horizontal;
       movementY = this.vertical;
     }
-    movementX *= this.speed;
-    movementY *= this.speed;
+    movementX *= this.speedMult;
+    movementY *= this.speedMult;
+    modX *= this.gravityMult;
+    modY *= this.gravityMult;
 
     modifierX = (modX + movementX) / Config.physics.variable_multiplyer;
     modifierY = (modY + movementY) / Config.physics.variable_multiplyer;
@@ -227,56 +267,111 @@ class Player extends PIXI.Container {
     }
 
 
-    let imx = this.speedX<<8;
-    let imy = this.speedY<<8;
+
+    // jumping
+    let mod = 1
+    let inJump = false;
+    if (this.isSpaceJustPressed){
+      this.lastJump = -Date.now();
+      inJump = true;
+      mod = -1
+    }
+
+    if(this.isSpaceDown){
+        if(this.lastJump < 0){
+          if(Date.now() + this.lastJump > 750){
+            inJump = true;
+          }
+        }else{
+          if(Date.now() - this.lastJump > 150){
+            inJump = true;
+          }
+        }
+    }
+
+    if((this.speedX == 0 && origModX && modX || this.speedY == 0 && origModY && modY) && grounded) {
+      // On ground so reset jumps to 0
+      this.jumpCount = 0;
+    }
+
+    if(this.jumpCount == 0 && !grounded) this.jumpCount = 1; // Not on ground so first 'jump' removed
+
+    if(inJump) {
+      if(this.jumpCount < this.maxJumps && origModX && modX) { // Jump in x direction
+        if (this.maxJumps < 1000) { // Not infinite jumps
+          this.jumpCount += 1;
+        }
+        this.speedX = (-origModX * Config.physics.jump_height * this.jumpMult) / Config.physics.variable_multiplyer;
+        this.lastJump = Date.now() * mod;
+      }
+      if(this.jumpCount < this.maxJumps && origModY && modY) { // Jump in y direction
+        if (this.maxJumps < 1000) { // Not infinite jumps
+          this.jumpCount += 1;
+        }
+        this.speedY = (-origModY * Config.physics.jump_height * this.jumpMult) / Config.physics.variable_multiplyer;
+        this.lastJump = Date.now() * mod;
+      }
+    }
+
+    // touchBlock(cx, cy, isgodmod);
+    // sendMovement(cx, cy);
+
+
+
+    // autoalign
+    let imx = (this.speedX*256)>>0;
+    let imy = (this.speedY*256)>>0;
 
     let moving = false;
 
     if(imx != 0) {
       moving = true;
     }
-    else if(Math.abs(this.modifierX) < 0.1) {
+    else if(Math.abs(modifierX) < 0.1) {
       let tx = this.x % Config.blockSize;
-      if(tx < Config.autoalign_range) {
-        if(tx < Config.autoalign_snap_range) {
+      if(tx < Config.physics.autoalign_range) {
+        if(tx < Config.physics.autoalign_snap_range) {
           this.x >>= 0;
         }
         else this.x -= tx/(Config.blockSize-1);
       }
-      else if(tx > Config.blockSize - Config.autoalign_range) {
-        if(tx > Config.blockSize - Config.autoalign_snap_range) {
+      else if(tx > Config.blockSize - Config.physics.autoalign_range) {
+        if(tx > Config.blockSize - Config.physics.autoalign_snap_range) {
           this.x >>= 0;
           this.x++;
         }
-        else this.x += (tx-(Config.blockSize - Config.autoalign_range))/(Config.blockSize-1);
+        else this.x += (tx-(Config.blockSize - Config.physics.autoalign_range))/(Config.blockSize-1);
       }
     }
 
     if(imy != 0) {
       moving = true;
     }
-    else if(Math.abs(this.modifierY) < 0.1) {
+    else if(Math.abs(modifierY) < 0.1) {
       let ty = this.y % Config.blockSize;
-      if(ty < Config.autoalign_range) {
-        if(ty < Config.autoalign_snap_range) {
+      if(ty < Config.physics.autoalign_range) {
+        if(ty < Config.physics.autoalign_snap_range) {
           this.y >>= 0;
         }
         else this.y -= ty/(Config.blockSize-1);
       }
-      else if(ty > Config.blockSize - Config.autoalign_range) {
-        if(ty > Config.blockSize - Config.autoalign_snap_range) {
+      else if(ty > Config.blockSize - Config.physics.autoalign_range) {
+        if(ty > Config.blockSize - Config.physics.autoalign_snap_range) {
           this.y >>= 0;
           this.y++;
         }
-        else this.y += (ty-(Config.blockSize - Config.autoalign_range))/(Config.blockSize-1);
+        else this.y += (ty-(Config.blockSize - Config.physics.autoalign_range))/(Config.blockSize-1);
       }
     }
   }
 
-  get speed() {
+  get speedMult() {
     return 1;
   }
-  get gravity() {
+  get gravityMult() {
+    return 1;
+  }
+  get jumpMult() {
     return 1;
   }
 }
