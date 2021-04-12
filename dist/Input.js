@@ -64,14 +64,32 @@ class Input {
     this.middleMouseJustPressed = false;
   }
 
-  static isKeyDown(keyCode) {
-    return !!this.keys[keyCode];
+  static isKeyDown(keyCode, ignoreShift = false) {
+    if(typeof(keyCode) == 'number')
+      return !!this.keys[keyCode];
+    else {
+      let key = keyCode.key;
+      if(!ignoreShift && this.isKeyDown(16) != key.needsShift) return false;
+      return this.isKeyDown(key.keyCode);
+    }
   }
-  static isKeyJustPressed(keyCode) {
-    return !!this.justPressedKeys[keyCode];
+  static isKeyJustPressed(keyCode, ignoreShift = false) {
+    if(typeof(keyCode) == 'number')
+      return !!this.justPressedKeys[keyCode];
+    else {
+      let key = keyCode.key;
+      if(!ignoreShift && this.isKeyDown(16) != key.needsShift) return false;
+      return this.isKeyJustPressed(key.keyCode);
+    }
   }
-  static isKeyJustReleased(keyCode) {
-    return !!this.justReleasedKeys[keyCode];
+  static isKeyJustReleased(keyCode, ignoreShift = false) {
+    if(typeof(keyCode) == 'number')
+      return !!this.justReleasedKeys[keyCode];
+    else {
+      let key = keyCode.key;
+      if(!ignoreShift && this.isKeyDown(16) != key.needsShift) return false;
+      return this.isKeyJustReleased(key.keyCode);
+    }
   }
 
   static get isMouseDown() {
@@ -86,5 +104,28 @@ class Input {
   }
   static get isMiddleMouseJustPressed() {
     return this.middleMouseJustPressed;
+  }
+
+
+
+  static keyBindings = [];
+  static keyBindFromId = [];
+
+  id; name; keyDefault; keyAzerty; keyCustom; staffOnly;
+  static add(id, name, keyDefault, keyAzerty = null, staffOnly = false) {
+    let keybind = new Input(id, name, keyDefault, keyAzerty, staffOnly)
+    this.keyBindings.push(keybind);
+    this.keyBindFromId[id] = keybind;
+    return keybind;
+  }
+  constructor(id, name, keyDefault, keyAzerty, staffOnly) {
+    this.id = id;
+    this.name = name;
+    this.keyDefault = keyDefault;
+    this.keyAzerty = keyAzerty;
+    this.staffOnly = staffOnly;
+  }
+  get key() {
+    return this.keyCustom ? this.keyCustom : false && this.keyAzerty ? this.keyAzerty : this.keyDefault;
   }
 }
