@@ -15,6 +15,17 @@ class UI extends PIXI.Container {
   }
 
   enterFrame() {
+    let player = Global.base.state.player;
+    this.debugText.text =
+`Everybody Edits: Rewritten (vAlpha)
+Ping: xx
+${this.getFPSText()}
+Position: ${this.getPosText(player)}
+Time: ${(player.ticks * Config.physics.ms_per_tick/1000).toFixed(2)}s
+`;
+  }
+
+  getFPSText() {
     //overengineered fps counter let's go
     let fps;
     if(fps < 1) fps = ticker.FPS;
@@ -30,7 +41,10 @@ class UI extends PIXI.Container {
           this.fps.push(ticker.FPS);
         }
     }
-    this.debugText.text = fps < 1 ? `SPF: ${Math.gaussRound(1/fps,1)}` : `FPS: ${Math.gaussRound(fps,1)}`;
+    return fps < 1 ? `SPF: ${Math.gaussRound(1/fps,1)}` : `FPS: ${Math.gaussRound(fps,1)}`
+  }
+  getPosText(player) {
+    return `(${player.x.toFixed(3)}, ${player.y.toFixed(3)})`
   }
 
   drawUIRect(localx, localy, width, height, x, y, colour) {
