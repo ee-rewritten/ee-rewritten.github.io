@@ -32,7 +32,7 @@ class Input {
       }
     });
 
-    window.addEventListener('mousedown', e => {
+    window.addEventListener('pointerdown', e => {
       this.isGameInFocus = e.target == Global.canvas;
       if(this.isGameInFocus) {
         this.mouseDown = this.mouseJustPressed = true;
@@ -40,13 +40,13 @@ class Input {
         this.mouseY = e.offsetY;
       }
     });
-    window.addEventListener('mousemove', e => {
+    window.addEventListener('pointermove', e => {
       if(e.target == Global.canvas) {
         this.mouseX = e.offsetX;
         this.mouseY = e.offsetY;
       }
     })
-    window.addEventListener('mouseup', e => {
+    window.addEventListener('pointerup', e => {
       this.mouseDown = false;
       this.isGameInFocus = e.target == Global.canvas;
         if(this.isGameInFocus) {
