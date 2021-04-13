@@ -9,6 +9,7 @@ class Player extends PIXI.Container {
   x = 0; y = 0;
 
   _isInGodMode = false;
+  _layer = null;
 
   speedX = 0; speedY = 0;
   horizontal = 0; vertical = 0; isSpaceDown = false; isSpaceJustPressed = false;
@@ -79,6 +80,7 @@ class Player extends PIXI.Container {
     if(bool == null ) bool = !this.isInGodMode;
     this._isInGodMode = bool;
     this.godmodeSprite.visible = bool;
+    this.playstate.movePlayer(this);
   }
   get isInGodMode() {
     return this._isInGodMode;

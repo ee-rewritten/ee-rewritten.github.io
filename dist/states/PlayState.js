@@ -11,14 +11,16 @@ class PlayState extends State {
   constructor(width, height, depth) {
     super();
 
-    this.players = new Container();
+    this.players = new Array(ItemLayer.PLAYER_LAYERS.length);
+    for (let i = 0; i < this.players.length; i++) {
+      this.players[i] = new Container();
+    }
 
     this.world = new World(this, width, height, depth);
 
     this.player = new Player(this, true, Config.blockSize, Config.blockSize);
     this.player.smiley = 20;
     this.player.godmodeSprite.tint = 0xAAFF00;
-    this.players.addChild(this.player);
     this.target = this.player;
 
     this.camera.x = this.target.x - Config.gameWidthCeil/2;
@@ -26,14 +28,22 @@ class PlayState extends State {
     this.enterFrame();
   }
 
+  movePlayer(p) {
+    if(p.layer != null) this.players[p.layer].removeChild(p);
+    p.layer = p.isInGodMode ? 1 : 0;
+    this.players[p.layer].addChild(p);
+  }
+
   enterFrame() {
     this.world.x = -Math.round(this.camera.x);
     this.world.y = -Math.round(this.camera.y);
     this.world.redraw();
 
-    this.players.children.forEach(p => {
-      p.enterFrame();
-    });
+    for(let i = 0; i < this.players.length; i++) {
+      this.players[i].children.forEach(p => {
+        p.enterFrame();
+      });
+    }
   }
 
   tick() {
@@ -64,9 +74,11 @@ class PlayState extends State {
     }
 
 
-    this.players.children.forEach(p => {
-      p.tick();
-    });
+    for(let i = 0; i < this.players.length; i++) {
+      this.players[i].children.forEach(p => {
+        p.tick();
+      });
+    }
     this.world.tick();
     if(this.target != null) {
       this.camera.x -= (this.camera.x - (this.target.x - Config.gameWidthCeil/2)) * Config.camera_lag;

@@ -39,8 +39,10 @@ class World extends PIXI.Container {
       blockContainer.zIndex = i;
       this.addChild(blockContainer);
     }
-    playstate.players.zIndex = ItemLayer.PLAYER_LAYER;
-    this.addChild(playstate.players);
+    for (let i = 0; i < playstate.players.length; i++) {
+      this.addChild(playstate.players[i]);
+      playstate.players[i].zIndex = ItemLayer.PLAYER_LAYERS[i];
+    }
 
     this.sortChildren();
 
@@ -183,7 +185,6 @@ class World extends PIXI.Container {
     if(player.x < 0 || player.y < 0 ||
       player.x > (this.width-1) * Config.blockSize || player.y > (this.height-1) * Config.blockSize) return true;
 
-    if(player.isInGodMode) return false;
 
     //top left of player, in block coords
     let startX = Math.floor(player.x/Config.blockSize);
@@ -193,26 +194,23 @@ class World extends PIXI.Container {
     let endY = player.y/Config.blockSize + 1;
 
     for(let blockX = startX; blockX < endX; blockX++) {
-      let map = this.realmap[0][blockX];
-      if(!map) continue;
       for(let blockY = startY; blockY < endY; blockY++) {
-        let id = map[blockY];
+        let id = this.getTile(0, blockX, blockY);
 
+        if(player.isInGodMode && id != ItemManager.blockVoid[ItemLayer.BELOW].id) continue;
         if(id == 0) continue;
-        if(!this.intersects(player.x, player.y, blockX, blockY)) continue;
+        // if(!this.intersects(player.x*Config.blockSize, player.y*Config.blockSize, blockX, blockY)) continue;
 
         return true;
       }
     }
-
     return false;
   }
   intersects(x1, y1, x2, y2) {
-    return x1 > x2 + Config.blockSize
-        || x2 > x1 + Config.blockSize
-        || y1 > y2 + Config.blockSize
-        || y2 > y1 + Config.blockSize;
-
+    return (x1 > x2 + Config.blockSize
+         || x2 > x1 + Config.blockSize
+         || y1 > y2 + Config.blockSize
+         || y2 > y1 + Config.blockSize);
   }
 
   offset = 0;
