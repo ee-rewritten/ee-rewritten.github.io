@@ -1,9 +1,12 @@
 class UI extends PIXI.Container {
   debugText;
   fps = new Array(10);
+  report = {};
 
   constructor() {
     super();
+    Global.report = this.report;
+
     this.drawUIRect(1, -1, Config.fullWidth-Config.gameWidth, Config.fullHeight+2, Config.gameWidth, 0, 0x000000);
     this.drawUIRect(1, 0, Config.gameWidth, Config.fullHeight-Config.gameHeight-1, 0, Config.gameHeight, 0x323231);
 
@@ -12,17 +15,23 @@ class UI extends PIXI.Container {
     this.debugText = new ShadowText('FPS: xx',{fontName: 'Nokia', fontSize:13});
     this.debugText.x = 5;
     this.addChild(this.debugText);
+
+    this.report.Ping = 'xx';
+    this.report.FPS = 'xx';
+    this.report.Position = 'xx';
+    this.report.Time = 'xx';
   }
 
   enterFrame() {
     let player = Global.base.state.player;
-    this.debugText.text =
-`Everybody Edits: Rewritten (vAlpha)
-Ping: xx
-${this.getFPSText()}
-Position: ${this.getPosText(player)}
-Time: ${(player.ticks * Config.physics.ms_per_tick/1000).toFixed(2)}s
-`;
+    this.debugText.text = `Everybody Edits: Rewritten (vAlpha)`
+    this.report.Ping = 'xx';
+    this.report.FPS = this.getFPSText();
+    this.report.Position = this.getPosText(player)
+    this.report.Time = (player.ticks * Config.physics.ms_per_tick/1000).toFixed(2) + 's';
+    for (const property in this.report) {
+      this.debugText.text += `\n${property}: ${this.report[property]}`;
+    }
   }
 
   getFPSText() {
@@ -41,7 +50,7 @@ Time: ${(player.ticks * Config.physics.ms_per_tick/1000).toFixed(2)}s
           this.fps.push(ticker.FPS);
         }
     }
-    return fps < 1 ? `SPF: ${Math.gaussRound(1/fps,1)}` : `FPS: ${Math.gaussRound(fps,1)}`
+    return fps < 1 ? `SPF: ${(1/fps).toFixed(1)}` : `${fps.toFixed(1)}`
   }
   getPosText(player) {
     return `(${player.x.toFixed(3)}, ${player.y.toFixed(3)})`

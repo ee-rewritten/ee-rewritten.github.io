@@ -3,7 +3,8 @@ class Global {
   static app;
   static canvas;
   static stage;
-  
+  static report;
+
   static randomInt(min, max) {
     return Math.floor(Math.random() * (max+1 - min)) + min;
   }
