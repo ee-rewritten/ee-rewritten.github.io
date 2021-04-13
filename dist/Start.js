@@ -9,6 +9,7 @@ const Graphics = PIXI.Graphics;
 const Text = PIXI.Text;
 const BMText = PIXI.BitmapText;
 const BlurFilter = PIXI.filters.BlurFilter;
+const NineSlice = PIXI.NineSlicePlane;
 // PIXI.settings.ROUND_PIXELS = true;
 PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
 

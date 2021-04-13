@@ -32,9 +32,15 @@ class Game {
       });
     }
 
-    //moved loading assets into ItemManager because that just makes sense
-    //provides the below init function as a callback, to initiate the rest of the game
-    ItemManager.loadAssets(this.init);
+    //moved adding assets into ItemManager because that just makes sense
+    //as well as other relevant scripts - UI images in UI
+    ItemManager.loadAssets();
+    UI.loadAssets();
+
+    loader
+      .add('Nokia', './Assets/Nokia.fnt')
+      .add('Visitor', './Assets/Visitor.fnt')
+      .load(this.init);
   }
 
   //This `init` function will run when the image has loaded

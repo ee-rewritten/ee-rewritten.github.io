@@ -3,19 +3,29 @@ class UI extends PIXI.Container {
   fps = new Array(10);
   report = {};
 
-  chatRect;
-  hotbarRect;
+  chat;
+  hotbar;
+
+  infoBG; infoBox; info;
+
+  static loadAssets() {
+    loader
+      .add('hotbar', './Assets/hotbar.png') //borders: 1
+      .add('info', './Assets/info.png') //12
+  }
 
   constructor() {
     super();
     Global.report = this.report;
 
+    this.hotbar = new NineSlice(loader.resources['hotbar'].texture, 1, 1, 1, 1);
+    this.hotbar.width = Config.gameWidth;
+    this.hotbar.y = Config.gameHeight;
+    this.addChild(this.hotbar);
+
     this.chatRect = this.drawUIRect(1, -1,
       Config.fullWidth-Config.gameWidth, Config.fullHeight+2,
       Config.gameWidth, 0, 0x000000);
-    this.hotbarRect = this.drawUIRect(1, 0,
-      Config.gameWidth-1, Config.fullHeight-Config.gameHeight-1,
-      0, Config.gameHeight, 0x323231);
 
     this.debugText = new ShadowText('FPS: xx',{fontName: 'Nokia', fontSize:13});
     this.debugText.x = 5;
@@ -25,12 +35,37 @@ class UI extends PIXI.Container {
     this.report.FPS = 'xx';
     this.report.Position = 'xx';
     this.report.Time = 'xx';
+
+    this.info = new Container();
+
+    this.infoBG = new Sprite(PIXI.Texture.WHITE);
+    this.infoBG.tint = 0;
+    this.infoBG.alpha = 0.6;
+    this.infoBG.width = Config.gameWidth;
+    this.infoBG.height = Config.gameHeight;
+    this.info.addChild(this.infoBG);
+
+    this.infoBox = new NineSlice(loader.resources['info'].texture, 12, 12, 12, 12);
+    this.info.addChild(this.infoBox);
+    this.info.visible = false;
+
+    this.addChild(this.info);
   }
   redrawChat(width) {
     this.removeChild(this.chatRect);
     this.chatRect = this.drawUIRect(1, -1,
       width-Config.gameWidth, Config.fullHeight+2,
       Config.gameWidth, 0, 0x000000);
+  }
+
+  showInfo(title, body) {
+    this.info.visible = true;
+    this.infoBox.width = Config.gameWidth - 200;
+    this.infoBox.height = Config.gameHeight - 200;
+    this.infoBox.x = this.infoBox.y = 100;
+  }
+  hideInfo() {
+    this.info.visible = false;
   }
 
   enterFrame() {
