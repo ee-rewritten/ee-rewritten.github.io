@@ -3,8 +3,8 @@ class Input {
   static justPressedKeys = {};
   static justReleasedKeys = {};
 
-  static mouseX = 0;
-  static mouseY = 0;
+  static _mouseX = 0;
+  static _mouseY = 0;
   static mouseDown = false;
   static mouseJustPressed = false;
 
@@ -17,7 +17,7 @@ class Input {
   static init() {
     if(this.inited) throw new Error('Input is already initialised.');
     window.addEventListener('keydown', e => {
-      if(this.isGameInFocus) {
+      if(this.isGameInFocus || e.keyCode == 122) {
         if(!this.keys[e.keyCode]) {
           this.justPressedKeys[e.keyCode] = true;
           this.keys[e.keyCode] = true;
@@ -26,7 +26,7 @@ class Input {
       }
     });
     window.addEventListener('keyup', e => {
-      if(this.keys[e.keyCode]) {
+      if(this.keys[e.keyCode] || e.keyCode == 122) {
         this.justReleasedKeys[e.keyCode] = true;
         delete this.keys[e.keyCode];
       }
@@ -56,6 +56,11 @@ class Input {
     });
     this.inited = true;
   }
+
+  static get mouseX() {return this._mouseX;}
+  static get mouseY() {return this._mouseY;}
+  static set mouseX(value) {this._mouseX = value/Global.scale;}
+  static set mouseY(value) {this._mouseY = value/Global.scale;}
 
   static resetJustPressed() {
     this.justPressedKeys = {};

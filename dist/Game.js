@@ -22,9 +22,14 @@ class Game {
 
     //Add the canvas that Pixi automatically created for you to the HTML document
     window.onload = () => {
+      Global.screenWidth = window.screen.width;
+      Global.screenHeight = window.screen.height;
       //negative margin hack because pixi's canvas is 5px taller than specified and I can't fix it
       Global.canvas.style.marginBottom = "-5px";
       document.getElementById('ee').appendChild(Global.canvas);
+      document.addEventListener('fullscreenchange', () => {
+        Global.isFullscreen = (document.fullscreenElement != null);
+      });
     }
 
     //moved loading assets into ItemManager because that just makes sense

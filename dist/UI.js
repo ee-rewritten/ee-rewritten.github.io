@@ -3,15 +3,20 @@ class UI extends PIXI.Container {
   fps = new Array(10);
   report = {};
 
+  chatRect;
+  hotbarRect;
+
   constructor() {
     super();
     Global.report = this.report;
 
-    this.drawUIRect(1, -1, Config.fullWidth-Config.gameWidth, Config.fullHeight+2, Config.gameWidth, 0, 0x000000);
-    this.drawUIRect(1, 0, Config.gameWidth, Config.fullHeight-Config.gameHeight-1, 0, Config.gameHeight, 0x323231);
+    this.chatRect = this.drawUIRect(1, -1,
+      Config.fullWidth-Config.gameWidth, Config.fullHeight+2,
+      Config.gameWidth, 0, 0x000000);
+    this.hotbarRect = this.drawUIRect(1, 0,
+      Config.gameWidth-1, Config.fullHeight-Config.gameHeight-1,
+      0, Config.gameHeight, 0x323231);
 
-    // this.debugText = new Text('FPS: xx',{fill: 'white', fontSize: 12});
-    // this.debugText = new BMText('FPS: xx',{fontName: 'Nokia', fontSize:13});
     this.debugText = new ShadowText('FPS: xx',{fontName: 'Nokia', fontSize:13});
     this.debugText.x = 5;
     this.addChild(this.debugText);
@@ -20,6 +25,12 @@ class UI extends PIXI.Container {
     this.report.FPS = 'xx';
     this.report.Position = 'xx';
     this.report.Time = 'xx';
+  }
+  redrawChat(width) {
+    this.removeChild(this.chatRect);
+    this.chatRect = this.drawUIRect(1, -1,
+      width-Config.gameWidth, Config.fullHeight+2,
+      Config.gameWidth, 0, 0x000000);
   }
 
   enterFrame() {
@@ -50,10 +61,10 @@ class UI extends PIXI.Container {
           this.fps.push(ticker.FPS);
         }
     }
-    return fps < 1 ? `SPF: ${(1/fps).toFixed(1)}` : `${fps.toFixed(1)}`
+    return fps < 1 ? `SPF: ${(1/fps).toFixed(1)}` : `${fps.toFixed(1)}`;
   }
   getPosText(player) {
-    return `(${player.x.toFixed(3)}, ${player.y.toFixed(3)})`
+    return `(${player.x.toFixed(3)}, ${player.y.toFixed(3)})`;
   }
 
   drawUIRect(localx, localy, width, height, x, y, colour) {
@@ -66,5 +77,6 @@ class UI extends PIXI.Container {
     rect.endFill();
     // rect.alpha = 0.5;
     this.addChild(rect);
+    return rect;
   }
 }

@@ -47,6 +47,10 @@ class PlayState extends State {
   }
 
   tick() {
+    if(Input.isKeyJustPressed(122)) {
+      if(!Global.isFullscreen) Global.goFullscreen();
+    }
+
     if(Input.isKeyDown(Key.lookLeft)) {
       this.camera.x -= 15;
     }
