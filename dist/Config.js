@@ -13,8 +13,8 @@ class Config {
 
   //game width&height rounded up to the next multiple of block size
   //prevents glitchy offsets when moving blocks in the game container
-  static gameWidthCeil = Config.blockSize*Math.ceil(this.gameWidth/Config.blockSize);
-  static gameHeightCeil = Config.blockSize*Math.ceil(this.gameHeight/Config.blockSize);
+  static gameWidthCeil = Config.blockSize*Math.ceil(Config.gameWidth/Config.blockSize);
+  static gameHeightCeil = Config.blockSize*Math.ceil(Config.gameHeight/Config.blockSize);
 
   static camera_lag = 1/16;
 
