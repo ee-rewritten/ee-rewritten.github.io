@@ -42,6 +42,8 @@ class Player extends PIXI.Container {
 
     this.nameText = new ShadowText(name, {fontName: 'Visitor', fontSize: 13});
     this.addChild(this.nameText);
+
+    this.enterFrame();
   }
 
   set smiley(id) {
@@ -96,7 +98,8 @@ class Player extends PIXI.Container {
     this.nameText.position.set(
       Math.round(this.x+Config.blockSize/2-this.nameText.get('width')/2 + 2),
       Math.round(this.y+Config.blockSize-2));
-    this.nameText.visible = !this.playstate.player.moving || Input.isKeyDown(16);
+    if(this.playstate.target)
+      this.nameText.visible = !this.playstate.target.moving || Input.isKeyDown(16);
   }
 
   tick() {
