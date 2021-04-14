@@ -4,6 +4,9 @@ class UI extends PIXI.Container {
   fps = new Array(10);
   report = {};
 
+  joystick;
+  joystickPointerId = -1;
+
   chat; worldName; worldInfo;
 
   hotbar;
@@ -15,6 +18,9 @@ class UI extends PIXI.Container {
       .add('hotbar', './Assets/hotbar.png') //borders: 1
       .add('info', './Assets/info.png') //12
       .add('chat', './Assets/chat.png') //1
+
+      .add('outer', './Assets/outer.png')
+      .add('inner', './Assets/inner.png')
   }
 
   static createNineSlice(name, borders) {
@@ -91,6 +97,34 @@ class UI extends PIXI.Container {
     this.info.visible = false;
 
     this.addChild(this.info);
+
+
+    // joystick?
+    if(Global.isMobile) {
+      this.joystick = new Joystick({
+        outer: new Sprite(loader.resources['outer'].texture),
+        inner: new Sprite(loader.resources['inner'].texture),
+
+        onStart: event => {
+          this.joystickPointerId = event.pointerId;
+          Input.joystickDirection = '';
+        },
+        onChange: (event, data) => {
+          Input.joystickDirection = data.power > 0.6 ? data.direction : '';
+          this.report.PointerId = this.joystickPointerId;
+        },
+        onEnd: event => {
+          Input.joystickDirection = '';
+          this.joystickPointerId = -1;
+        }
+      });
+      this.joystick.outer.alpha = 0.6;
+      this.joystick.inner.alpha = 0.4;
+      this.joystick.x = this.joystick.width/2 + 10;
+      this.joystick.y = Config.gameHeight - this.joystick.height/2 - 10;
+      this.addChild(this.joystick);
+    }
+
   }
 
   redrawChat(width) {

@@ -45,6 +45,8 @@ class Game {
 
   //This `init` function will run when the image has loaded
   init() {
+    Global.isMobile = mobileCheck();
+
     ItemManager.init();
     Input.init();
 

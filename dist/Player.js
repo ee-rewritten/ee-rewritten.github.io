@@ -104,14 +104,27 @@ class Player extends PIXI.Container {
 
   tick() {
     if(this.isme) {
-      this.horizontal =
-        (Input.isKeyDown(39) || Input.isKeyDown(Key.right, true))
-       -(Input.isKeyDown(37) || Input.isKeyDown(Key.left, true));
-      this.vertical =
-       (Input.isKeyDown(40) || Input.isKeyDown(Key.down, true))
-      -(Input.isKeyDown(38) || Input.isKeyDown(Key.up, true));
-      this.isSpaceDown = Input.isKeyDown(Key.jump, true);
-      this.isSpaceJustPressed = Input.isKeyJustPressed(Key.jump, true);
+
+      if(Global.isMobile) {
+        this.horizontal =
+          Input.joystickDirection.includes('right')
+         -Input.joystickDirection.includes('left');
+        this.vertical =
+          Input.joystickDirection.includes('bottom')
+         -Input.joystickDirection.includes('top');
+      }
+
+      else {
+        this.horizontal =
+          (Input.isKeyDown(39) || Input.isKeyDown(Key.right, true))
+         -(Input.isKeyDown(37) || Input.isKeyDown(Key.left, true));
+        this.vertical =
+         (Input.isKeyDown(40) || Input.isKeyDown(Key.down, true))
+        -(Input.isKeyDown(38) || Input.isKeyDown(Key.up, true));
+        this.isSpaceDown = Input.isKeyDown(Key.jump, true);
+        this.isSpaceJustPressed = Input.isKeyJustPressed(Key.jump, true);
+      }
+
     }
 
     let blockX = Math.round(this.x/Config.blockSize);

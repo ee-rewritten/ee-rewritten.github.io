@@ -1,13 +1,18 @@
 class Global {
   static base;
+
   static app;
   static canvas;
   static stage;
+
   static report;
+
   static _isFullscreen = false;
   static scale = 1;
   static screenWidth;
   static screenHeight;
+  
+  static isMobile = false;
 
   static resize(width) {
     if(this.base && this.base.UI) this.base.UI.redrawChat(width);

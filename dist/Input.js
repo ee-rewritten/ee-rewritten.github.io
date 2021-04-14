@@ -13,6 +13,8 @@ class Input {
 
   static isGameInFocus = false;
 
+  static joystickDirection = '';
+
   static inited = false;
   static init() {
     if(this.inited) throw new Error('Input is already initialised.');
@@ -33,6 +35,7 @@ class Input {
     });
 
     window.addEventListener('pointerdown', e => {
+      if(e.pointerId == Global.base?.UI?.joystickPointerId) return;
       this.isGameInFocus = e.target == Global.canvas;
       if(this.isGameInFocus) {
         this.mouseDown = this.mouseJustPressed = true;
@@ -41,12 +44,14 @@ class Input {
       }
     });
     window.addEventListener('pointermove', e => {
+      if(e.pointerId == Global.base?.UI?.joystickPointerId) return;
       if(e.target == Global.canvas) {
         this.mouseX = e.offsetX;
         this.mouseY = e.offsetY;
       }
     })
     window.addEventListener('pointerup', e => {
+      if(e.pointerId == Global.base?.UI?.joystickPointerId) return;
       this.mouseDown = false;
       this.isGameInFocus = e.target == Global.canvas;
         if(this.isGameInFocus) {
