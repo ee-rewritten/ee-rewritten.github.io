@@ -1,10 +1,12 @@
 class Player extends PIXI.Container {
+  nameText;
   smileySprite;
   _smileyRow = 0;
   _smiley = 0;
   godmodeSprite;
 
   isme = false;
+  name = '';
   playstate;
   x = 0; y = 0;
 
@@ -14,34 +16,32 @@ class Player extends PIXI.Container {
   speedX = 0; speedY = 0;
   horizontal = 0; vertical = 0; isSpaceDown = false; isSpaceJustPressed = false;
   lastJump = -Date.now(); jumpCount = 0; maxJumps = 1;
+  moving = false;
 
   ticks = 0;
 
   static smileyOffset = Math.round(-(Config.smileySize-Config.blockSize)/2);
   static godmodeOffset = Math.round(-(Config.godmodeSize-Config.smileySize)/2) + this.smileyOffset;
 
-  constructor(playstate, isme, x, y) {
+  constructor(playstate, isme, name, x, y) {
     super();
     this.isme = isme;
     this.playstate = playstate;
+    this.name = name;
     this.x = x;
     this.y = y;
 
-    this.sortableChildren = true;
+    let godmodeTexture = new Texture(ItemManager.godmodeBMD, new Rectangle(Config.godmodeSize,0,Config.godmodeSize,Config.godmodeSize));
+    this.godmodeSprite = new Sprite(godmodeTexture);
+    this.addChild(this.godmodeSprite);
+    this.toggleGodMode(false);
 
     let smileyTexture = new Texture(ItemManager.smileysBMD, new Rectangle(0,0,Config.smileySize,Config.smileySize));
     this.smileySprite = new Sprite(smileyTexture);
-    this.smileySprite.zIndex = 1;
     this.addChild(this.smileySprite);
 
-    let godmodeTexture = new Texture(ItemManager.godmodeBMD, new Rectangle(Config.godmodeSize,0,Config.godmodeSize,Config.godmodeSize));
-    this.godmodeSprite = new Sprite(godmodeTexture);
-    this.godmodeSprite.zIndex = 0;
-    this.addChild(this.godmodeSprite);
-
-    this.toggleGodMode(false);
-
-    this.sortChildren();
+    this.nameText = new ShadowText(name, {fontName: 'Visitor', fontSize: 13});
+    this.addChild(this.nameText);
   }
 
   set smiley(id) {
@@ -87,8 +87,16 @@ class Player extends PIXI.Container {
   }
 
   enterFrame() {
-    this.smileySprite.position.set(Math.round(this.x+Player.smileyOffset), Math.round(this.y+Player.smileyOffset));
-    this.godmodeSprite.position.set(Math.round(this.x+Player.godmodeOffset), Math.round(this.y+Player.godmodeOffset));
+    this.smileySprite.position.set(
+      Math.round(this.x+Player.smileyOffset),
+      Math.round(this.y+Player.smileyOffset));
+    this.godmodeSprite.position.set(
+      Math.round(this.x+Player.godmodeOffset),
+      Math.round(this.y+Player.godmodeOffset));
+    this.nameText.position.set(
+      Math.round(this.x+Config.blockSize/2-this.nameText.get('width')/2 + 2),
+      Math.round(this.y+Config.blockSize-2));
+    this.nameText.visible = !this.playstate.player.moving || Input.isKeyDown(16);
   }
 
   tick() {
@@ -326,10 +334,10 @@ class Player extends PIXI.Container {
     let imx = (this.speedX*256)>>0;
     let imy = (this.speedY*256)>>0;
 
-    let moving = false;
+    this.moving = false;
 
     if(imx != 0) {
-      moving = true;
+      this.moving = true;
     }
     else if(Math.abs(modifierX) < 0.1) {
       let tx = this.x % Config.blockSize;
@@ -349,7 +357,7 @@ class Player extends PIXI.Container {
     }
 
     if(imy != 0) {
-      moving = true;
+      this.moving = true;
     }
     else if(Math.abs(modifierY) < 0.1) {
       let ty = this.y % Config.blockSize;
