@@ -15,13 +15,13 @@ class Game {
   }
 
   constructor() {
-    //Create a Pixi Application
-    Global.app = new PIXI.Application({width: Config.fullWidth, height: Config.fullHeight});
-    Global.canvas = Global.app.view;
-    Global.stage = Global.app.stage;
-
-    //Add the canvas that Pixi automatically created for you to the HTML document
     window.onload = () => {
+      //Create a Pixi Application
+      Global.app = new PIXI.Application({width: Config.fullWidth, height: Config.fullHeight});
+      Global.canvas = Global.app.view;
+      Global.stage = Global.app.stage;
+
+      //Add the canvas that Pixi automatically created for you to the HTML document
       Global.screenWidth = window.screen.width;
       Global.screenHeight = window.screen.height;
       //negative margin hack because pixi's canvas is 5px taller than specified and I can't fix it
