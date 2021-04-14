@@ -17,44 +17,56 @@ class UI extends PIXI.Container {
       .add('chat', './Assets/chat.png') //1
   }
 
+  static createNineSlice(name, borders) {
+    return new NineSlice(loader.resources[name].texture, borders, borders, borders, borders);
+  }
+  static createText(text, font, scale = 1) {
+    return new BMText(text, {fontName: font,
+      fontSize: (font == 'Visitor' ? Config.fontVisitorSize :
+                 font == 'Nokia' ? Config.fontNokiaSize : 1) * scale});
+  }
+  static createShadowText(text, font, blur = 2, amount = 3, scale = 1) {
+    return new ShadowText(text, {fontName: font,
+      fontSize: (font == 'Visitor' ? Config.fontVisitorSize :
+                 font == 'Nokia' ? Config.fontNokiaSize : 1) * scale},
+      blur, amount);
+  }
+
   constructor() {
     super();
     Global.report = this.report;
 
     // bottom hotbar
-    this.hotbar = this.createNineSlice('hotbar', 1);
+    this.hotbar = UI.createNineSlice('hotbar', 1);
     this.hotbar.width = Config.gameWidth;
     this.hotbar.y = Config.gameHeight;
     this.addChild(this.hotbar);
 
 
     // right chat panel
-    this.chat = this.createNineSlice('chat', 1);
+    this.chat = UI.createNineSlice('chat', 1);
     this.chat.width = Config.fullWidth-Config.gameWidth;
     this.chat.height = Config.fullHeight;
     this.chat.x = Config.gameWidth;
     this.addChild(this.chat);
 
-    this.worldName = new BMText(Global.base.state.worldName, {fontName: 'Visitor', fontSize:26});
+    this.worldName = UI.createText(Global.base.state.worldName, 'Visitor', 2);
     this.worldName.x = 4;
-    this.worldName.y = -7;
+    this.worldName.y = 1;
     this.chat.addChild(this.worldName);
 
-    this.worldInfo = new Container();
-    let y = 15;
+    this.worldInfo = UI.createText('', 'Visitor');
+    this.worldInfo.tint = 0xA9A9A9;
+    this.worldInfo.x = 5;
+    this.worldInfo.y = 19;
     for (const stat in Global.base.state.worldInfo) {
-      let text = new BMText(`${stat}: ${Global.base.state.worldInfo[stat]}`, {fontName: 'Visitor', fontSize:13});;
-      text.tint = 0xA9A9A9;
-      text.x = 5;
-      text.y = y;
-      this.worldInfo.addChild(text);
-      y += 9;
+      this.worldInfo.text += `${stat}: ${Global.base.state.worldInfo[stat]}\n`;
     }
     this.chat.addChild(this.worldInfo);
 
 
     // top left debug info
-    this.debugText = new ShadowText('FPS: xx',{fontName: 'Nokia', fontSize:13});
+    this.debugText = UI.createShadowText('FPS: xx', 'Nokia');
     this.debugText.x = 5;
     this.addChild(this.debugText);
 
@@ -74,15 +86,11 @@ class UI extends PIXI.Container {
     this.infoBG.height = Config.gameHeight;
     this.info.addChild(this.infoBG);
 
-    this.infoBox = this.createNineSlice('info', 12);
+    this.infoBox = UI.createNineSlice('info', 12);
     this.info.addChild(this.infoBox);
     this.info.visible = false;
 
     this.addChild(this.info);
-  }
-
-  createNineSlice(name, borders) {
-    return new NineSlice(loader.resources[name].texture, borders, borders, borders, borders);
   }
 
   redrawChat(width) {

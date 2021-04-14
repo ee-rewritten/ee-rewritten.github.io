@@ -50,7 +50,7 @@ class Game {
 
     Global.stage.sortableChildren = true;
 
-    Global.base.state = new PlayState(100, 100, 2, 'Untitled World', {by: 'unknown', plays: 0, favorites: 0, likes: 0});
+    Global.base.state = new PlayState(100, 100, 2, 'Untitled World', {by: 'unknown', plays: 1, favorites: 0, likes: 0});
 
     Global.base.UI = new UI();
     Global.base.UI.zIndex = 1;

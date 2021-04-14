@@ -3,6 +3,9 @@ class Config {
   static smileySize = 26;
   static godmodeSize = 64;
 
+  static fontVisitorSize = 8;
+  static fontNokiaSize = 13;
+
   static smileyRows = 2;
 
   static fullWidth = 850;
