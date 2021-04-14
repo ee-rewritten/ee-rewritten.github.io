@@ -15,6 +15,8 @@ class Key {
   static lookLeft =          Input.add(23, "Look Left", new Key(71, true), null, true);       // Shift + G
   static lookDown =          Input.add(20, "Look Down", new Key(72, true), null, true);       // Shift + H
   static lookRight =         Input.add(21, "Look Right", new Key(74, true), null, true);      // Shift + J
+  static hideUI =            Input.add(24, "Hide UI", new Key(79, true), null, true);         // Shift + O
+
   constructor (keyCode, shift = false) {
     this.keyCode = keyCode;
     this.needsShift = shift;
