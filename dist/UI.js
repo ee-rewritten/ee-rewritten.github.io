@@ -1,9 +1,11 @@
 class UI extends PIXI.Container {
   debugText;
+  showDebug = true;
   fps = new Array(10);
   report = {};
 
-  chat;
+  chat; worldName; worldInfo;
+
   hotbar;
 
   infoBG; infoBox; info;
@@ -12,21 +14,46 @@ class UI extends PIXI.Container {
     loader
       .add('hotbar', './Assets/hotbar.png') //borders: 1
       .add('info', './Assets/info.png') //12
+      .add('chat', './Assets/chat.png') //1
   }
 
   constructor() {
     super();
     Global.report = this.report;
 
-    this.hotbar = new NineSlice(loader.resources['hotbar'].texture, 1, 1, 1, 1);
+    // bottom hotbar
+    this.hotbar = this.createNineSlice('hotbar', 1);
     this.hotbar.width = Config.gameWidth;
     this.hotbar.y = Config.gameHeight;
     this.addChild(this.hotbar);
 
-    this.chatRect = this.drawUIRect(1, -1,
-      Config.fullWidth-Config.gameWidth, Config.fullHeight+2,
-      Config.gameWidth, 0, 0x000000);
 
+    // right chat panel
+    this.chat = this.createNineSlice('chat', 1);
+    this.chat.width = Config.fullWidth-Config.gameWidth;
+    this.chat.height = Config.fullHeight;
+    this.chat.x = Config.gameWidth;
+    this.addChild(this.chat);
+
+    this.worldName = new BMText(Global.base.state.worldName, {fontName: 'Visitor', fontSize:26});
+    this.worldName.x = 4;
+    this.worldName.y = -7;
+    this.chat.addChild(this.worldName);
+
+    this.worldInfo = new Container();
+    let y = 15;
+    for (const stat in Global.base.state.worldInfo) {
+      let text = new BMText(`${stat}: ${Global.base.state.worldInfo[stat]}`, {fontName: 'Visitor', fontSize:13});;
+      text.tint = 0xA9A9A9;
+      text.x = 5;
+      text.y = y;
+      this.worldInfo.addChild(text);
+      y += 9;
+    }
+    this.chat.addChild(this.worldInfo);
+
+
+    // top left debug info
     this.debugText = new ShadowText('FPS: xx',{fontName: 'Nokia', fontSize:13});
     this.debugText.x = 5;
     this.addChild(this.debugText);
@@ -36,6 +63,8 @@ class UI extends PIXI.Container {
     this.report.Position = 'xx';
     this.report.Time = 'xx';
 
+
+    // info popup
     this.info = new Container();
 
     this.infoBG = new Sprite(PIXI.Texture.WHITE);
@@ -45,17 +74,19 @@ class UI extends PIXI.Container {
     this.infoBG.height = Config.gameHeight;
     this.info.addChild(this.infoBG);
 
-    this.infoBox = new NineSlice(loader.resources['info'].texture, 12, 12, 12, 12);
+    this.infoBox = this.createNineSlice('info', 12);
     this.info.addChild(this.infoBox);
     this.info.visible = false;
 
     this.addChild(this.info);
   }
+
+  createNineSlice(name, borders) {
+    return new NineSlice(loader.resources[name].texture, borders, borders, borders, borders);
+  }
+
   redrawChat(width) {
-    this.removeChild(this.chatRect);
-    this.chatRect = this.drawUIRect(1, -1,
-      width-Config.gameWidth, Config.fullHeight+2,
-      Config.gameWidth, 0, 0x000000);
+    this.chat.width = width-Config.gameWidth;
   }
 
   showInfo(title, body) {
@@ -70,13 +101,17 @@ class UI extends PIXI.Container {
 
   enterFrame() {
     let player = Global.base.state.player;
-    this.debugText.text = `Everybody Edits: Rewritten (vAlpha)`
-    this.report.Ping = 'xx';
-    this.report.FPS = this.getFPSText();
-    this.report.Position = this.getPosText(player)
-    this.report.Time = (player.ticks * Config.physics.ms_per_tick/1000).toFixed(2) + 's';
-    for (const property in this.report) {
-      this.debugText.text += `\n${property}: ${this.report[property]}`;
+
+    if(this.debugText.visible != this.showDebug) this.debugText.visible = this.showDebug;
+    if(this.showDebug) {
+      this.debugText.text = `Everybody Edits: Rewritten (vAlpha)`
+      this.report.Ping = 'xx';
+      this.report.FPS = this.getFPSText();
+      this.report.Position = this.getPosText(player)
+      this.report.Time = (player.ticks * Config.physics.ms_per_tick/1000).toFixed(2) + 's';
+      for (const property in this.report) {
+        this.debugText.text += `\n${property}: ${this.report[property]}`;
+      }
     }
   }
 

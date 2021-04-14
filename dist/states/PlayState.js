@@ -1,6 +1,6 @@
 class PlayState extends State {
   target;
-  world;
+  world; worldName; worldInfo;
   player;
   players;
 
@@ -8,7 +8,7 @@ class PlayState extends State {
     x: 0,
     y: 0
   }
-  constructor(width, height, depth) {
+  constructor(width, height, depth, worldName, worldInfo) {
     super();
 
     this.players = new Array(ItemLayer.PLAYER_LAYERS.length);
@@ -17,8 +17,10 @@ class PlayState extends State {
     }
 
     this.world = new World(this, width, height, depth);
+    this.worldName = worldName;
+    this.worldInfo = worldInfo;
 
-    this.player = new Player(this, true, Config.blockSize, Config.blockSize);
+    this.player = new Player(this, true, 'seb135', Config.blockSize, Config.blockSize);
     this.player.smiley = 20;
     this.player.godmodeSprite.tint = 0xAAFF00;
     this.target = this.player;
@@ -65,6 +67,9 @@ class PlayState extends State {
     }
     if(Input.isKeyJustPressed(Key.lockCamera)) {
       this.target = this.target ? null : this.player;
+    }
+    if(Input.isKeyJustPressed(Key.hideUI)) {
+      Global.base.UI.visible = !Global.base.UI.visible;
     }
 
     if(Input.isKeyJustPressed(Key.godmode)) {
