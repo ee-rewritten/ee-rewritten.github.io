@@ -21,9 +21,17 @@ class Game {
       Global.canvas = Global.app.view;
       Global.stage = Global.app.stage;
 
+      //https://github.com/pixijs/pixi.js/issues/7407#issuecomment-820444887
+      const interaction = Global.app.renderer.plugins.interaction;
+      interaction.removeEvents();
+      interaction.supportsTouchEvents = !interaction.supportsPointerEvents && 'ontouchstart' in window;
+      interaction.interactionDOMElement = Global.app.view;
+      interaction.addEvents();
+
       //Add the canvas that Pixi automatically created for you to the HTML document
       Global.screenWidth = window.screen.width;
       Global.screenHeight = window.screen.height;
+
       //negative margin hack because pixi's canvas is 5px taller than specified and I can't fix it
       Global.canvas.style.marginBottom = "-5px";
       document.getElementById('ee').appendChild(Global.canvas);

@@ -99,7 +99,7 @@ class UI extends PIXI.Container {
     this.addChild(this.info);
 
 
-    // joystick?
+    // joystick.
     if(Global.isMobile) {
       this.joystick = new Joystick({
         outer: new Sprite(loader.resources['outer'].texture),
@@ -111,7 +111,6 @@ class UI extends PIXI.Container {
         },
         onChange: (event, data) => {
           Input.joystickDirection = data.power > 0.6 ? data.direction : '';
-          this.report.PointerId = this.joystickPointerId;
         },
         onEnd: event => {
           Input.joystickDirection = '';
