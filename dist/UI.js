@@ -15,19 +15,27 @@ class UI extends PIXI.Container {
 
   static loadAssets() {
     loader
-      .add('hotbar', './Assets/hotbar.png') //borders: 1
-      .add('info', './Assets/info.png') //12
-      .add('chat', './Assets/chat.png') //1
+      //9-slices
+      .add('hotbar', './Assets/UI/hotbar.png') //borders: 1
+      .add('info', './Assets/UI/info.png') //12
+      .add('chat', './Assets/UI/chat.png') //1
 
-      .add('outer', './Assets/outer.png')
-      .add('inner', './Assets/inner.png')
+      //joystick
+      .add('outer', './Assets/UI/outer.png')
+      .add('inner', './Assets/UI/inner.png')
+
+      //hotbar images
+      .add('share', './Assets/UI/share.png')
+      .add('chaticon', './Assets/UI/chaticon.png')
+      .add('map', './Assets/UI/map.png')
+      .add('favlike', './Assets/UI/favlike.png')
   }
 
   static createNineSlice(name, borders) {
     return new NineSlice(loader.resources[name].texture, borders, borders, borders, borders);
   }
-  static createText(text, font, scale = 1) {
-    return new BMText(text, {fontName: font,
+  static createText(text, font, scale = 1, align = 'left') {
+    return new BMText(text, {align: align, fontName: font,
       fontSize: (font == 'Visitor' ? Config.fontVisitorSize :
                  font == 'Nokia' ? Config.fontNokiaSize : 1) * scale});
   }
@@ -43,9 +51,22 @@ class UI extends PIXI.Container {
     Global.report = this.report;
 
     // bottom hotbar
-    this.hotbar = UI.createNineSlice('hotbar', 1);
-    this.hotbar.width = Config.gameWidth;
-    this.hotbar.y = Config.gameHeight;
+    this.hotbar = new Hotbar();
+
+    this.hotbar.addTextButton('goto\nlobby', false, 'lobby');
+    this.hotbar.addTextureButton('share');
+
+    this.hotbar.addTextButton('god\nmode', false, 'god');
+
+    this.hotbar.addTextureButton('smiley', ItemManager.smileysBMD, Config.smileySize, Config.smileySize);
+    this.hotbar.addTextureButton('aura', ItemManager.godmodeBMD, Config.godmodeSize, Config.godmodeSize, 1);
+    this.hotbar.addTextureButton('chat', 'chaticon');
+
+    this.hotbar.addTextButton('enter level code to edit        ', false, 'code');
+
+    this.hotbar.addTextureButton('map', null, null, null, 0, true, 31);
+    this.hotbar.addTextureButton('favlike', null, 43, 28, 0, true, 43);
+    this.hotbar.addTextButton('options', true);
     this.addChild(this.hotbar);
 
 
@@ -123,7 +144,6 @@ class UI extends PIXI.Container {
       this.joystick.y = Config.gameHeight - this.joystick.height/2 - 10;
       this.addChild(this.joystick);
     }
-
   }
 
   redrawChat(width) {

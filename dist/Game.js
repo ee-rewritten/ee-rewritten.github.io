@@ -46,8 +46,8 @@ class Game {
     UI.loadAssets();
 
     loader
-      .add('Nokia', './Assets/Nokia.fnt')
-      .add('Visitor', './Assets/Visitor.fnt')
+      .add('Nokia', './Assets/fonts/Nokia.fnt')
+      .add('Visitor', './Assets/fonts/Visitor.fnt')
       .load(this.init);
   }
 
