@@ -83,7 +83,7 @@ class Joystick extends PIXI.Container {
       dragging = true;
       that.inner.alpha = 1;
 
-      that.settings.onStart?.(eventData);
+      that.settings.onStart?.(event);
     }
 
     function onDragEnd(event) {
@@ -94,7 +94,7 @@ class Joystick extends PIXI.Container {
       dragging = false;
       that.inner.alpha = that.innerAlphaStandby;
 
-      that.settings.onEnd?.(eventData);
+      that.settings.onEnd?.(event);
     }
 
     function onDragMove(event) {
@@ -146,7 +146,7 @@ class Joystick extends PIXI.Container {
         }
         that.inner.position = centerPoint;
         power = that.getPower(centerPoint);
-        that.settings.onChange?.(eventData, { angle, direction, power, });
+        that.settings.onChange?.(event, { angle, direction, power, });
         return;
       }
 
@@ -163,7 +163,7 @@ class Joystick extends PIXI.Container {
 
         that.inner.position = centerPoint;
         power = that.getPower(centerPoint);
-        that.settings.onChange?.(eventData, { angle, direction, power, });
+        that.settings.onChange?.(event, { angle, direction, power, });
         return;
       }
 
@@ -211,7 +211,7 @@ class Joystick extends PIXI.Container {
       direction = that.getJoystickDirection(centerPoint);
       that.inner.position = centerPoint;
 
-      that.settings.onChange?.(eventData, { angle, direction, power, });
+      that.settings.onChange?.(event, { angle, direction, power, });
     };
 
     this.on('pointerdown', onDragStart)

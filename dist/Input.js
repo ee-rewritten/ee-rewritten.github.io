@@ -35,7 +35,12 @@ class Input {
     });
 
     window.addEventListener('pointerdown', e => {
-      if(e.pointerId == Global.base?.UI?.joystickPointerId) return;
+      // if(e.pointerId == Global.base?.UI?.joystickPointerId) return;
+      if(this.joystickDirection) {
+        this.mouseDown = false;
+        this.mouseJustPressed = false;
+        return;
+      }
       this.isGameInFocus = e.target == Global.canvas;
       if(this.isGameInFocus) {
         this.mouseDown = this.mouseJustPressed = true;
@@ -44,14 +49,22 @@ class Input {
       }
     });
     window.addEventListener('pointermove', e => {
-      if(e.pointerId == Global.base?.UI?.joystickPointerId) return;
+      // if(e.pointerId == Global.base?.UI?.joystickPointerId) return;
+      if(this.joystickDirection) {
+        this.mouseDown = false;
+        return;
+      }
       if(e.target == Global.canvas) {
         this.mouseX = e.offsetX;
         this.mouseY = e.offsetY;
       }
     })
     window.addEventListener('pointerup', e => {
-      if(e.pointerId == Global.base?.UI?.joystickPointerId) return;
+      // if(e.pointerId == Global.base?.UI?.joystickPointerId) return;
+      if(this.joystickDirection) {
+        this.mouseDown = false;
+        return;
+      }
       this.mouseDown = false;
       this.isGameInFocus = e.target == Global.canvas;
         if(this.isGameInFocus) {

@@ -106,8 +106,8 @@ class UI extends PIXI.Container {
         inner: new Sprite(loader.resources['inner'].texture),
 
         onStart: event => {
-          this.joystickPointerId = event.pointerId;
-          Input.joystickDirection = '';
+          this.joystickPointerId = event.data.pointerId;
+          Input.joystickDirection = 'start';
         },
         onChange: (event, data) => {
           Input.joystickDirection = data.power > 0.6 ? data.direction : '';
