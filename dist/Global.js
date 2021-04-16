@@ -11,7 +11,7 @@ class Global {
   static scale = 1;
   static screenWidth;
   static screenHeight;
-  
+
   static isMobile = false;
 
   static resize(width) {
@@ -21,9 +21,27 @@ class Global {
     this.app.renderer.resize(width, Config.fullHeight);
   }
 
-  static goFullscreen() {
-    this.canvas.requestFullscreen();
+  static set fullscreen(bool) {
+    if(bool) {
+      if (this.canvas.requestFullscreen) {
+        this.canvas.requestFullscreen();
+      } else if (this.canvas.webkitRequestFullscreen) { /* Safari */
+        this.canvas.webkitRequestFullscreen();
+      } else if (this.canvas.msRequestFullscreen) { /* IE11 */
+        this.canvas.msRequestFullscreen();
+      }
+    }
+    else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if (document.webkitExitFullscreen) { /* Safari */
+        document.webkitExitFullscreen();
+      } else if (document.msExitFullscreen) { /* IE11 */
+        document.msExitFullscreen();
+      }
+    }
   }
+
   static set isFullscreen(value) {
     this._isFullscreen = value;
 

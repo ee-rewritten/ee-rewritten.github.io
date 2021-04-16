@@ -36,7 +36,11 @@ class Game {
       Global.canvas.style.marginBottom = "-5px";
       document.getElementById('ee').appendChild(Global.canvas);
       document.addEventListener('fullscreenchange', () => {
-        Global.isFullscreen = (document.fullscreenElement != null);
+        let element =
+          document.fullscreenElement || /* Standard syntax */
+          document.webkitFullscreenElement || /* Safari and Opera syntax */
+          document.msFullscreenElement; /* IE11 syntax */
+        Global.isFullscreen = (element != null);
       });
     }
 

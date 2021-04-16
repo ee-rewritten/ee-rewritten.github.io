@@ -10,6 +10,7 @@ class UI extends PIXI.Container {
   chat; worldName; worldInfo;
 
   hotbar;
+  blockselector;
 
   infoBG; infoBox; info;
 
@@ -29,6 +30,9 @@ class UI extends PIXI.Container {
       .add('chaticon', './Assets/UI/chaticon.png')
       .add('map', './Assets/UI/map.png')
       .add('favlike', './Assets/UI/favlike.png')
+      .add('fullscreen', './Assets/UI/fullscreen.png')
+
+      .add('selector', './Assets/UI/selector.png')
   }
 
   static createNineSlice(name, borders) {
@@ -68,6 +72,7 @@ class UI extends PIXI.Container {
     let blockbar = new Container();
     blockbar.x = 3;
 
+
     let blockcontainer = new Container();
     blockcontainer.y = this.hotbar.height - Config.blockSize - 3;
     blockbar.addChild(blockcontainer);
@@ -87,10 +92,15 @@ class UI extends PIXI.Container {
       block.addChild(blocknum);
 
       block.interactive = true;
-      block.on('pointerdown', e=>Global.base.state.selectedBlock = (e.target.getAttr('id')));
+      block.on('pointerdown', e => {
+        Global.base.state.selectedBlock = (e.target.getAttr('id'));
+        this.blockselector.x = e.target.x;
+      });
 
       blockcontainer.addChild(block);
     }
+    this.blockselector = new Sprite(loader.resources['selector'].texture);
+    blockcontainer.addChild(this.blockselector);
 
     let blockbartext = UI.createText('level bricks', 'Visitor');
     blockbartext.y = 1;
@@ -106,6 +116,11 @@ class UI extends PIXI.Container {
     this.hotbar.addTextureButton('map', null, null, null, 0, true, 31);
     this.hotbar.addTextureButton('favlike', null, 43, 28, 0, true, 43);
     this.hotbar.addTextButton('options', true);
+
+    let fullscreenbtn = this.hotbar.addTextureButton('fullscreen', null, null, null, 0, true,);
+    fullscreenbtn.interactive = true;
+    fullscreenbtn.on('pointerdown', e=>Global.fullscreen = !Global.isFullscreen);
+
     this.addChild(this.hotbar);
 
 
