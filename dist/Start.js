@@ -13,6 +13,10 @@ const NineSlice = PIXI.NineSlicePlane;
 // PIXI.settings.ROUND_PIXELS = true;
 PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
 
+// https://www.html5gamedevs.com/topic/19712-how-to-keep-attributes-on-objects/?do=findComment&comment=111865
+PIXI.DisplayObject.prototype.getAttr = function(name) { if (!this.attrs) return; return this.attrs[name] };
+PIXI.DisplayObject.prototype.setAttr = function(name, value) { if (!this.attrs) this.attrs = {}; this.attrs[name] = value; };
+
 // http://thenewcode.com/895/JavaScript-Rounding-Recipes
 // http://www.timdown.co.uk/
 Math.gaussRound = function(num, decimalPlaces) {

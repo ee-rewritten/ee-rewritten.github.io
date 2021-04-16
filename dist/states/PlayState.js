@@ -3,6 +3,7 @@ class PlayState extends State {
   world; worldName; worldInfo;
   player;
   players;
+  selectedBlock = ItemManager.blockEmpty[0].id;
 
   camera = {
     x: 0,
@@ -77,7 +78,7 @@ class PlayState extends State {
     }
 
     if(Input.isMouseDown && Input.mouseX <= Config.gameWidth && Input.mouseY <= Config.gameHeight) {
-      let id = Input.isKeyDown(16) ? ItemManager.blockEmpty[0].id : ItemManager.packs['beta'].blocks[3].id;
+      let id = Input.isKeyDown(16) ? ItemManager.blockEmpty[0].id : this.selectedBlock;
       let pos = this.world.toLocal({x: Input.mouseX, y: Input.mouseY}, Global.stage);
       this.world.setTile(id, Math.floor(pos.x/Config.blockSize), Math.floor(pos.y/Config.blockSize));
     }

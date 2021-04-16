@@ -27,6 +27,10 @@ class ItemBlock {
     return this._frames[0];
   }
 
+  get sprite() {
+    return new Sprite(new Texture(ItemManager.blocksBMD, this.frame));
+  }
+
   animationFrame(offset, x, y) {
     return this._frames[((offset*this.speed >> 0)+x+y)%this._frames.length];
   }

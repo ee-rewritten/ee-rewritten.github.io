@@ -56,13 +56,52 @@ class UI extends PIXI.Container {
     this.hotbar.addTextButton('goto\nlobby', false, 'lobby');
     this.hotbar.addTextureButton('share');
 
-    this.hotbar.addTextButton('god\nmode', false, 'god');
+    let godbtn = this.hotbar.addTextButton('god\nmode', false, 'god');
+    godbtn.interactive = true;
+    godbtn.on('pointerdown', e=>Global.base.state.player.toggleGodMode());
 
     this.hotbar.addTextureButton('smiley', ItemManager.smileysBMD, Config.smileySize, Config.smileySize);
     this.hotbar.addTextureButton('aura', ItemManager.godmodeBMD, Config.godmodeSize, Config.godmodeSize, 1);
     this.hotbar.addTextureButton('chat', 'chaticon');
 
-    this.hotbar.addTextButton('enter level code to edit        ', false, 'code');
+    // this.hotbar.addTextButton('enter level code to edit        ', false, 'code');
+    let blockbar = new Container();
+    blockbar.x = 3;
+
+    let blockcontainer = new Container();
+    blockcontainer.y = this.hotbar.height - Config.blockSize - 3;
+    blockbar.addChild(blockcontainer);
+
+    for(let i = 0; i <= 10; i++) {
+      let imblock = i ? ItemManager.packs['basic'].blocks[i-1] : ItemManager.blockEmpty[1];
+      if(!imblock) break;
+      let block = imblock.sprite;
+      block.x = i * Config.blockSize;
+      block.setAttr('id', imblock.id);
+
+      let blocknum = UI.createText(i ? (i%10).toString() : '^', 'Visitor');
+      blocknum.x = Config.blockSize - blocknum.width+3;
+      blocknum.y = Config.blockSize - blocknum.height+5;
+      blocknum.alpha = 0.5;
+
+      block.addChild(blocknum);
+
+      block.interactive = true;
+      block.on('pointerdown', e=>Global.base.state.selectedBlock = (e.target.getAttr('id')));
+
+      blockcontainer.addChild(block);
+    }
+
+    let blockbartext = UI.createText('level bricks', 'Visitor');
+    blockbartext.y = 1;
+    blockbar.addChild(blockbartext);
+
+    let blockmore = UI.createText('^ more', 'Visitor');
+    blockmore.x = blockcontainer.width +  6;
+    blockmore.y = (this.hotbar.height-blockmore.height)/2 + 2;
+    blockbar.addChild(blockmore);
+
+    this.hotbar.addImageButton('edit', blockbar, null, null, 0, false, blockbar.width + 7, false)
 
     this.hotbar.addTextureButton('map', null, null, null, 0, true, 31);
     this.hotbar.addTextureButton('favlike', null, 43, 28, 0, true, 43);

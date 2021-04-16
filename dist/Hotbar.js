@@ -30,6 +30,7 @@ class Hotbar extends PIXI.NineSlicePlane {
     }
     this.addChild(button);
     this.buttons[name] = button;
+    return button;
   }
   addTextureButton(name, texture, ...args) {
     let sprite;
@@ -37,15 +38,17 @@ class Hotbar extends PIXI.NineSlicePlane {
     if(typeof(texture) == "string")
       sprite = new Sprite(new Texture(ItemManager.baseTexture(texture)));
     else sprite = new Sprite(new Texture(texture));
-    this.addImageButton(name, sprite, ...args);
+    return this.addImageButton(name, sprite, ...args);
   }
 
-  addImageButton(name, sprite, imgWidth = null, imgHeight = null, frame = 0, alignRight = false, width = 30) {
+  addImageButton(name, sprite, imgWidth = null, imgHeight = null, frame = 0, alignRight = false, width = 30, center = true) {
     let button = UI.createNineSlice('hotbar', 1);
     if(imgWidth && imgHeight)
       sprite.texture.frame = new Rectangle(frame*imgWidth, 0, imgWidth, imgHeight);
-    sprite.x = (width-sprite.width)/2;
-    sprite.y = (this.height-sprite.height)/2;
+    if(center) {
+      sprite.x = (width-sprite.width)/2;
+      sprite.y = (this.height-sprite.height)/2;
+    }
     button.addChild(sprite);
 
     button.width = width;
@@ -59,6 +62,7 @@ class Hotbar extends PIXI.NineSlicePlane {
     }
     this.addChild(button);
     this.buttons[name] = button;
+    return button;
   }
   setButtonFrame(name, frame) {
     let texture = this.buttons[name].children[0].texture;
