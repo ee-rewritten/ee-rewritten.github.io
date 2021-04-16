@@ -3,7 +3,9 @@ class PlayState extends State {
   world; worldName; worldInfo;
   player;
   players;
+
   selectedBlock = ItemManager.blockEmpty[0].id;
+  layerlock = 0;
 
   camera = {
     x: 0,
@@ -51,7 +53,7 @@ class PlayState extends State {
 
   tick() {
     if(Input.isKeyJustPressed(122)) {
-      if(!Global.isFullscreen) Global.goFullscreen();
+      Global.fullscreen = !Global.isFullscreen;
     }
 
     if(Input.isKeyDown(Key.lookLeft)) {
@@ -78,9 +80,19 @@ class PlayState extends State {
     }
 
     if(Input.isMouseDown && Input.mouseX <= Config.gameWidth && Input.mouseY <= Config.gameHeight) {
-      let id = Input.isKeyDown(16) ? ItemManager.blockEmpty[0].id : this.selectedBlock;
+      let id = this.selectedBlock;
       let pos = this.world.toLocal({x: Input.mouseX, y: Input.mouseY}, Global.stage);
-      this.world.setTile(id, Math.floor(pos.x/Config.blockSize), Math.floor(pos.y/Config.blockSize));
+      let x = Math.floor(pos.x/Config.blockSize), y = Math.floor(pos.y/Config.blockSize)
+
+      if((Input.isKeyDown(16) || ItemManager.isBlockEmpty(id))) {
+        if(Input.isMouseJustPressed) {
+          if(ItemManager.isBlockEmpty(this.world.getTile(0, x, y))) this.layerlock = 1;
+          else this.layerlock = 0;
+        }
+        id = ItemManager.blockEmpty[this.layerlock].id;
+      }
+
+      this.world.setTile(id, x, y);
     }
 
 

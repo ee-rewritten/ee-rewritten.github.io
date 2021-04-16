@@ -52,6 +52,13 @@ class ItemManager {
     this.createBlockPack('sci-fi').addStaticBlocks(15, ItemLayer.BELOW);
   }
 
+  static isBlockEmpty(id) {
+    for(let i = 0; i < this.blockEmpty.length; i++) {
+      if(id == this.blockEmpty[i].id) return true;
+    }
+    return false;
+  }
+
   static lastYOffset = 0;
   static createBlockPack(name, payvaultId = '') {
     let tab = this._addingToTab;
