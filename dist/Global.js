@@ -24,11 +24,11 @@ class Global {
   static set fullscreen(bool) {
     if(bool) {
       if (this.canvas.requestFullscreen) {
-        this.canvas.requestFullscreen();
+        this.canvas.requestFullscreen().then(() => screen.orientation.lock('landscape'));
       } else if (this.canvas.webkitRequestFullscreen) { /* Safari */
-        this.canvas.webkitRequestFullscreen();
+        this.canvas.webkitRequestFullscreen().then(() => screen.orientation.lock('landscape'));
       } else if (this.canvas.msRequestFullscreen) { /* IE11 */
-        this.canvas.msRequestFullscreen();
+        this.canvas.msRequestFullscreen().then(() => screen.orientation.lock('landscape'));
       }
     }
     else {
@@ -46,6 +46,11 @@ class Global {
     this._isFullscreen = value;
 
     if(value) {
+      var orientation = (screen.orientation || {}).type || screen.mozOrientation || screen.msOrientation;
+      if(orientation.contains('landscape')) {
+        this.screenWidth = window.screen.width;
+        this.screenHeight = window.screen.height;
+      }
       let ratio = this.screenWidth/this.screenHeight;
       this.resize(Math.floor(Config.fullHeight*ratio));
       this.scale = this.screenHeight / Config.fullHeight;

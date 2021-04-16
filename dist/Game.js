@@ -28,12 +28,12 @@ class Game {
       interaction.interactionDOMElement = Global.app.view;
       interaction.addEvents();
 
-      //Add the canvas that Pixi automatically created for you to the HTML document
       Global.screenWidth = window.screen.width;
       Global.screenHeight = window.screen.height;
 
       //negative margin hack because pixi's canvas is 5px taller than specified and I can't fix it
       Global.canvas.style.marginBottom = "-5px";
+      //Add the canvas that Pixi automatically created for you to the HTML document
       document.getElementById('ee').appendChild(Global.canvas);
       document.addEventListener('fullscreenchange', () => {
         let element =
