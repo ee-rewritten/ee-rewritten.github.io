@@ -21,14 +21,23 @@ class Global {
     this.app.renderer.resize(width, Config.fullHeight);
   }
 
+  static rotate() {
+    try {
+      screen.orientation.lock('landscape');
+    } catch (e) {
+      console.log('hi')
+    } finally {
+
+    }
+  }
   static set fullscreen(bool) {
     if(bool) {
       if (this.canvas.requestFullscreen) {
-        this.canvas.requestFullscreen().then(() => screen.orientation.lock('landscape'));
+        this.canvas.requestFullscreen().then(this.rotate);
       } else if (this.canvas.webkitRequestFullscreen) { /* Safari */
-        this.canvas.webkitRequestFullscreen().then(() => screen.orientation.lock('landscape'));
+        this.canvas.webkitRequestFullscreen().then(this.rotate);
       } else if (this.canvas.msRequestFullscreen) { /* IE11 */
-        this.canvas.msRequestFullscreen().then(() => screen.orientation.lock('landscape'));
+        this.canvas.msRequestFullscreen().then(this.rotate);
       }
     }
     else {
@@ -47,7 +56,7 @@ class Global {
 
     if(value) {
       var orientation = (screen.orientation || {}).type || screen.mozOrientation || screen.msOrientation;
-      if(orientation.contains('landscape')) {
+      if(orientation.includes('landscape')) {
         this.screenWidth = window.screen.width;
         this.screenHeight = window.screen.height;
       }
