@@ -119,9 +119,12 @@ class World extends PIXI.Container {
     if(!ItemManager.blocks[id]) id = ItemManager.blockError[0].id;
     let layer = ItemLayer.RLAYER_TO_BLAYER[ItemManager.blocks[id].layer];
     if(!this.realmap[layer] || !this.realmap[layer][x]) return;
+
+    if(this.realmap[layer][x][y] == id) return;
+
     this.realmap[layer][x][y] = id;
     this.sortIntoRenderLayer(layer, x, y, id);
-    this.redraw(true);
+    this.redraw(true, x, y);
   }
 
   sortIntoRenderLayer(layer, x, y, id) {
@@ -136,7 +139,7 @@ class World extends PIXI.Container {
     });
   }
 
-  redraw(force) {
+  redraw(force, x = null, y = null) {
     for (let renderLayer = 0; renderLayer < this.rendermapContainers.length; renderLayer++) {
       let blockContainer = this.rendermapContainers[renderLayer];
 
@@ -152,7 +155,8 @@ class World extends PIXI.Container {
           id = this.getRenderTile(renderLayer, block.x/Config.blockSize, block.y/Config.blockSize);
         }
 
-        if(offscreen || force || ItemManager.blocks[id] && ItemManager.blocks[id].isAnimated) {
+        if(offscreen || force && (x == null && y == null || x == block.x/Config.blockSize && y == block.y/Config.blockSize)
+          || ItemManager.blocks[id] && ItemManager.blocks[id].isAnimated) {
           if(offscreen) {
             if(pos.x <= -Config.blockSize) block.x += Config.gameWidthCeil + Config.blockSize;
             if(pos.x > Config.gameWidthCeil) block.x -= Config.gameWidthCeil + Config.blockSize;
