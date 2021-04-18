@@ -22,13 +22,8 @@ class Global {
   }
 
   static rotate() {
-    try {
-      screen.orientation.lock('landscape');
-    } catch (e) {
-      console.log('hi')
-    } finally {
-
-    }
+    let nothing = () => {};
+    screen.orientation.lock('landscape').then(nothing, nothing);
   }
   static set fullscreen(bool) {
     if(bool) {
@@ -56,7 +51,7 @@ class Global {
 
     if(value) {
       var orientation = (screen.orientation || {}).type || screen.mozOrientation || screen.msOrientation;
-      if(orientation.includes('landscape')) {
+      if(this.isMobile && orientation.includes('landscape')) {
         this.screenWidth = window.screen.width;
         this.screenHeight = window.screen.height;
       }
