@@ -21,17 +21,15 @@ class Hotbar extends PIXI.NineSlicePlane {
 
     button.width = buttonText.width-2 + padding*2;
     button.height = this.height;
-    if(alignRight) {
-      this.lastRightX += button.width-1;
-      button.x = this.width - this.lastRightX;
-    } else {
-      button.x = this.lastLeftX;
-      this.lastLeftX += button.width-1;
-    }
+
+    button.setAttr('alignRight', alignRight);
+    this.alignButton(button);
+
     this.addChild(button);
     this.buttons[name] = button;
     return button;
   }
+
   addTextureButton(name, texture, ...args) {
     let sprite;
     if(!texture) texture = name;
@@ -53,13 +51,10 @@ class Hotbar extends PIXI.NineSlicePlane {
 
     button.width = width;
     button.height = this.height;
-    if(alignRight) {
-      this.lastRightX += button.width-1;
-      button.x = this.width - this.lastRightX;
-    } else {
-      button.x = this.lastLeftX;
-      this.lastLeftX += button.width-1;
-    }
+
+    button.setAttr('alignRight', alignRight);
+    this.alignButton(button);
+
     this.addChild(button);
     this.buttons[name] = button;
     return button;
@@ -68,5 +63,37 @@ class Hotbar extends PIXI.NineSlicePlane {
     let texture = this.buttons[name].children[0].texture;
     if(texture && texture.frame.width*(frame+1) <= texture.baseTexture.width)
       texture.frame = new Rectangle(texture.frame.width*frame, 0, texture.frame.width, texture.frame.height);
+  }
+
+  showButton(name, visible) {
+    let button = this.buttons[name]
+    if(button.visible != visible) {
+      button.visible = visible;
+      this.alignButtons(button.getAttr('alignRight'));
+    }
+  }
+
+  alignButton(button) {
+    if(button.getAttr('alignRight')) {
+      this.lastRightX += button.width-1;
+      button.x = this.width - this.lastRightX;
+    } else {
+      button.x = this.lastLeftX;
+      this.lastLeftX += button.width-1;
+    }
+  }
+  alignButtons(right = false) {
+    if(right) this.lastRightX = 1;
+    else this.lastLeftX = 0;
+    for(let name in this.buttons) {
+      let button = this.buttons[name];
+      if(button.visible && button.getAttr('alignRight') == right) this.alignButton(button);
+    }
+  }
+
+  addEventListener(name, event, callback) {
+    let button = this.buttons[name];
+    button.interactive = true;
+    button.on(event, callback);
   }
 }
