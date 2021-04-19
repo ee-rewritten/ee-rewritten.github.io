@@ -10,7 +10,10 @@ class UI extends PIXI.Container {
   chat; worldName; worldInfo;
 
   hotbar;
+  hotbarsmiley;
+  blockcontainer;
   blockselector;
+  _selectedBlock;
 
   infoBG; infoBox; info;
 
@@ -27,6 +30,7 @@ class UI extends PIXI.Container {
 
       //hotbar images
       .add('share', './Assets/UI/share.png')
+      .add('aura', './Assets/UI/aura.png')
       .add('chaticon', './Assets/UI/chaticon.png')
       .add('map', './Assets/UI/map.png')
       .add('favlike', './Assets/UI/favlike.png')
@@ -64,62 +68,25 @@ class UI extends PIXI.Container {
     godbtn.interactive = true;
     godbtn.on('pointerdown', e=>Global.base.state.player.toggleGodMode());
 
-    this.hotbar.addTextureButton('smiley', ItemManager.smileysBMD, Config.smileySize, Config.smileySize);
-    this.hotbar.addTextureButton('aura', ItemManager.godmodeBMD, Config.godmodeSize, Config.godmodeSize, 1);
-    this.hotbar.addTextureButton('chat', 'chaticon');
+    this.hotbarsmiley = new Sprite(new Texture(ItemManager.smileysBMD, new Rectangle(0,0,Config.smileySize,Config.smileySize)));
+    let bg = this.hotbar.addTextureButton('smiley', 'aura', 28, 28);
+    bg.addChild(this.hotbarsmiley);
+    this.hotbarsmiley.x = (30-Config.smileySize)/2;
+    this.hotbarsmiley.y = (this.hotbar.height-Config.smileySize)/2;
+
+    this.hotbar.addTextureButton('aura', null, 28, 28);
+    this.hotbar.addTextureButton('chat', 'chaticon', 28, 28);
 
     // this.hotbar.addTextButton('enter level code to edit        ', false, 'code');
-    let blockbar = new Container();
-    blockbar.x = 3;
-
-
-    let blockcontainer = new Container();
-    blockcontainer.y = this.hotbar.height - Config.blockSize - 3;
-    blockbar.addChild(blockcontainer);
-
-    for(let i = 0; i <= 10; i++) {
-      let imblock = i ? ItemManager.packs['basic'].blocks[i-1] : ItemManager.blockEmpty[1];
-      if(!imblock) break;
-      let block = imblock.sprite;
-      block.x = i * Config.blockSize;
-      block.setAttr('id', imblock.id);
-
-      let blocknum = UI.createText(i ? (i%10).toString() : '^', 'Visitor');
-      blocknum.x = Config.blockSize - blocknum.width+3;
-      blocknum.y = Config.blockSize - blocknum.height+5;
-      blocknum.alpha = 0.5;
-
-      block.addChild(blocknum);
-
-      block.interactive = true;
-      block.on('pointerdown', e => {
-        Global.base.state.selectedBlock = (e.target.getAttr('id'));
-        this.blockselector.x = e.target.x;
-      });
-
-      blockcontainer.addChild(block);
-    }
-    this.blockselector = new Sprite(loader.resources['selector'].texture);
-    blockcontainer.addChild(this.blockselector);
-
-    let blockbartext = UI.createText('level bricks', 'Visitor');
-    blockbartext.y = 1;
-    blockbar.addChild(blockbartext);
-
-    let blockmore = UI.createText('^ more', 'Visitor');
-    blockmore.x = blockcontainer.width +  6;
-    blockmore.y = (this.hotbar.height-blockmore.height)/2 + 2;
-    blockbar.addChild(blockmore);
-
+    let blockbar = this.createBlockBar();
     this.hotbar.addImageButton('edit', blockbar, null, null, 0, false, blockbar.width + 7, false)
 
-    this.hotbar.addTextureButton('map', null, null, null, 0, true, 31);
+    this.hotbar.addTextureButton('map', null, 29, 28, 0, true, 31);
     this.hotbar.addTextureButton('favlike', null, 43, 28, 0, true, 43);
     this.hotbar.addTextButton('options', true);
 
-    let fullscreenbtn = this.hotbar.addTextureButton('fullscreen', null, null, null, 0, true,);
-    fullscreenbtn.interactive = true;
-    fullscreenbtn.on('pointerdown', e=>Global.fullscreen = !Global.isFullscreen);
+    this.hotbar.addTextureButton('fullscreen', null, null, null, 0, true,);
+    this.hotbar.addEventListener('fullscreen', 'pointerdown', e=>Global.fullscreen = !Global.isFullscreen);
 
     this.addChild(this.hotbar);
 
@@ -198,6 +165,92 @@ class UI extends PIXI.Container {
       this.joystick.y = Config.gameHeight - this.joystick.height/2 - 10;
       this.addChild(this.joystick);
     }
+  }
+
+  createBlockBar() {
+    let blockbar = new Container();
+    blockbar.x = 3;
+
+    this.blockcontainer = new Container();
+    let numcontainer = new Container();
+    this.blockcontainer.y = numcontainer.y = this.hotbar.height - Config.blockSize - 3;
+    blockbar.addChild(this.blockcontainer);
+    blockbar.addChild(numcontainer);
+
+    for(let i = 0; i <= 10; i++) {
+      let imblock = i ? ItemManager.packs['beta'].blocks[i-1] : ItemManager.blockEmpty[1];
+      if(!imblock) break;
+      let block = imblock.sprite;
+      block.x = i * Config.blockSize;
+      block.setAttr('blockid', imblock.id);
+      block.setAttr('id', i);
+
+      let blocknum = UI.createText(i ? (i%10).toString() : '^', 'Visitor');
+      blocknum.x = block.x + Config.blockSize - blocknum.width+3;
+      blocknum.y = Config.blockSize - blocknum.height+5;
+      blocknum.alpha = 0.5;
+
+      block.interactive = true;
+      block.on('pointerdown', e => {
+        this.selectBlock(e.target.getAttr('blockid'));
+      });
+
+      this.blockcontainer.addChild(block);
+      numcontainer.addChild(blocknum);
+    }
+    this.blockselector = new Sprite(loader.resources['selector'].texture);
+    this.blockcontainer.addChild(this.blockselector);
+
+    this.selectNthBlock(0);
+
+    let blockbartext = UI.createText('level bricks', 'Visitor');
+    blockbartext.y = 1;
+    blockbar.addChild(blockbartext);
+
+    let blockmore = UI.createText('^ more', 'Visitor');
+    blockmore.x = this.blockcontainer.width +  6;
+    blockmore.y = (this.hotbar.height-blockmore.height)/2 + 2;
+    blockbar.addChild(blockmore);
+
+    return blockbar;
+  }
+
+  selectBlock(value) {
+    this._selectedBlock = value;
+    for(let i = 0; i < this.blockcontainer.children.length; i++) {
+      let block = this.blockcontainer.children[i];
+      if(block.getAttr('blockid') == value) {
+        this.blockselector.visible = true;
+        this.blockselector.x = block.x;
+        return;
+      }
+    }
+    this.blockselector.visible = false;
+  }
+  get selectedBlock() {return this._selectedBlock}
+
+  selectNthBlock(value) {
+    let block = this.blockcontainer.children[value];
+    if(!block) return;
+
+    if(block.getAttr('id') == value) {
+      this.blockselector.visible = true;
+      this.blockselector.x = block.x;
+      this._selectedBlock = block.getAttr('blockid');
+      return;
+    }
+  }
+
+  handleKey(e) {
+    this.selectNthBlock(this.getTopRowIndex(e));
+  }
+  getTopRowIndex(event) {
+    if(event.code == 'Backquote') return 0;
+    if(event.keyCode > 48 && event.keyCode < 58) return event.keyCode-48;
+    if(event.keyCode == 48) return 10;
+    if(event.code == 'Minus') return 11;
+    if(event.code == 'Plus') return 12;
+    return null;
   }
 
   redrawChat(width) {

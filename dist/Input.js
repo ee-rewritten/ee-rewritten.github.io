@@ -23,6 +23,7 @@ class Input {
         if(!this.keys[e.keyCode]) {
           this.justPressedKeys[e.keyCode] = true;
           this.keys[e.keyCode] = true;
+          Global.base?.UI?.handleKey(e);
         }
         e.preventDefault();
       }

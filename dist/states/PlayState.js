@@ -4,7 +4,6 @@ class PlayState extends State {
   player;
   players;
 
-  selectedBlock = ItemManager.blockEmpty[0].id;
   layerlock = 0;
 
   camera = {
@@ -79,8 +78,15 @@ class PlayState extends State {
       this.player.toggleGodMode();
     }
 
+    if(Input.isKeyDown(16)) {
+      Global.base.UI.blockselector.x = 0;
+    }
+    else if(Input.isKeyJustReleased(16)) {
+      Global.base.UI.selectBlock(Global.base.UI.selectedBlock);
+    }
+
     if(Input.isMouseDown && Input.mouseX <= Config.gameWidth && Input.mouseY <= Config.gameHeight) {
-      let id = this.selectedBlock;
+      let id = Global.base.UI.selectedBlock;
       let pos = this.world.toLocal({x: Input.mouseX, y: Input.mouseY}, Global.stage);
       let x = Math.floor(pos.x/Config.blockSize), y = Math.floor(pos.y/Config.blockSize)
 
