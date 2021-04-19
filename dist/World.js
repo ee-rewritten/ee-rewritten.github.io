@@ -41,7 +41,9 @@ class World extends PIXI.Container {
     }
     for (let i = 0; i < playstate.players.length; i++) {
       this.addChild(playstate.players[i]);
+      this.addChild(playstate.names[i]);
       playstate.players[i].zIndex = ItemLayer.PLAYER_LAYERS[i];
+      playstate.names[i].zIndex = ItemLayer.NAME_LAYERS[i];
     }
 
     this.sortChildren();

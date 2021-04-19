@@ -34,15 +34,14 @@ class Player extends PIXI.Container {
     let godmodeTexture = new Texture(ItemManager.godmodeBMD, new Rectangle(Config.godmodeSize,0,Config.godmodeSize,Config.godmodeSize));
     this.godmodeSprite = new Sprite(godmodeTexture);
     this.addChild(this.godmodeSprite);
-    this.toggleGodMode(false);
 
     let smileyTexture = new Texture(ItemManager.smileysBMD, new Rectangle(0,0,Config.smileySize,Config.smileySize));
     this.smileySprite = new Sprite(smileyTexture);
     this.addChild(this.smileySprite);
 
     this.nameText = UI.createShadowText(name, 'Visitor');
-    this.addChild(this.nameText);
 
+    this.toggleGodMode(false);
     this.enterFrame();
   }
 

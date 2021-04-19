@@ -2,7 +2,7 @@ class PlayState extends State {
   target;
   world; worldName; worldInfo;
   player;
-  players;
+  players; names;
 
   layerlock = 0;
 
@@ -14,8 +14,10 @@ class PlayState extends State {
     super();
 
     this.players = new Array(ItemLayer.PLAYER_LAYERS.length);
+    this.names = new Array(ItemLayer.NAME_LAYERS.length);
     for (let i = 0; i < this.players.length; i++) {
       this.players[i] = new Container();
+      this.names[i] = new Container();
     }
 
     this.world = new World(this, width, height, depth);
@@ -33,9 +35,13 @@ class PlayState extends State {
   }
 
   movePlayer(p) {
-    if(p.layer != null) this.players[p.layer].removeChild(p);
+    if(p.layer != null) {
+      this.players[p.layer].removeChild(p);
+      this.names[p.layer].removeChild(p.nameText);
+    }
     p.layer = p.isInGodMode ? 1 : 0;
     this.players[p.layer].addChild(p);
+    this.names[p.layer].addChild(p.nameText);
   }
 
   enterFrame() {
