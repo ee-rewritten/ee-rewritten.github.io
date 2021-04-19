@@ -60,9 +60,11 @@ class Player extends PIXI.Container {
         y += Config.smileyRows*Config.smileySize;
       }
     }
+    let frame = new Rectangle(x, y,
+      Config.smileySize, Config.smileySize)
 
-    this.smileySprite.texture.frame = new Rectangle(x, y,
-      Config.smileySize, Config.smileySize);
+    this.smileySprite.texture.frame = frame;
+    if(Global.base.UI) Global.base.UI.hotbarsmiley.texture.frame = frame;
   }
   get smiley() {
     return this._smiley;

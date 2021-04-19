@@ -68,7 +68,7 @@ class UI extends PIXI.Container {
     godbtn.interactive = true;
     godbtn.on('pointerdown', e=>Global.base.state.player.toggleGodMode());
 
-    this.hotbarsmiley = new Sprite(new Texture(ItemManager.smileysBMD, new Rectangle(0,0,Config.smileySize,Config.smileySize)));
+    this.hotbarsmiley = new Sprite(new Texture(ItemManager.smileysBMD, Global.base.state.player.smileySprite.texture.frame));
     let bg = this.hotbar.addTextureButton('smiley', 'aura', 28, 28);
     bg.addChild(this.hotbarsmiley);
     this.hotbarsmiley.x = (30-Config.smileySize)/2;
@@ -178,7 +178,7 @@ class UI extends PIXI.Container {
     blockbar.addChild(numcontainer);
 
     for(let i = 0; i <= 10; i++) {
-      let imblock = i ? ItemManager.packs['beta'].blocks[i-1] : ItemManager.blockEmpty[1];
+      let imblock = i ? ItemManager.packs['basic'].blocks[i-1] : ItemManager.blockEmpty[1];
       if(!imblock) break;
       let block = imblock.sprite;
       block.x = i * Config.blockSize;
