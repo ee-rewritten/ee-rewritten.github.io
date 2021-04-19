@@ -22,10 +22,12 @@ class Global {
   }
 
   static rotate() {
+    Input.isGameInFocus = true;
     let nothing = () => {};
     screen.orientation.lock('landscape').then(nothing, nothing);
   }
   static set fullscreen(bool) {
+    Input.isGameInFocus = false;
     if(bool) {
       if (this.canvas.requestFullscreen) {
         this.canvas.requestFullscreen().then(this.rotate);
