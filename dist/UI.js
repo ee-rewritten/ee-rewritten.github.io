@@ -14,6 +14,8 @@ class UI extends PIXI.Container {
   blockcontainer;
   blockselector;
   _selectedBlock;
+  _showingMore = false;
+  blockbar;
 
   infoBG; infoBox; info;
 
@@ -35,11 +37,12 @@ class UI extends PIXI.Container {
       .add('map', './Assets/UI/map.png')
       .add('favlike', './Assets/UI/favlike.png')
       .add('fullscreen', './Assets/UI/fullscreen.png')
+      .add('moreless', './Assets/UI/moreless.png')
 
       .add('selector', './Assets/UI/selector.png')
   }
 
-  static createNineSlice(name, borders) {
+  static createNineSlice(name, borders = 1) {
     return new NineSlice(loader.resources[name].texture, borders, borders, borders, borders);
   }
   static createText(text, font, scale = 1, align = 'left') {
@@ -64,24 +67,29 @@ class UI extends PIXI.Container {
     this.hotbar.addTextButton('goto\nlobby', false, 'lobby');
     this.hotbar.addTextureButton('share');
 
-    let godbtn = this.hotbar.addTextButton('god\nmode', false, 'god');
-    godbtn.interactive = true;
-    godbtn.on('pointerdown', e=>Global.base.state.player.toggleGodMode());
+    this.hotbar.addTextButton('god\nmode', false, 'god');
+    this.hotbar.addEventListener('god', 'pointerdown', ()=>Global.base.state.player.toggleGodMode(), false);
 
     this.hotbarsmiley = new Sprite(new Texture(ItemManager.smileysBMD, Global.base.state.player.smileySprite.texture.frame));
     let bg = this.hotbar.addTextureButton('smiley', 'aura', 28, 28);
     bg.addChild(this.hotbarsmiley);
     this.hotbarsmiley.x = (30-Config.smileySize)/2;
     this.hotbarsmiley.y = (this.hotbar.height-Config.smileySize)/2;
+    this.hotbar.addEventListener('smiley', 'pointerdown', ()=>{});
 
     this.hotbar.addTextureButton('aura', null, 28, 28);
+    this.hotbar.addEventListener('aura', 'pointerdown', ()=>{});
+
     this.hotbar.addTextureButton('chat', 'chaticon', 28, 28);
+    this.hotbar.addEventListener('chat', 'pointerdown', ()=>{});
 
     // this.hotbar.addTextButton('enter level code to edit        ', false, 'code');
-    let blockbar = this.createBlockBar();
-    this.hotbar.addImageButton('edit', blockbar, null, null, 0, false, blockbar.width + 7, false)
+    let hotbarblocks = this.createBlockBar();
+    this.hotbar.addImageButton('edit', hotbarblocks, null, null, 0, false, hotbarblocks.width+2, false)
 
     this.hotbar.addTextureButton('map', null, 29, 28, 0, true, 31);
+    this.hotbar.addEventListener('map', 'pointerdown', ()=>{});
+
     this.hotbar.addTextureButton('favlike', null, 43, 28, 0, true, 43);
     this.hotbar.addTextButton('options', true);
 
@@ -92,7 +100,7 @@ class UI extends PIXI.Container {
 
 
     // right chat panel
-    this.chat = UI.createNineSlice('chat', 1);
+    this.chat = UI.createNineSlice('chat');
     this.chat.width = Config.fullWidth-Config.gameWidth;
     this.chat.height = Config.fullHeight;
     this.chat.x = Config.gameWidth;
@@ -168,14 +176,14 @@ class UI extends PIXI.Container {
   }
 
   createBlockBar() {
-    let blockbar = new Container();
-    blockbar.x = 3;
+    let hotbarblocks = new Container();
+    hotbarblocks.x = 3;
 
     this.blockcontainer = new Container();
     let numcontainer = new Container();
     this.blockcontainer.y = numcontainer.y = this.hotbar.height - Config.blockSize - 3;
-    blockbar.addChild(this.blockcontainer);
-    blockbar.addChild(numcontainer);
+    hotbarblocks.addChild(this.blockcontainer);
+    hotbarblocks.addChild(numcontainer);
 
     for(let i = 0; i <= 10; i++) {
       let imblock = i ? ItemManager.packs['basic'].blocks[i-1] : ItemManager.blockEmpty[1];
@@ -194,6 +202,8 @@ class UI extends PIXI.Container {
       block.on('pointerdown', e => {
         this.selectBlock(e.target.getAttr('blockid'));
       });
+      block.on('pointerover', e=>document.body.style.cursor = 'pointer');
+      block.on('pointerout', e=>document.body.style.cursor = '');
 
       this.blockcontainer.addChild(block);
       numcontainer.addChild(blocknum);
@@ -203,17 +213,36 @@ class UI extends PIXI.Container {
 
     this.selectNthBlock(0);
 
-    let blockbartext = UI.createText('level bricks', 'Visitor');
-    blockbartext.y = 1;
-    blockbar.addChild(blockbartext);
+    let blocktext = UI.createText('level bricks', 'Visitor');
+    blocktext.y = 1;
+    hotbarblocks.addChild(blocktext);
 
-    let blockmore = UI.createText('^ more', 'Visitor');
-    blockmore.x = this.blockcontainer.width +  6;
-    blockmore.y = (this.hotbar.height-blockmore.height)/2 + 2;
-    blockbar.addChild(blockmore);
+    this.blockbar = UI.createNineSlice('hotbar');
 
-    return blockbar;
+    let blockmore = new Sprite(loader.resources['moreless'].texture);
+    blockmore.texture.frame = new Rectangle(0, 0, blockmore.texture.width/2, blockmore.texture.height);
+    blockmore.x = this.blockcontainer.width;
+    blockmore.y = (this.hotbar.height-blockmore.height)/2;
+
+    blockmore.interactive = true;
+    blockmore.on('pointerdown', e => {
+      this.showingMore = !this.showingMore;
+
+      let base = blockmore.texture.baseTexture;
+      blockmore.texture.frame = new Rectangle(this.showingMore ? base.width/2 : 0, 0, base.width/2, base.height);
+    });
+    blockmore.on('pointerover', e=>document.body.style.cursor = 'pointer');
+    blockmore.on('pointerout', e=>document.body.style.cursor = '');
+
+    hotbarblocks.addChild(blockmore);
+
+    return hotbarblocks;
   }
+
+  set showingMore(value) {
+    this._showingMore = value;
+  }
+  get showingMore() {return this._showingMore}
 
   selectBlock(value) {
     this._selectedBlock = value;
@@ -227,8 +256,6 @@ class UI extends PIXI.Container {
     }
     this.blockselector.visible = false;
   }
-  get selectedBlock() {return this._selectedBlock}
-
   selectNthBlock(value) {
     let block = this.blockcontainer.children[value];
     if(!block) return;
@@ -240,6 +267,8 @@ class UI extends PIXI.Container {
       return;
     }
   }
+  get selectedBlock() {return this._selectedBlock}
+
 
   handleKey(e) {
     this.selectNthBlock(this.getTopRowIndex(e));
