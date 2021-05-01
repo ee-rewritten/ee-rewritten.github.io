@@ -13,6 +13,7 @@ class UI extends PIXI.Container {
   hotbarsmiley;
   blockcontainer;
   blockselector;
+  blockmore;
   _selectedBlock;
   _showingMore = false;
   blockbar;
@@ -217,30 +218,39 @@ class UI extends PIXI.Container {
     blocktext.y = 1;
     hotbarblocks.addChild(blocktext);
 
-    this.blockbar = UI.createNineSlice('hotbar');
+    this.blockmore = new Sprite(loader.resources['moreless'].texture);
+    this.blockmore.texture.frame = new Rectangle(0, 0, this.blockmore.texture.width/2, this.blockmore.texture.height);
+    this.blockmore.x = this.blockcontainer.width;
+    this.blockmore.y = (this.hotbar.height-this.blockmore.height)/2;
 
-    let blockmore = new Sprite(loader.resources['moreless'].texture);
-    blockmore.texture.frame = new Rectangle(0, 0, blockmore.texture.width/2, blockmore.texture.height);
-    blockmore.x = this.blockcontainer.width;
-    blockmore.y = (this.hotbar.height-blockmore.height)/2;
-
-    blockmore.interactive = true;
-    blockmore.on('pointerdown', e => {
+    this.blockmore.interactive = true;
+    this.blockmore.on('pointerdown', e => {
       this.showingMore = !this.showingMore;
-
-      let base = blockmore.texture.baseTexture;
-      blockmore.texture.frame = new Rectangle(this.showingMore ? base.width/2 : 0, 0, base.width/2, base.height);
     });
-    blockmore.on('pointerover', e=>document.body.style.cursor = 'pointer');
-    blockmore.on('pointerout', e=>document.body.style.cursor = '');
+    this.blockmore.on('pointerover', e=>document.body.style.cursor = 'pointer');
+    this.blockmore.on('pointerout', e=>document.body.style.cursor = '');
 
-    hotbarblocks.addChild(blockmore);
+    hotbarblocks.addChild(this.blockmore);
 
     return hotbarblocks;
   }
 
   set showingMore(value) {
     this._showingMore = value;
+
+    if(!this.blockbar) {
+      this.blockbar = UI.createNineSlice('hotbar');
+      this.blockbar.alpha = 0.95;
+      this.blockbar.width = this.hotbar.width;
+      this.blockbar.height = 100;
+      this.blockbar.y = this.hotbar.y - this.blockbar.height + 1;
+
+      this.addChild(this.blockbar);
+    }
+    this.blockbar.visible = value;
+
+    let base = this.blockmore.texture.baseTexture;
+    this.blockmore.texture.frame = new Rectangle(value ? base.width/2 : 0, 0, base.width/2, base.height);
   }
   get showingMore() {return this._showingMore}
 
