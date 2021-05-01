@@ -12,6 +12,7 @@ class Input {
   static middleMouseJustPressed = false;
 
   static isGameInFocus = false;
+  static allowInput = true;
 
   static joystickDirection = '';
 
@@ -19,7 +20,7 @@ class Input {
   static init() {
     if(this.inited) throw new Error('Input is already initialised.');
     window.addEventListener('keydown', e => {
-      if(this.isGameInFocus || e.keyCode == 122) {
+      if(this.isGameInFocus && this.allowInput || e.keyCode == 122) {
         if(!this.keys[e.keyCode]) {
           this.justPressedKeys[e.keyCode] = true;
           this.keys[e.keyCode] = true;
@@ -38,7 +39,7 @@ class Input {
     window.addEventListener('pointerdown', e => {
       if(e.pointerId == Global.base?.UI?.joystickPointerId || e.buttons & 0b10) return;
       this.isGameInFocus = e.target == Global.canvas;
-      if(this.isGameInFocus) {
+      if(this.isGameInFocus && this.allowInput) {
         this.mouseDown = this.mouseJustPressed = true;
         this.mouseX = e.offsetX;
         this.mouseY = e.offsetY;
@@ -55,7 +56,7 @@ class Input {
       if(e.pointerId == Global.base?.UI?.joystickPointerId || e.buttons & 0b10) return;
       this.mouseDown = false;
       this.isGameInFocus = e.target == Global.canvas;
-        if(this.isGameInFocus) {
+        if(this.isGameInFocus && this.allowInput) {
         this.mouseX = e.offsetX;
         this.mouseY = e.offsetY;
       }
