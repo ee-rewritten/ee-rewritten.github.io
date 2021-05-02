@@ -16,7 +16,7 @@ class Hotbar extends PIXI.NineSlicePlane {
     let buttonText = UI.createText(text, 'Visitor', 1, 'center');
 
     buttonText.x = padding+1;
-    buttonText.y = (button.height-buttonText.height)/2 + 2;
+    buttonText.y = (this.height-buttonText.height)/2 + 2;
     button.addChild(buttonText);
 
     button.width = buttonText.width-2 + padding*2;
