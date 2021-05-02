@@ -72,13 +72,13 @@ class UI extends PIXI.Container {
     this.hotbar.addEventListener('god', 'pointerdown', ()=>Global.base.state.player.toggleGodMode(), false);
 
     this.hotbarsmiley = new Sprite(new Texture(ItemManager.smileysBMD, Global.base.state.player.smileySprite.texture.frame));
-    let bg = this.hotbar.addTextureButton('smiley', 'aura', 28, 28);
+    let bg = this.hotbar.addTextureButton('smiley', 'aura', 40, 40);
     bg.addChild(this.hotbarsmiley);
     this.hotbarsmiley.x = (30-Config.smileySize)/2;
     this.hotbarsmiley.y = (this.hotbar.height-Config.smileySize)/2;
     this.hotbar.addEventListener('smiley', 'pointerdown', ()=>{});
 
-    this.hotbar.addTextureButton('aura', null, 28, 28);
+    this.hotbar.addTextureButton('aura', null, 40, 40);
     this.hotbar.addEventListener('aura', 'pointerdown', ()=>{});
 
     this.hotbar.addTextureButton('chat', 'chaticon', 28, 28);
@@ -94,7 +94,7 @@ class UI extends PIXI.Container {
     this.hotbar.addTextureButton('favlike', null, 43, 28, 0, true, 43);
     this.hotbar.addTextButton('options', true);
 
-    this.hotbar.addTextureButton('fullscreen', null, null, null, 0, true,);
+    this.hotbar.addTextureButton('fullscreen', null, null, null, 0, true);
     this.hotbar.addEventListener('fullscreen', 'pointerdown', e=>Global.fullscreen = !Global.isFullscreen);
 
     this.addChild(this.hotbar);
@@ -186,15 +186,24 @@ class UI extends PIXI.Container {
     hotbarblocks.addChild(this.blockcontainer);
     hotbarblocks.addChild(numcontainer);
 
-    for(let i = 0; i <= 10; i++) {
-      let imblock = i ? ItemManager.packs['basic'].blocks[i-1] : ItemManager.blockEmpty[1];
+    for(let i = 0; i <= 12; i++) {
+      let imblock = i ? ItemManager.packs['game'].blocks[i-1] : ItemManager.blockEmpty[1];
+      if(!imblock) imblock = ItemManager.packs['basic'].blocks[i-1-ItemManager.packs['game'].blocks.length];
       if(!imblock) break;
       let block = imblock.sprite;
       block.x = i * Config.blockSize;
       block.setAttr('blockid', imblock.id);
       block.setAttr('id', i);
 
-      let blocknum = UI.createText(i ? (i%10).toString() : '^', 'Visitor');
+      let blocknumtext =
+      i == 0 ? '^' :
+      i < 10 ? i.toString() :
+      i == 10 ? '0' :
+      i == 11 ? '-' :
+      i == 12 ? '+'
+      : '';
+
+      let blocknum = UI.createText(blocknumtext, 'Visitor');
       blocknum.x = block.x + Config.blockSize - blocknum.width+3;
       blocknum.y = Config.blockSize - blocknum.height+5;
       blocknum.alpha = 0.5;
@@ -288,7 +297,7 @@ class UI extends PIXI.Container {
     if(event.keyCode > 48 && event.keyCode < 58) return event.keyCode-48;
     if(event.keyCode == 48) return 10;
     if(event.code == 'Minus') return 11;
-    if(event.code == 'Plus') return 12;
+    if(event.code == 'Equal') return 12;
     return null;
   }
 

@@ -42,7 +42,11 @@ class Hotbar extends PIXI.NineSlicePlane {
   addImageButton(name, sprite, imgWidth = null, imgHeight = null, frame = 0, alignRight = false, width = 30, center = true) {
     let button = UI.createNineSlice('hotbar');
     if(imgWidth && imgHeight)
-      sprite.texture.frame = new Rectangle(frame*imgWidth, 0, imgWidth, imgHeight);
+      sprite.texture.frame = this.createFrame(imgWidth, imgHeight, width, this.height, frame);
+
+    button.setAttr('frameWidth',  imgWidth);
+    button.setAttr('frameHeight', imgHeight);
+
     if(center) {
       sprite.x = (width-sprite.width)/2;
       sprite.y = (this.height-sprite.height)/2;
@@ -60,13 +64,26 @@ class Hotbar extends PIXI.NineSlicePlane {
     return button;
   }
   setButtonFrame(name, frame) {
-    let texture = this.buttons[name]?.children[0].texture;
+    let button = this.buttons[name];
+    let texture = button?.children[0].texture;
     if(texture && texture.frame.width*(frame+1) <= texture.baseTexture.width)
-      texture.frame = new Rectangle(texture.frame.width*frame, 0, texture.frame.width, texture.frame.height);
+      texture.frame = this.createFrame(button.getAttr('frameWidth'), button.getAttr('frameHeight'), button.width, button.height, frame);
   }
   getButtonFrame(name) {
-    let texture = this.buttons[name]?.children[0].texture;
-    if(texture) return texture.frame.x/texture.frame.width;
+    let button = this.buttons[name];
+    let texture = button?.children[0].texture;
+    if(texture)
+      return Math.floor(texture.frame.x/texture.frame.width);
+  }
+
+  createFrame(imgWidth, imgHeight, maxWidth, maxHeight, frame) {
+    let x = frame*imgWidth, y = 0;
+    return new Rectangle(
+      imgWidth  <= maxWidth  ? x : x + (imgWidth -maxWidth)/2,    //x
+      imgHeight <= maxHeight ? y : y + (imgHeight-maxHeight)/2,   //y
+
+      imgWidth  <= maxWidth  ? imgWidth  : maxWidth,              //width
+      imgHeight <= maxHeight ? imgHeight : maxHeight);            //height
   }
 
   showButton(name, visible) {
