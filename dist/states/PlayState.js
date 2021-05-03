@@ -85,13 +85,13 @@ class PlayState extends State {
     }
 
     if(Input.isKeyDown(16)) {
-      Global.base.UI.blockselector.x = 0;
+      Global.base.UI.tempSelectDelete();
     }
     else if(Input.isKeyJustReleased(16)) {
       Global.base.UI.selectBlock(Global.base.UI.selectedBlock);
     }
 
-    if(Input.isMouseDown && Input.mouseX <= Config.gameWidth && Input.mouseY <= Config.gameHeight) {
+    if(Input.isMouseDown && Global.base.UI.isMouseInGame) {
       let id = Global.base.UI.selectedBlock;
       let pos = this.world.toLocal({x: Input.mouseX, y: Input.mouseY}, Global.stage);
       let x = Math.floor(pos.x/Config.blockSize), y = Math.floor(pos.y/Config.blockSize)

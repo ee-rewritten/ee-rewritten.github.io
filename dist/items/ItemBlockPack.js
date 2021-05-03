@@ -1,17 +1,57 @@
-class ItemBlockPack {
+class ItemBlockPack extends PIXI.Container {
   name = '';
   payvaultId = '';
   tab = 0;
   blocks = [];
   yOffset = 0;
+
+  displayOnly = false;
+
   usedFrames = 0;
 
-  constructor(name, payvaultId, tab, packId, yOffset) {
+  nameText;
+  blockContainer;
+
+  constructor(name, payvaultId, tab, packId, yOffset, displayOnly = false) {
+    super();
     this.name = name;
     this.payvaultId = payvaultId;
     this.tab = tab;
     this.packId = packId;
     this.yOffset = yOffset;
+
+    this.displayOnly = displayOnly;
+
+    this.nameText = UI.createText(name, 'Visitor');
+    this.addChild(this.nameText);
+
+    this.blockContainer = new Container();
+    this.blockContainer.y = this.nameText.height-2;
+    this.addChild(this.blockContainer);
+  }
+
+  pushBlock(block) {
+    let blockSprite = ItemManager.blockEmpty[1] ? ItemManager.blockEmpty[1].sprite : block.sprite
+    blockSprite.x = this.blocks.length * Config.blockSize;
+    blockSprite.setAttr('blockid', block.id);
+
+    blockSprite.interactive = true;
+    blockSprite.on('pointerdown', e => {
+      Global.base?.UI?.selectBlock(e.target.getAttr('blockid'));
+    });
+    blockSprite.on('pointerover', e=>document.body.style.cursor = 'pointer');
+    blockSprite.on('pointerout', e=>document.body.style.cursor = '');
+
+    if(ItemManager.blockEmpty[1]) {
+      let actualBlockSprite = block.sprite;
+      blockSprite.addChild(actualBlockSprite);
+    }
+    this.blockContainer.addChild(blockSprite);
+
+    this.blocks.push(block);
+
+    if(this.displayOnly) return;
+    ItemManager.blocks[block.id] = block;
   }
 
   addStaticBlock(layer, artOffset) {
@@ -24,10 +64,7 @@ class ItemBlockPack {
     //adding a regular block to the pack
     let id = ItemManager.calculateId(this.tab, this.packId, this.blocks.length);
 
-    let block = new ItemBlock(id, layer, artOffset, this.yOffset);
-
-    ItemManager.blocks[id] = block;
-    this.blocks.push(block);
+    this.pushBlock(new ItemBlock(id, layer, artOffset, this.yOffset));
 
     this.usedFrames++;
   }
@@ -40,10 +77,7 @@ class ItemBlockPack {
     if(!artOffset) artOffset = this.usedFrames;
     let id = ItemManager.calculateId(this.tab, this.packId, this.blocks.length);
 
-    let block = new ItemBlock(id, layer, artOffset, this.yOffset, frames, speed);
-
-    ItemManager.blocks[id] = block;
-    this.blocks.push(block);
+    this.pushBlock(new ItemBlock(id, layer, artOffset, this.yOffset, frames, speed));
 
     this.usedFrames += frames;
   }

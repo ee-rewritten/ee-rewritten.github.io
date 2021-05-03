@@ -11,12 +11,12 @@ class UI extends PIXI.Container {
 
   hotbar;
   hotbarsmiley;
-  blockcontainer;
-  blockselector;
-  blockmore;
+  blockContainer;
+  blockSelector;
+  blockMore;
   _selectedBlock;
   _showingMore = false;
-  blockbar;
+  blockMenu;
 
   infoBG; infoBox; info;
 
@@ -86,6 +86,7 @@ class UI extends PIXI.Container {
 
     // this.hotbar.addTextButton('enter level code to edit        ', false, 'code');
     let hotbarblocks = this.createBlockBar();
+    this.showingMore = false;
     this.hotbar.addImageButton('edit', hotbarblocks, null, null, 0, false, hotbarblocks.width+2, false)
 
     this.hotbar.addTextureButton('map', null, 29, 28, 0, true, 31);
@@ -180,20 +181,18 @@ class UI extends PIXI.Container {
     let hotbarblocks = new Container();
     hotbarblocks.x = 3;
 
-    this.blockcontainer = new Container();
     let numcontainer = new Container();
-    this.blockcontainer.y = numcontainer.y = this.hotbar.height - Config.blockSize - 3;
-    hotbarblocks.addChild(this.blockcontainer);
+    let pack = new ItemBlockPack('level bricks', '', 0, 0, 0, true);
+    this.blockContainer = pack.blockContainer;
+
+    hotbarblocks.addChild(pack);
     hotbarblocks.addChild(numcontainer);
 
     for(let i = 0; i <= 12; i++) {
-      let imblock = i ? ItemManager.packs['game'].blocks[i-1] : ItemManager.blockEmpty[1];
-      if(!imblock) imblock = ItemManager.packs['basic'].blocks[i-1-ItemManager.packs['game'].blocks.length];
-      if(!imblock) break;
-      let block = imblock.sprite;
-      block.x = i * Config.blockSize;
-      block.setAttr('blockid', imblock.id);
-      block.setAttr('id', i);
+      let block = i ? ItemManager.packs['game'].blocks[i-1] : ItemManager.blockEmpty[1];
+      if(!block) block = ItemManager.packs['basic'].blocks[i-1-ItemManager.packs['game'].blocks.length];
+      if(!block) break;
+      pack.pushBlock(block);
 
       let blocknumtext =
       i == 0 ? '^' :
@@ -204,42 +203,32 @@ class UI extends PIXI.Container {
       : '';
 
       let blocknum = UI.createText(blocknumtext, 'Visitor');
-      blocknum.x = block.x + Config.blockSize - blocknum.width+3;
-      blocknum.y = Config.blockSize - blocknum.height+5;
+      blocknum.x = i * Config.blockSize + Config.blockSize - blocknum.width+3;
       blocknum.alpha = 0.5;
 
-      block.interactive = true;
-      block.on('pointerdown', e => {
-        this.selectBlock(e.target.getAttr('blockid'));
-      });
-      block.on('pointerover', e=>document.body.style.cursor = 'pointer');
-      block.on('pointerout', e=>document.body.style.cursor = '');
-
-      this.blockcontainer.addChild(block);
       numcontainer.addChild(blocknum);
     }
-    this.blockselector = new Sprite(loader.resources['selector'].texture);
-    this.blockcontainer.addChild(this.blockselector);
+    pack.y = (this.hotbar.height-pack.height)/2;
+    numcontainer.y = pack.y + pack.height - numcontainer.height+2;
+
+    this.blockSelector = new Sprite(loader.resources['selector'].texture);
+    this.blockContainer.addChild(this.blockSelector);
 
     this.selectNthBlock(0);
 
-    let blocktext = UI.createText('level bricks', 'Visitor');
-    blocktext.y = 1;
-    hotbarblocks.addChild(blocktext);
+    this.blockMore = new Sprite(loader.resources['moreless'].texture);
+    this.blockMore.texture.frame = new Rectangle(0, 0, this.blockMore.texture.width/2, this.blockMore.texture.height);
+    this.blockMore.x = this.blockContainer.width;
+    this.blockMore.y = (this.hotbar.height-this.blockMore.height)/2;
 
-    this.blockmore = new Sprite(loader.resources['moreless'].texture);
-    this.blockmore.texture.frame = new Rectangle(0, 0, this.blockmore.texture.width/2, this.blockmore.texture.height);
-    this.blockmore.x = this.blockcontainer.width;
-    this.blockmore.y = (this.hotbar.height-this.blockmore.height)/2;
-
-    this.blockmore.interactive = true;
-    this.blockmore.on('pointerdown', e => {
+    this.blockMore.interactive = true;
+    this.blockMore.on('pointerdown', e => {
       this.showingMore = !this.showingMore;
     });
-    this.blockmore.on('pointerover', e=>document.body.style.cursor = 'pointer');
-    this.blockmore.on('pointerout', e=>document.body.style.cursor = '');
+    this.blockMore.on('pointerover', e=>document.body.style.cursor = 'pointer');
+    this.blockMore.on('pointerout', e=>document.body.style.cursor = '');
 
-    hotbarblocks.addChild(this.blockmore);
+    hotbarblocks.addChild(this.blockMore);
 
     return hotbarblocks;
   }
@@ -247,47 +236,71 @@ class UI extends PIXI.Container {
   set showingMore(value) {
     this._showingMore = value;
 
-    if(!this.blockbar) {
-      this.blockbar = UI.createNineSlice('hotbar');
-      this.blockbar.alpha = 0.95;
-      this.blockbar.width = this.hotbar.width;
-      this.blockbar.height = 100;
-      this.blockbar.y = this.hotbar.y - this.blockbar.height + 1;
+    if(!this.blockMenu) {
+      this.blockMenu = UI.createNineSlice('hotbar');
 
-      this.addChild(this.blockbar);
+      let usedX = 7, usedY = 7;
+      let lastPack;
+      ItemManager.blockTabs[0].forEach(pack => {
+        if(usedX + pack.width > this.hotbar.width) {
+          usedX = 7;
+          usedY += pack.height + 2;
+        }
+
+        pack.x = usedX; pack.y = usedY;
+        usedX += pack.width + 5;
+
+        lastPack = pack;
+        this.blockMenu.addChild(pack);
+      });
+
+      this.blockMenu.alpha = 0.95;
+      this.blockMenu.width = this.hotbar.width;
+      this.blockMenu.height = usedY + lastPack.height + 6;
+      this.blockMenu.y = this.hotbar.y - this.blockMenu.height + 1;
+      this.addChild(this.blockMenu);
     }
-    this.blockbar.visible = value;
+    this.blockMenu.visible = value;
 
-    let base = this.blockmore.texture.baseTexture;
-    this.blockmore.texture.frame = new Rectangle(value ? base.width/2 : 0, 0, base.width/2, base.height);
+    let base = this.blockMore.texture.baseTexture;
+    this.blockMore.texture.frame = new Rectangle(value ? base.width/2 : 0, 0, base.width/2, base.height);
   }
   get showingMore() {return this._showingMore}
 
   selectBlock(value) {
     this._selectedBlock = value;
-    for(let i = 0; i < this.blockcontainer.children.length; i++) {
-      let block = this.blockcontainer.children[i];
+    for(let i = 0; i < this.blockContainer.children.length; i++) {
+      let block = this.blockContainer.children[i];
       if(block.getAttr('blockid') == value) {
-        this.blockselector.visible = true;
-        this.blockselector.x = block.x;
+        this.blockSelector.visible = true;
+        this.blockSelector.x = block.x;
         return;
       }
     }
-    this.blockselector.visible = false;
+    this.blockSelector.visible = false;
   }
   selectNthBlock(value) {
-    let block = this.blockcontainer.children[value];
+    let block = this.blockContainer.children[value];
     if(!block) return;
 
-    if(block.getAttr('id') == value) {
-      this.blockselector.visible = true;
-      this.blockselector.x = block.x;
+    // if(block.getAttr('id') == value) {
+      this.blockSelector.visible = true;
+      this.blockSelector.x = block.x;
       this._selectedBlock = block.getAttr('blockid');
       return;
-    }
+    // }
+  }
+  tempSelectDelete() {
+    this.blockSelector.x = 0;
+    this.blockSelector.visible = true;
   }
   get selectedBlock() {return this._selectedBlock}
 
+
+  get isMouseInGame() {
+    return Input.mouseX <= Config.gameWidth && Input.mouseY <= Config.gameHeight
+    && (!this.showingMore || Input.mouseY <= this.blockMenu.y)
+  }
 
   handleKey(e) {
     this.selectNthBlock(this.getTopRowIndex(e));
