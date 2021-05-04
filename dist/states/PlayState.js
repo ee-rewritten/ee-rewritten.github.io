@@ -91,6 +91,13 @@ class PlayState extends State {
       Global.base.UI.selectBlock(Global.base.UI.selectedBlock);
     }
 
+    if(Input.isKeyJustPressed(66)) {
+      Global.base.UI.showUI(Global.base.UI.blockMenu, true);
+    }
+    if(Input.isKeyJustReleased(66)) {
+      Global.base.UI.showUI(Global.base.UI.blockMenu, false);
+    }
+
     if(Input.isMouseDown && Global.base.UI.isMouseInGame) {
       let id = Global.base.UI.selectedBlock;
       let pos = this.world.toLocal({x: Input.mouseX, y: Input.mouseY}, Global.stage);

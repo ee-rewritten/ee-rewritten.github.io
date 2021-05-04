@@ -16,6 +16,7 @@ class UI extends PIXI.Container {
   blockMore;
   _selectedBlock;
   blockMenu;
+  menus = [];
 
   infoBG; infoBox; info;
 
@@ -25,6 +26,7 @@ class UI extends PIXI.Container {
       .add('hotbar', './Assets/UI/hotbar.png') //borders: 1
       .add('info', './Assets/UI/info.png') //12
       .add('chat', './Assets/UI/chat.png') //1
+      .add('menu', './Assets/UI/menu.png') //1
 
       //joystick
       .add('outer', './Assets/UI/outer.png')
@@ -84,7 +86,8 @@ class UI extends PIXI.Container {
     this.hotbar.addEventListener('chat', 'pointerdown', ()=>{});
 
     let hotbarblocks = this.createBlockBar();
-    this.showingMore = false;
+    this.redrawBlockMenu();
+    this.showUI(this.blockMenu, false);
     this.hotbar.addImageButton('edit', hotbarblocks, null, null, 0, false, hotbarblocks.width+2, false)
 
     this.hotbar.addTextureButton('map', null, 29, 28, 0, true, 31);
@@ -224,7 +227,7 @@ class UI extends PIXI.Container {
 
     this.blockMore.interactive = true;
     this.blockMore.on('pointerdown', e => {
-      this.showingMore = !this.showingMore;
+      this.showUI(this.blockMenu);
     });
     this.blockMore.on('pointerover', e=>document.body.style.cursor = 'pointer');
     this.blockMore.on('pointerout', e=>document.body.style.cursor = '');
@@ -244,15 +247,31 @@ class UI extends PIXI.Container {
       this.joystick.y = (this.showingMore ? this.blockMenu.y : Config.gameHeight) - offs;
     }
   }
+  showUI(menuObject, visible = null) {
+    if(!menuObject) return;
+    if(visible == null) visible = !menuObject.visible;
+
+    this.menus.forEach(menu => menu.visible = false);
+    menuObject.visible = visible;
+
+    switch (menuObject) {
+      case this.blockMenu: {
+          let base = this.blockMore.texture.baseTexture;
+          this.blockMore.texture.frame = new Rectangle(visible ? base.width/2 : 0, 0, base.width/2, base.height);
+      }
+      break;
+    }
+  }
 
   redrawBlockMenu() {
     if(!this.blockMenu) {
-      this.blockMenu = UI.createNineSlice('hotbar');
+      this.blockMenu = UI.createNineSlice('menu');
       ItemManager.blockTabs[0].forEach(pack => {
         pack.visible = false;
         this.blockMenu.addChild(pack);
       });
       this.addChild(this.blockMenu);
+      this.menus.push(this.blockMenu);
     }
 
     let usedX = 7, usedY = 7;
@@ -276,25 +295,15 @@ class UI extends PIXI.Container {
       lastPack = pack;
     });
 
-    this.blockMenu.alpha = 0.95;
     this.blockMenu.width = this.hotbar.width;
     this.blockMenu.height = usedY + lastPack.height + 6;
     this.repositionUI();
   }
-
-  set showingMore(value) {
-    if(!this.blockMenu)
-      this.redrawBlockMenu();
-    this.blockMenu.visible = value;
-
-    let base = this.blockMore.texture.baseTexture;
-    this.blockMore.texture.frame = new Rectangle(value ? base.width/2 : 0, 0, base.width/2, base.height);
-    this.repositionUI();
-  }
-  get showingMore() {return this.blockMenu.visible}
+  get showingMore() {return this.blockMenu && this.blockMenu.visible}
 
   selectBlock(value) {
     this._selectedBlock = value;
+    if(Input.isKeyDown(16)) return;
     for(let i = 0; i < this.blockContainer.children.length; i++) {
       let block = this.blockContainer.children[i];
       if(block.getAttr('blockid') == value) {
@@ -309,12 +318,11 @@ class UI extends PIXI.Container {
     let block = this.blockContainer.children[value];
     if(!block) return;
 
-    // if(block.getAttr('id') == value) {
-      this.blockSelector.visible = true;
-      this.blockSelector.x = block.x;
-      this._selectedBlock = block.getAttr('blockid');
-      return;
-    // }
+    this._selectedBlock = block.getAttr('blockid');
+
+    if(Input.isKeyDown(16)) return;
+    this.blockSelector.x = block.x;
+    this.blockSelector.visible = true;
   }
   tempSelectDelete() {
     this.blockSelector.x = 0;
@@ -346,9 +354,22 @@ class UI extends PIXI.Container {
 
   showInfo(title, body) {
     this.info.visible = true;
-    this.infoBox.width = Config.gameWidth - 200;
-    this.infoBox.height = Config.gameHeight - 200;
-    this.infoBox.x = this.infoBox.y = 100;
+
+    if(this.infoBox.children.length == 0) {
+      this.infoBox.addChild(UI.createText('', 'Nokia', 2));
+      this.infoBox.addChild(UI.createText('', 'Nokia', 1));
+    }
+    let titleText = this.infoBox.children[0], bodyText = this.infoBox.children[1];
+
+    titleText.text = title; bodyText.text = body;
+    bodyText.x = titleText.x = 15;
+    titleText.y = 7;
+    bodyText.y = titleText.y + titleText.height;
+
+    this.infoBox.width = Math.max(titleText.width, bodyText.width) + 30;
+    this.infoBox.height = titleText.height + bodyText.height + 14;
+    this.infoBox.x = Math.floor((Config.gameWidth -this.infoBox.width )/2);
+    this.infoBox.y = Math.floor((Config.gameHeight-this.infoBox.height)/2);
   }
   hideInfo() {
     this.info.visible = false;
