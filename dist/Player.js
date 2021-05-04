@@ -15,8 +15,8 @@ class Player extends PIXI.Container {
 
   speedX = 0; speedY = 0;
   horizontal = 0; vertical = 0; isSpaceDown = false; isSpaceJustPressed = false;
-  lastJump = -Date.now(); jumpCount = 0; maxJumps = 1;
-  moving = false;
+  lastJump = -1; jumpCount = 0; maxJumps = 1;
+  lastMoved = -1;
 
   ticks = 0;
 
@@ -289,18 +289,18 @@ class Player extends PIXI.Container {
     let mod = 1
     let inJump = false;
     if (this.isSpaceJustPressed){
-      this.lastJump = -Date.now();
+      this.lastJump = -this.ticks;
       inJump = true;
       mod = -1
     }
 
     if(this.isSpaceDown){
         if(this.lastJump < 0){
-          if(Date.now() + this.lastJump > 750){
+          if(this.ticks + this.lastJump > 75){
             inJump = true;
           }
         }else{
-          if(Date.now() - this.lastJump > 150){
+          if(this.ticks - this.lastJump > 15){
             inJump = true;
           }
         }
@@ -319,14 +319,14 @@ class Player extends PIXI.Container {
           this.jumpCount += 1;
         }
         this.speedX = (-origModX * Config.physics.jump_height * this.jumpMult) / Config.physics.variable_multiplyer;
-        this.lastJump = Date.now() * mod;
+        this.lastJump = this.ticks * mod;
       }
       if(this.jumpCount < this.maxJumps && origModY && modY) { // Jump in y direction
         if (this.maxJumps < 1000) { // Not infinite jumps
           this.jumpCount += 1;
         }
         this.speedY = (-origModY * Config.physics.jump_height * this.jumpMult) / Config.physics.variable_multiplyer;
-        this.lastJump = Date.now() * mod;
+        this.lastJump = this.ticks * mod;
       }
     }
 
@@ -338,8 +338,6 @@ class Player extends PIXI.Container {
     // autoalign
     let imx = (this.speedX*256)>>0;
     let imy = (this.speedY*256)>>0;
-
-    this.moving = false;
 
     if(imx != 0) {
       this.moving = true;
@@ -382,6 +380,14 @@ class Player extends PIXI.Container {
     }
 
     this.ticks++;
+  }
+
+  get moving() {
+    return this.ticks - this.lastMoved < 100;
+  }
+  set moving(value) {
+    if(value) this.lastMoved = this.ticks;
+    else this.lastMoved = -1;
   }
 
   get speedMult() {
