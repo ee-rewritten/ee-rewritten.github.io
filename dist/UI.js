@@ -15,7 +15,6 @@ class UI extends PIXI.Container {
   blockSelector;
   blockMore;
   _selectedBlock;
-  _showingMore = false;
   blockMenu;
 
   infoBG; infoBox; info;
@@ -84,7 +83,6 @@ class UI extends PIXI.Container {
     this.hotbar.addTextureButton('chat', 'chaticon', 28, 28);
     this.hotbar.addEventListener('chat', 'pointerdown', ()=>{});
 
-    // this.hotbar.addTextButton('enter level code to edit        ', false, 'code');
     let hotbarblocks = this.createBlockBar();
     this.showingMore = false;
     this.hotbar.addImageButton('edit', hotbarblocks, null, null, 0, false, hotbarblocks.width+2, false)
@@ -150,31 +148,34 @@ class UI extends PIXI.Container {
 
     this.addChild(this.info);
 
-
     // joystick.
     if(Global.isMobile) {
-      this.joystick = new Joystick({
-        outer: new Sprite(loader.resources['outer'].texture),
-        inner: new Sprite(loader.resources['inner'].texture),
-
-        onStart: event => {
-          this.joystickPointerId = event.data.pointerId;
-          Input.joystickDirection = 'start';
-        },
-        onChange: (event, data) => {
-          Input.joystickDirection = data.power > 0.6 ? data.direction : '';
-        },
-        onEnd: event => {
-          Input.joystickDirection = '';
-          this.joystickPointerId = -1;
-        }
-      });
-      this.joystick.outer.alpha = 0.6;
-      this.joystick.inner.alpha = 0.4;
-      this.joystick.x = this.joystick.width/2 + 10;
-      this.joystick.y = Config.gameHeight - this.joystick.height/2 - 10;
-      this.addChild(this.joystick);
+      this.createJoyStick();
     }
+
+    this.repositionUI();
+  }
+
+  createJoyStick() {
+    this.joystick = new Joystick({
+      outer: new Sprite(loader.resources['outer'].texture),
+      inner: new Sprite(loader.resources['inner'].texture),
+
+      onStart: event => {
+        this.joystickPointerId = event.data.pointerId;
+        Input.joystickDirection = 'start';
+      },
+      onChange: (event, data) => {
+        Input.joystickDirection = data.power > 0.6 ? data.direction : '';
+      },
+      onEnd: event => {
+        Input.joystickDirection = '';
+        this.joystickPointerId = -1;
+      }
+    });
+    this.joystick.outer.alpha = 0.6;
+    this.joystick.inner.alpha = 0.4;
+    this.addChild(this.joystick);
   }
 
   createBlockBar() {
@@ -233,39 +234,64 @@ class UI extends PIXI.Container {
     return hotbarblocks;
   }
 
-  set showingMore(value) {
-    this._showingMore = value;
+  repositionUI() {
+    if(this.blockMenu)
+      this.blockMenu.y = this.hotbar.y - this.blockMenu.height + 1;
 
+    if(this.joystick) {
+      let offs = this.joystick.width/2 + 10;
+      this.joystick.x = offs;
+      this.joystick.y = (this.showingMore ? this.blockMenu.y : Config.gameHeight) - offs;
+    }
+  }
+
+  redrawBlockMenu() {
     if(!this.blockMenu) {
       this.blockMenu = UI.createNineSlice('hotbar');
-
-      let usedX = 7, usedY = 7;
-      let lastPack;
       ItemManager.blockTabs[0].forEach(pack => {
-        if(usedX + pack.width > this.hotbar.width) {
-          usedX = 7;
-          usedY += pack.height + 2;
-        }
-
-        pack.x = usedX; pack.y = usedY;
-        usedX += pack.width + 5;
-
-        lastPack = pack;
+        pack.visible = false;
         this.blockMenu.addChild(pack);
       });
-
-      this.blockMenu.alpha = 0.95;
-      this.blockMenu.width = this.hotbar.width;
-      this.blockMenu.height = usedY + lastPack.height + 6;
-      this.blockMenu.y = this.hotbar.y - this.blockMenu.height + 1;
       this.addChild(this.blockMenu);
     }
+
+    let usedX = 7, usedY = 7;
+    let lastPack;
+
+    this.blockMenu.children.forEach(pack => {
+      if(pack.payvaultId != '') {
+        pack.visible = false;
+        return;
+      }
+      pack.visible = true;
+
+      if(usedX + pack.width > this.hotbar.width) {
+        usedX = 7;
+        usedY += pack.height + 2;
+      }
+
+      pack.x = usedX; pack.y = usedY;
+      usedX += pack.width + 5;
+
+      lastPack = pack;
+    });
+
+    this.blockMenu.alpha = 0.95;
+    this.blockMenu.width = this.hotbar.width;
+    this.blockMenu.height = usedY + lastPack.height + 6;
+    this.repositionUI();
+  }
+
+  set showingMore(value) {
+    if(!this.blockMenu)
+      this.redrawBlockMenu();
     this.blockMenu.visible = value;
 
     let base = this.blockMore.texture.baseTexture;
     this.blockMore.texture.frame = new Rectangle(value ? base.width/2 : 0, 0, base.width/2, base.height);
+    this.repositionUI();
   }
-  get showingMore() {return this._showingMore}
+  get showingMore() {return this.blockMenu.visible}
 
   selectBlock(value) {
     this._selectedBlock = value;
