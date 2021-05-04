@@ -46,9 +46,9 @@ class ItemManager {
 
     pack = this.createBlockPack('beta');
     pack.addStaticBlocks(3, ItemLayer.ABOVE);
-    pack.addAnimatedBlock(7, ItemLayer.BELOW, 0.5);
+    pack.addAnimatedBlock(7, ItemLayer.ABOVE, 0.5);
 
-    this.createBlockPack('bricks').addStaticBlocks(10, ItemLayer.BELOW);
+    this.createBlockPack('brick').addStaticBlocks(10, ItemLayer.BELOW);
 
     this.lastYOffset = 15;
     this.createBlockPack('sci-fi').addStaticBlocks(15, ItemLayer.BELOW);
@@ -80,5 +80,8 @@ class ItemManager {
 
   static calculateId(tab, packId, blockIndex) {
     return tab << 13 | packId << 6 | blockIndex;
+  }
+  static getTab(id) {
+    return id >> 13;
   }
 }
