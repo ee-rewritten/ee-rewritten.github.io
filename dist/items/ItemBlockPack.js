@@ -50,16 +50,20 @@ class ItemBlockPack extends PIXI.Container {
 
     this.blocks.push(block);
 
+    this.blockContainer.x = 0;
+    if(this.nameText.width > this.blockContainer.width)
+      this.blockContainer.x = Math.floor((this.nameText.width-this.blockContainer.width)/2);
+
     if(this.displayOnly) return;
     ItemManager.blocks[block.id] = block;
   }
 
-  addStaticBlock(layer, artOffset) {
+  addStaticBlock(layer, artOffset = null) {
     //limit of 2^6 blocks per pack because ID system
     if(this.blocks.length == 64)
       throw new Error(`Maximum blocks reached in pack ${this.name}`);
 
-    if(!artOffset) artOffset = this.usedFrames;
+    if(artOffset == null) artOffset = this.usedFrames;
 
     //adding a regular block to the pack
     let id = ItemManager.calculateId(this.tab, this.packId, this.blocks.length);
@@ -69,8 +73,11 @@ class ItemBlockPack extends PIXI.Container {
     this.usedFrames++;
   }
 
-  addStaticBlocks(amount, layer) {
-    for(let i = 0; i < amount; i++) this.addStaticBlock(layer);
+  addStaticBlocks(amount, layer, artOffset = null) {
+    for(let i = 0; i < amount; i++) {
+      if(artOffset == null) this.addStaticBlock(layer);
+      else this.addStaticBlock(layer, i+artOffset);
+    }
   }
 
   addAnimatedBlock(frames, layer, speed = 1, artOffset = null) {

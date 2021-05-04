@@ -44,14 +44,29 @@ class ItemManager {
 
     this.createBlockPack('basic').addStaticBlocks(10, ItemLayer.BELOW);
 
-    pack = this.createBlockPack('beta');
-    pack.addStaticBlocks(3, ItemLayer.ABOVE);
-    pack.addAnimatedBlock(7, ItemLayer.ABOVE, 0.5);
+    /*pack = */this.createBlockPack('beta').addStaticBlocks(10, ItemLayer.BELOW);
+    // pack.addStaticBlocks(3, ItemLayer.ABOVE);
+    // pack.addAnimatedBlock(7, ItemLayer.ABOVE, 0.5);
 
     this.createBlockPack('brick').addStaticBlocks(10, ItemLayer.BELOW);
+    this.createBlockPack('metal').addStaticBlocks(3, ItemLayer.BELOW);
+    this.createBlockPack('grass').addStaticBlocks(3, ItemLayer.BELOW);
+    this.createBlockPack('generic').addStaticBlocks(5, ItemLayer.BELOW);
+    this.createBlockPack('factory').addStaticBlocks(5, ItemLayer.BELOW);
+    this.createBlockPack('secrets').addStaticBlocks(1, ItemLayer.BELOW);
+    this.createBlockPack('glass').addStaticBlocks(8, ItemLayer.BELOW);
+    this.createBlockPack('minerals').addStaticBlocks(7, ItemLayer.BELOW);
+    this.createBlockPack('christmas 2011').addStaticBlocks(5, ItemLayer.BELOW);
 
-    this.lastYOffset = 15;
-    this.createBlockPack('sci-fi').addStaticBlocks(15, ItemLayer.BELOW);
+    pack = this.createBlockPack('candy');
+    pack.addStaticBlocks(2, ItemLayer.BELOW);
+    pack.addStaticBlocks(3, ItemLayer.BELOW, 6);
+
+    this.createBlockPack('summer 2011').addStaticBlocks(1, ItemLayer.BELOW);
+    this.createBlockPack('halloween 2011').addStaticBlocks(2, ItemLayer.BELOW);
+
+    // this.lastYOffset = 15;
+    this.createBlockPack('sci-fi').addStaticBlocks(9, ItemLayer.BELOW);
   }
 
   static isBlockEmpty(id) {
