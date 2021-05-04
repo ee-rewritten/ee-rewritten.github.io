@@ -3,6 +3,8 @@ class World extends PIXI.Container {
   width;
   height;
 
+  placeQueue = {};
+
   //full map array
   realmap;
   //array of render maps
@@ -127,7 +129,16 @@ class World extends PIXI.Container {
 
     if(this.realmap[layer][x][y] == id) return;
 
+    let wasOverlapping = this.overlaps(Global.base.state.player);
+    let oldId = this.realmap[layer][x][y];
     this.realmap[layer][x][y] = id;
+    if(!wasOverlapping && this.overlaps(Global.base.state.player)) {
+      this.realmap[layer][x][y] = oldId;
+      this.placeQueue[`${x},${y}`] = (() => this.setTile(id, x, y));
+      return true;
+    }
+    if(layer == 0) delete this.placeQueue[`${x},${y}`];
+
     this.sortIntoRenderLayer(layer, x, y, id);
     this.redraw(true, x, y);
   }
@@ -225,5 +236,12 @@ class World extends PIXI.Container {
   offset = 0;
   tick() {
     this.offset += 0.3;
+
+    let coords = Object.keys(this.placeQueue);
+    while(coords.length) {
+      let coord = coords.shift();
+      if(!this.placeQueue[coord]())
+        delete this.placeQueue[coord];
+    }
   }
 }
