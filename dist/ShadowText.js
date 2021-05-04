@@ -3,7 +3,7 @@ class ShadowText extends PIXI.Container {
   bmshadows;
   blurfilter;
 
-  constructor(text, style, blur = 2, amount = 3) {
+  constructor(text, style, blur = 2, amount = 3, shadowColour = 0) {
     super();
     this.bmtext = new BMText(text, style);
 
@@ -12,7 +12,7 @@ class ShadowText extends PIXI.Container {
     this.bmshadows = new Array(amount);
     for (let i = 0; i < this.bmshadows.length; i++) {
       this.bmshadows[i] = new BMText(text, style);
-      this.bmshadows[i].tint = 0;
+      this.bmshadows[i].tint = shadowColour;
       this.bmshadows[i].filters = [this.blurfilter];
       this.addChild(this.bmshadows[i]);
     }
@@ -32,9 +32,9 @@ class ShadowText extends PIXI.Container {
     this.blurfilter.blur = value;
   }
 
-  set(prop, value) {
+  set(prop, value, shadowOnly = false) {
     for (let i = 0; i < this.bmshadows.length; i++) this.bmshadows[i][prop] = value;
-    this.bmtext[prop] = value;
+    if(!shadowOnly) this.bmtext[prop] = value;
   }
   get(prop) {
     return this.bmtext[prop];

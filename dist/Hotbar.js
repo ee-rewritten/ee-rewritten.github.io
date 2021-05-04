@@ -13,7 +13,8 @@ class Hotbar extends PIXI.NineSlicePlane {
   addTextButton(text, alignRight = false, name = null, padding = 7) {
     if(!name) name = text;
     let button = UI.createNineSlice('hotbar', 1);
-    let buttonText = UI.createText(text, 'Visitor', 1, 'center');
+    let buttonText = UI.createShadowText(text, 'Visitor', 1, 'center', 2, 1, 0xFFFFFF);
+    buttonText.set('visible', false, true);
 
     buttonText.x = padding+1;
     buttonText.y = (this.height-buttonText.height)/2 + 2;
@@ -28,6 +29,15 @@ class Hotbar extends PIXI.NineSlicePlane {
     this.addChild(button);
     this.buttons[name] = button;
     return button;
+  }
+  setTextGlow(name, glowing = null) {
+    let button = this.buttons[name];
+    if(!button) return;
+
+    if(glowing == null) glowing = !button.getAttr('glowing');
+    button.setAttr('glowing', glowing);
+
+    button.children[0].set('visible', glowing, true);
   }
 
   addTextureButton(name, texture, ...args) {

@@ -83,7 +83,8 @@ class Player extends PIXI.Container {
     if(bool == null ) bool = !this.isInGodMode;
     this._isInGodMode = bool;
     this.godmodeSprite.visible = bool;
-    this.playstate.movePlayer(this);
+    this.playstate.movePlayer(this); //moves into a different container for rendering
+    Global.base.UI?.hotbar.setTextGlow('god', bool);
   }
   get isInGodMode() {
     return this._isInGodMode;

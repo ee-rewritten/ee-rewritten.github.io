@@ -50,11 +50,11 @@ class UI extends PIXI.Container {
       fontSize: (font == 'Visitor' ? Config.fontVisitorSize :
                  font == 'Nokia' ? Config.fontNokiaSize : 1) * scale});
   }
-  static createShadowText(text, font, blur = 2, amount = 3, scale = 1) {
-    return new ShadowText(text, {fontName: font,
+  static createShadowText(text, font, scale = 1, align = 'left', ...rest) {
+    return new ShadowText(text, {align: align, fontName: font,
       fontSize: (font == 'Visitor' ? Config.fontVisitorSize :
                  font == 'Nokia' ? Config.fontNokiaSize : 1) * scale},
-      blur, amount);
+      ...rest);
   }
 
   constructor() {
