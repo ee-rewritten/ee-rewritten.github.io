@@ -28,6 +28,7 @@ class Global {
   }
   static set fullscreen(bool) {
     Input.allowInput = false;
+    let allowInput = () => Input.allowInput = true;
     if(bool) {
       if (this.canvas.requestFullscreen) {
         this.canvas.requestFullscreen().then(this.rotate);
@@ -39,11 +40,11 @@ class Global {
     }
     else {
       if (document.exitFullscreen) {
-        document.exitFullscreen();
+        document.exitFullscreen().then(allowInput);
       } else if (document.webkitExitFullscreen) { /* Safari */
-        document.webkitExitFullscreen();
+        document.webkitExitFullscreen().then(allowInput);
       } else if (document.msExitFullscreen) { /* IE11 */
-        document.msExitFullscreen();
+        document.msExitFullscreen().then(allowInput);
       }
     }
   }
