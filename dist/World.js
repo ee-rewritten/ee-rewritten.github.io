@@ -57,7 +57,7 @@ class World extends PIXI.Container {
         for (let y = 0; y < height; y++) {
           map[layer][x][y] = ItemManager.blockEmpty[0].id;
           if(layer == 0 && (x == 0 || y == 0 || x == width-1 || y == height-1))
-            map[layer][x][y] = ItemManager.packs['basic'].blocks[1].id;
+            map[layer][x][y] = ItemManager.packs[0]['basic'].blocks[1].id;
         }
       }
     }

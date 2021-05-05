@@ -188,18 +188,19 @@ class UI extends PIXI.Container {
     let hotbarblocks = new Container();
     hotbarblocks.x = 3;
 
-    let numcontainer = new Container();
     let pack = new ItemBlockPack('level bricks', '', 0, 0, 0, true);
     this.levelBricksPack = pack;
-
     hotbarblocks.addChild(pack);
+
+    let numcontainer = new Container();
     hotbarblocks.addChild(numcontainer);
 
     for(let i = 0; i <= 12; i++) {
-      let block = i ? ItemManager.packs['game'].blocks[i-1] : ItemManager.blockEmpty[1];
-      if(!block) block = ItemManager.packs['basic'].blocks[i-1-ItemManager.packs['game'].blocks.length];
+      let block = ItemManager.defaultHotbarBlocks[i];
       if(!block) break;
       pack.pushBlock(block);
+
+      if(Global.isMobile) continue;
 
       let blocknumtext =
       i == 0 ? '^' :

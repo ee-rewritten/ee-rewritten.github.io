@@ -9,7 +9,7 @@ class ItemManager {
 
   static blockTabs = [];
   static blocks = {};
-  static packs = {};
+  static packs = [];
 
   static _addingToTab = 0;
 
@@ -80,6 +80,7 @@ class ItemManager {
   static createBlockPack(name, payvaultId = '') {
     let tab = this._addingToTab;
     if(!this.blockTabs[tab]) this.blockTabs[tab] = [];
+    if(!this.packs[tab]) this.packs[tab] = {};
 
     //limit of 2^7 packs per tab because of ID system
     if(this.blockTabs[tab].length == 128)
@@ -89,7 +90,7 @@ class ItemManager {
 
     this.blockTabs[tab].push(bp);
 
-    this.packs[name] = bp;
+    this.packs[tab][name] = bp;
     return bp;
   }
 
@@ -101,5 +102,17 @@ class ItemManager {
   }
   static getPackFromId(id) {
     return this.blockTabs[this.getTabFromId(id)][(id >> 6) & 0b111111];
+  }
+
+  _hotbarBlocks;
+  static get defaultHotbarBlocks() {
+    if(!this._hotbarBlocks) {
+      this._hotbarBlocks = [
+        this.blockEmpty[0],
+        ...this.packs[0]['basic'].blocks,
+        this.packs[0]['secrets'].blocks[0],
+      ];
+    }
+    return this._hotbarBlocks;
   }
 }
