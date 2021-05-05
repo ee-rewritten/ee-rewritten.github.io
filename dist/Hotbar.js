@@ -49,7 +49,7 @@ class Hotbar extends PIXI.NineSlicePlane {
     return this.addImageButton(name, sprite, ...args);
   }
 
-  addImageButton(name, sprite, imgWidth = null, imgHeight = null, frame = 0, alignRight = false, width = 30, center = true) {
+  addImageButton(name, sprite, imgWidth = null, imgHeight = null, frame = 0, alignRight = false, width = 30, align = 'center') {
     let button = UI.createNineSlice('hotbar');
     if(imgWidth && imgHeight)
       sprite.texture.frame = this.createFrame(imgWidth, imgHeight, width, this.height, frame);
@@ -57,8 +57,12 @@ class Hotbar extends PIXI.NineSlicePlane {
     button.setAttr('frameWidth',  imgWidth);
     button.setAttr('frameHeight', imgHeight);
 
-    if(center) {
+    if(align == 'center') {
       sprite.x = (width-sprite.width)/2;
+      sprite.y = (this.height-sprite.height)/2;
+    }
+    else if(align == 'right') {
+      sprite.x = width-sprite.width;
       sprite.y = (this.height-sprite.height)/2;
     }
     button.addChild(sprite);
@@ -124,16 +128,20 @@ class Hotbar extends PIXI.NineSlicePlane {
     }
   }
 
-  addEventListener(name, eventName, callback, toggleFrame = true, ...args) {
-    let button = this.buttons[name];
+  addEventListener(name, eventName, callback, toggleFrame = true, childOnly = false, ...args) {
+    let button = this.buttons[name]
     if(!button) return;
+    if(childOnly) button = button.children[0];
 
     button.interactive = true;
     button.on(eventName, e=>{
-      if(toggleFrame) this.setButtonFrame(name, 1 - this.getButtonFrame(name));
+      if(toggleFrame) this.toggleButtonFrame(name);
       callback(e, ...args);
     });
     button.on('pointerover', e=>document.body.style.cursor = 'pointer');
     button.on('pointerout', e=>document.body.style.cursor = '');
+  }
+  toggleButtonFrame(name) {
+    this.setButtonFrame(name, 1 - this.getButtonFrame(name));
   }
 }

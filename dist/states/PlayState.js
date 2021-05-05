@@ -84,7 +84,7 @@ class PlayState extends State {
       this.player.toggleGodMode();
     }
 
-    if(Input.isKeyDown(16)) {
+    if(Input.isKeyJustPressed(16)) {
       Global.base.UI.tempSelectDelete();
     }
     else if(Input.isKeyJustReleased(16)) {

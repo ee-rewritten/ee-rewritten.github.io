@@ -96,7 +96,10 @@ class ItemManager {
   static calculateId(tab, packId, blockIndex) {
     return tab << 13 | packId << 6 | blockIndex;
   }
-  static getTab(id) {
+  static getTabFromId(id) {
     return id >> 13;
+  }
+  static getPackFromId(id) {
+    return this.blockTabs[this.getTabFromId(id)][(id >> 6) & 0b111111];
   }
 }

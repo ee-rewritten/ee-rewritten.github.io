@@ -10,13 +10,11 @@ class UI extends PIXI.Container {
   chat; worldName; worldInfo;
 
   hotbar;
-  hotbarsmiley;
-  blockContainer;
-  blockSelector;
-  blockMore;
+  hotbarSmiley;
+  levelBricksPack;
   _selectedBlock;
-  blockMenu;
-  menus = [];
+  blockMenu; smileyMenu;
+  menus = {};
 
   infoBG; infoBox; info;
 
@@ -72,12 +70,15 @@ class UI extends PIXI.Container {
     this.hotbar.addTextButton('god\nmode', false, 'god');
     this.hotbar.addEventListener('god', 'pointerdown', ()=>Global.base.state.player.toggleGodMode(), false);
 
-    this.hotbarsmiley = new Sprite(new Texture(ItemManager.smileysBMD, Global.base.state.player.smileySprite.texture.frame));
+    this.hotbarSmiley = new Sprite(new Texture(ItemManager.smileysBMD, Global.base.state.player.smileySprite.texture.frame));
     let bg = this.hotbar.addTextureButton('smiley', 'aura', 40, 40);
-    bg.addChild(this.hotbarsmiley);
-    this.hotbarsmiley.x = (30-Config.smileySize)/2;
-    this.hotbarsmiley.y = (this.hotbar.height-Config.smileySize)/2;
-    this.hotbar.addEventListener('smiley', 'pointerdown', ()=>{});
+    bg.addChild(this.hotbarSmiley);
+    this.hotbarSmiley.x = (30-Config.smileySize)/2;
+    this.hotbarSmiley.y = (this.hotbar.height-Config.smileySize)/2;
+
+    this.redrawSmileyMenu();
+    this.showUI(this.smileyMenu, false);
+    this.hotbar.addEventListener('smiley', 'pointerdown', ()=>this.showUI(this.menus['smiley']));
 
     this.hotbar.addTextureButton('aura', null, 40, 40);
     this.hotbar.addEventListener('aura', 'pointerdown', ()=>{});
@@ -88,7 +89,9 @@ class UI extends PIXI.Container {
     let hotbarblocks = this.createBlockBar();
     this.redrawBlockMenu();
     this.showUI(this.blockMenu, false);
-    this.hotbar.addImageButton('edit', hotbarblocks, null, null, 0, false, hotbarblocks.width+2, false)
+    let editBtn = this.hotbar.addTextureButton('edit', 'moreless', 43, 28, 0, false, hotbarblocks.width+43, 'right')
+    editBtn.addChild(hotbarblocks);
+    this.hotbar.addEventListener('edit', 'pointerdown', ()=>this.showUI(this.menus['edit']), true, true);
 
     this.hotbar.addTextureButton('map', null, 29, 28, 0, true, 31);
     this.hotbar.addEventListener('map', 'pointerdown', ()=>{});
@@ -187,7 +190,7 @@ class UI extends PIXI.Container {
 
     let numcontainer = new Container();
     let pack = new ItemBlockPack('level bricks', '', 0, 0, 0, true);
-    this.blockContainer = pack.blockContainer;
+    this.levelBricksPack = pack;
 
     hotbarblocks.addChild(pack);
     hotbarblocks.addChild(numcontainer);
@@ -215,31 +218,22 @@ class UI extends PIXI.Container {
     pack.y = (this.hotbar.height-pack.height)/2;
     numcontainer.y = pack.y + pack.height - numcontainer.height+2;
 
-    this.blockSelector = new Sprite(loader.resources['selector'].texture);
-    this.blockContainer.addChild(this.blockSelector);
-
     this.selectNthBlock(0);
-
-    this.blockMore = new Sprite(loader.resources['moreless'].texture);
-    this.blockMore.texture.frame = new Rectangle(0, 0, this.blockMore.texture.width/2, this.blockMore.texture.height);
-    this.blockMore.x = this.blockContainer.width;
-    this.blockMore.y = (this.hotbar.height-this.blockMore.height)/2;
-
-    this.blockMore.interactive = true;
-    this.blockMore.on('pointerdown', e => {
-      this.showUI(this.blockMenu);
-    });
-    this.blockMore.on('pointerover', e=>document.body.style.cursor = 'pointer');
-    this.blockMore.on('pointerout', e=>document.body.style.cursor = '');
-
-    hotbarblocks.addChild(this.blockMore);
 
     return hotbarblocks;
   }
 
   repositionUI() {
-    if(this.blockMenu)
-      this.blockMenu.y = this.hotbar.y - this.blockMenu.height + 1;
+    for(let key in this.menus) {
+      let menu = this.menus[key];
+      menu.y = this.hotbar.y - menu.height + 1;
+
+      let button = this.hotbar.buttons[key];
+      if(!button) continue;
+      menu.x = button.x - Math.floor((menu.width - button.width)/2);
+      if(menu.x < 0) menu.x = 0;
+      else if(menu.x + menu.width > Config.gameWidth) menu.x = Config.gameWidth - menu.width;
+    }
 
     if(this.joystick) {
       let offs = this.joystick.width/2 + 10;
@@ -247,19 +241,18 @@ class UI extends PIXI.Container {
       this.joystick.y = (this.showingMore ? this.blockMenu.y : Config.gameHeight) - offs;
     }
   }
-  showUI(menuObject, visible = null) {
+  showUI(menuObject, visible = null, hideOthers = true) {
     if(!menuObject) return;
     if(visible == null) visible = !menuObject.visible;
 
-    this.menus.forEach(menu => menu.visible = false);
+    if(hideOthers) for(let key in this.menus) {
+      this.showUI(this.menus[key], false, false)
+    }
+
     menuObject.visible = visible;
 
-    switch (menuObject) {
-      case this.blockMenu: {
-          let base = this.blockMore.texture.baseTexture;
-          this.blockMore.texture.frame = new Rectangle(visible ? base.width/2 : 0, 0, base.width/2, base.height);
-      }
-      break;
+    for(let key in this.menus) {
+      if(this.menus[key] == menuObject) this.hotbar.setButtonFrame(key, visible ? 1 : 0);
     }
   }
 
@@ -271,7 +264,7 @@ class UI extends PIXI.Container {
         this.blockMenu.addChild(pack);
       });
       this.addChild(this.blockMenu);
-      this.menus.push(this.blockMenu);
+      this.menus['edit'] = this.blockMenu;
     }
 
     let usedX = 7, usedY = 7;
@@ -301,32 +294,41 @@ class UI extends PIXI.Container {
   }
   get showingMore() {return this.blockMenu && this.blockMenu.visible}
 
-  selectBlock(value) {
-    this._selectedBlock = value;
-    if(Input.isKeyDown(16)) return;
-    for(let i = 0; i < this.blockContainer.children.length; i++) {
-      let block = this.blockContainer.children[i];
-      if(block.getAttr('blockid') == value) {
-        this.blockSelector.visible = true;
-        this.blockSelector.x = block.x;
-        return;
-      }
+  redrawSmileyMenu() {
+    if(!this.smileyMenu) {
+      this.smileyMenu = UI.createNineSlice('menu');
+
+      this.smileyMenu.width = 100;
+      this.smileyMenu.height = 100;
+
+      this.addChild(this.smileyMenu);
+      this.menus['smiley'] = this.smileyMenu;
     }
-    this.blockSelector.visible = false;
   }
-  selectNthBlock(value) {
-    let block = this.blockContainer.children[value];
+
+
+  selectBlock(id) {
+    //select in the old pack to hide blockSelector
+    let oldPack = ItemManager.getPackFromId(this._selectedBlock);
+
+    oldPack.selectBlock(id);
+    this.levelBricksPack.selectBlock(id);
+
+    let newPack = ItemManager.getPackFromId(id);
+    if(newPack != oldPack)
+      newPack.selectBlock(id);
+
+    if(!Input.isKeyJustPressed(16))
+      this._selectedBlock = id;
+  }
+  selectNthBlock(index) {
+    let block = this.levelBricksPack.blockContainer.children[index];
     if(!block) return;
 
-    this._selectedBlock = block.getAttr('blockid');
-
-    if(Input.isKeyDown(16)) return;
-    this.blockSelector.x = block.x;
-    this.blockSelector.visible = true;
+    this.selectBlock(block.getAttr('blockid'));
   }
   tempSelectDelete() {
-    this.blockSelector.x = 0;
-    this.blockSelector.visible = true;
+    this.selectBlock(ItemManager.blockEmpty[1].id);
   }
   get selectedBlock() {return this._selectedBlock}
 

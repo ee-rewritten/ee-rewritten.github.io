@@ -11,6 +11,7 @@ class ItemBlockPack extends PIXI.Container {
 
   nameText;
   blockContainer;
+  blockSelector;
 
   constructor(name, payvaultId, tab, packId, yOffset, displayOnly = false) {
     super();
@@ -25,13 +26,20 @@ class ItemBlockPack extends PIXI.Container {
     this.nameText = UI.createText(name, 'Visitor');
     this.addChild(this.nameText);
 
+    let parentContainer = new Container();
+    parentContainer.y = this.nameText.height-2;
+    this.addChild(parentContainer);
+
     this.blockContainer = new Container();
-    this.blockContainer.y = this.nameText.height-2;
-    this.addChild(this.blockContainer);
+    parentContainer.addChild(this.blockContainer);
+
+    this.blockSelector = new Sprite(loader.resources['selector'].texture);
+    this.blockSelector.visible = false;
+    parentContainer.addChild(this.blockSelector);
   }
 
   pushBlock(block) {
-    let blockSprite = ItemManager.blockEmpty[1] ? ItemManager.blockEmpty[1].sprite : block.sprite
+    let blockSprite = ItemManager.blockEmpty[1] ? ItemManager.blockEmpty[1].sprite : block.sprite;
     blockSprite.x = this.blocks.length * Config.blockSize;
     blockSprite.setAttr('blockid', block.id);
 
@@ -56,6 +64,17 @@ class ItemBlockPack extends PIXI.Container {
 
     if(this.displayOnly) return;
     ItemManager.blocks[block.id] = block;
+  }
+  selectBlock(id) {
+    for(let i = 0; i < this.blockContainer.children.length; i++) {
+      let block = this.blockContainer.children[i];
+      if(block.getAttr('blockid') == id) {
+        this.blockSelector.visible = true;
+        this.blockSelector.x = block.x;
+        return;
+      }
+    }
+    this.blockSelector.visible = false;
   }
 
   addStaticBlock(layer, artOffset = null) {

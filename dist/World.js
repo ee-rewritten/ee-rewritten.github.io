@@ -119,7 +119,7 @@ class World extends PIXI.Container {
 
   setTile(id, x, y) {
     if(!ItemManager.blocks[id]) {
-      let errLayer = ItemManager.getTab(id) == ItemTab.BACKGROUND ? 1 : 0;
+      let errLayer = ItemManager.getTabFromId(id) == ItemTab.BACKGROUND ? 1 : 0;
       id = ItemManager.blockError[errLayer].id;
     }
     let layer = ItemLayer.RLAYER_TO_BLAYER[ItemManager.blocks[id].layer];
