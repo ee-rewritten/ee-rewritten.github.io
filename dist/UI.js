@@ -340,8 +340,17 @@ class UI extends PIXI.Container {
 
 
   get isMouseInGame() {
+    let isMouseOnMenu = false;
+    for(let key in this.menus) {
+      let menu = this.menus[key]
+      if(!menu.visible) continue;
+      if(Input.mouseY >= menu.y && Input.mouseX >= menu.x && Input.mouseX <= menu.x + menu.width) {
+        isMouseOnMenu = true;
+        break;
+      }
+    }
     return Input.mouseX <= Config.gameWidth && Input.mouseY <= Config.gameHeight
-    && (!this.showingMore || Input.mouseY <= this.blockMenu.y)
+    && !isMouseOnMenu;
   }
 
   handleKey(e) {
