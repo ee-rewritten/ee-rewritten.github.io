@@ -48,8 +48,6 @@ class World extends PIXI.Container {
       playstate.names[i].zIndex = ItemLayer.NAME_LAYERS[i];
     }
 
-    this.sortChildren();
-
     //init realmap
     let map = new Array(depth);
     for(let layer = 0; layer < depth; layer++) {

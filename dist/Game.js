@@ -70,8 +70,6 @@ class Game {
     Global.base.UI.zIndex = 1;
     Global.stage.addChild(Global.base.UI);
 
-    Global.stage.sortChildren();
-
     ticker.add(Global.base.enterFrame);
     ticker.start();
   }
