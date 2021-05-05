@@ -47,24 +47,10 @@ class Player extends PIXI.Container {
 
   set smiley(id) {
     this._smiley = id;
-    let x = id*Config.smileySize;
-    let y = this.smileyRow*Config.smileySize;
-
-    // phones can only load images with sizes less than 4096px
-    // thus the smiley image is 4082px
-    let imgWidth = this.smileySprite.texture.baseTexture.width;
-    if(x >= imgWidth) {
-      let wraps = Math.floor(x/imgWidth);
-      for(let i = 0; i < wraps; i++) {
-        x -= imgWidth;
-        y += Config.smileyRows*Config.smileySize;
-      }
-    }
-    let frame = new Rectangle(x, y,
-      Config.smileySize, Config.smileySize)
+    let frame = ItemManager.getSmileyById(id).frame(this.smileyRow);
 
     this.smileySprite.texture.frame = frame;
-    if(Global.base.UI) Global.base.UI.hotbarsmiley.texture.frame = frame;
+    if(Global.base.UI) Global.base.UI.hotbarSmiley.texture.frame = frame;
   }
   get smiley() {
     return this._smiley;

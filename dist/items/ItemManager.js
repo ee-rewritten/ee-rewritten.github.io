@@ -13,6 +13,8 @@ class ItemManager {
 
   static _addingToTab = 0;
 
+  static smileys = [];
+
   static baseTexture(id) {
     return loader.resources[id].texture.baseTexture;
   }
@@ -28,6 +30,10 @@ class ItemManager {
     this.blocksBMD = this.baseTexture('blocks');
     this.smileysBMD = this.baseTexture('smileys');
     this.godmodeBMD = this.baseTexture('godmode');
+
+
+    this.smileys[20] = new ItemSmiley(20, 'New Years 2010', '', 0xFFFFFF, 1, 1);
+
 
     let pack;
 
@@ -67,6 +73,10 @@ class ItemManager {
 
     // this.lastYOffset = 15;
     this.createBlockPack('sci-fi').addStaticBlocks(9, ItemLayer.BELOW);
+  }
+
+  static getSmileyById(id) {
+    return this.smileys[id];
   }
 
   static isBlockEmpty(id) {
