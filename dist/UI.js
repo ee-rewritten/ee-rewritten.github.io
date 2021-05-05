@@ -252,7 +252,11 @@ class UI extends PIXI.Container {
     menuObject.visible = visible;
 
     for(let key in this.menus) {
-      if(this.menus[key] == menuObject) this.hotbar.setButtonFrame(key, visible ? 1 : 0);
+      if(this.menus[key] == menuObject) {
+        this.hotbar.setButtonFrame(key, visible ? 1 : 0);
+        this.repositionUI();
+        return;
+      }
     }
   }
 
@@ -304,6 +308,7 @@ class UI extends PIXI.Container {
       this.addChild(this.smileyMenu);
       this.menus['smiley'] = this.smileyMenu;
     }
+    this.repositionUI();
   }
 
 

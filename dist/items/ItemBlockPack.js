@@ -58,9 +58,9 @@ class ItemBlockPack extends PIXI.Container {
 
     this.blocks.push(block);
 
-    this.blockContainer.x = 0;
+    this.blockContainer.parent.x = 0;
     if(this.nameText.width > this.blockContainer.width)
-      this.blockContainer.x = Math.floor((this.nameText.width-this.blockContainer.width)/2);
+      this.blockContainer.parent.x = Math.floor((this.nameText.width-this.blockContainer.width)/2);
 
     if(this.displayOnly) return;
     ItemManager.blocks[block.id] = block;
