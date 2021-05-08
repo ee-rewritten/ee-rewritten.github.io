@@ -88,7 +88,7 @@ class PlayState extends State {
       Global.base.UI.tempSelectDelete();
     }
     else if(Input.isKeyJustReleased(16)) {
-      Global.base.UI.selectBlock(Global.base.UI.selectedBlock);
+      Global.base.UI.selectBlock(Global.base.UI._selectedBlock);
     }
 
     if(Input.isKeyJustPressed(66)) {
@@ -103,7 +103,7 @@ class PlayState extends State {
       let pos = this.world.toLocal({x: Input.mouseX, y: Input.mouseY}, Global.stage);
       let x = Math.floor(pos.x/Config.blockSize), y = Math.floor(pos.y/Config.blockSize)
 
-      if((Input.isKeyDown(16) || ItemManager.isBlockEmpty(id))) {
+      if(ItemManager.isBlockEmpty(id)) {
         if(Input.isMouseJustPressed) {
           if(ItemManager.isBlockEmpty(this.world.getTile(0, x, y))) this.layerlock = 1;
           else this.layerlock = 0;

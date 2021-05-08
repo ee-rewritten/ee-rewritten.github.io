@@ -12,7 +12,7 @@ class UI extends PIXI.Container {
   hotbar;
   hotbarSmiley;
   levelBricksPack;
-  _selectedBlock;
+  _selectedBlock; _tempDelete;
   blockMenu; smileyMenu;
   menus = {};
 
@@ -324,8 +324,10 @@ class UI extends PIXI.Container {
     if(newPack != oldPack)
       newPack.selectBlock(id);
 
-    if(!Input.isKeyJustPressed(16))
-      this._selectedBlock = id;
+    if(Input.isKeyJustPressed(16)) return;
+
+    this._selectedBlock = id;
+    this._tempDelete = false;
   }
   selectNthBlock(index) {
     let block = this.levelBricksPack.blockContainer.children[index];
@@ -334,14 +336,15 @@ class UI extends PIXI.Container {
     this.selectBlock(block.getAttr('blockid'));
   }
   tempSelectDelete() {
-    this.selectBlock(ItemManager.blockEmpty[1].id);
+    this.selectBlock(ItemManager.blockEmpty[0].id);
+    this._tempDelete = true;
   }
-  get selectedBlock() {return this._selectedBlock}
+  get selectedBlock() {return this._tempDelete ? ItemManager.blockEmpty[1].id : this._selectedBlock}
 
 
   get isMouseInGame() {
     let isMouseOnMenu = false;
-    for(let key in this.menus) {
+    if(this.visible) for(let key in this.menus) {
       let menu = this.menus[key]
       if(!menu.visible) continue;
       if(Input.mouseY >= menu.y && Input.mouseX >= menu.x && Input.mouseX <= menu.x + menu.width) {
