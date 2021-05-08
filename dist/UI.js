@@ -275,6 +275,7 @@ class UI extends PIXI.Container {
     let usedX = 7, usedY = 7;
     let lastPack;
 
+    this.blockMenu.width = this.hotbar.width;
     this.blockMenu.children.forEach(pack => {
       if(pack.payvaultId != '') {
         pack.visible = false;
@@ -282,7 +283,7 @@ class UI extends PIXI.Container {
       }
       pack.visible = true;
 
-      if(usedX + pack.width > this.hotbar.width) {
+      if(usedX + pack.width > this.blockMenu.width) {
         usedX = 7;
         usedY += pack.height + 2;
       }
@@ -292,9 +293,8 @@ class UI extends PIXI.Container {
 
       lastPack = pack;
     });
-
-    this.blockMenu.width = this.hotbar.width;
     this.blockMenu.height = usedY + lastPack.height + 6;
+
     this.repositionUI();
   }
   get showingMore() {return this.blockMenu && this.blockMenu.visible}
@@ -302,13 +302,37 @@ class UI extends PIXI.Container {
   redrawSmileyMenu() {
     if(!this.smileyMenu) {
       this.smileyMenu = UI.createNineSlice('menu');
-
-      this.smileyMenu.width = 100;
-      this.smileyMenu.height = 100;
-
+      ItemManager.smileys.forEach(smiley => {
+        smiley.visible = false;
+        this.smileyMenu.addChild(smiley);
+      });
       this.addChild(this.smileyMenu);
       this.menus['smiley'] = this.smileyMenu;
     }
+
+    let usedX = 2, usedY = 2;
+    let lastSmiley;
+
+    this.smileyMenu.width = (Config.smileySize-4)*10 + 8;
+    this.smileyMenu.children.forEach(smiley => {
+      if(smiley.payvaultId != '') {
+        smiley.visible = false;
+        return;
+      }
+      smiley.visible = true;
+
+      if(usedX + (smiley.width-4) > this.smileyMenu.width) {
+        usedX = 2;
+        usedY += smiley.height - 4;
+      }
+
+      smiley.x = usedX; smiley.y = usedY;
+      usedX += smiley.width - 4;
+
+      lastSmiley = smiley;
+    });
+    this.smileyMenu.height = usedY + lastSmiley.height + 2;
+
     this.repositionUI();
   }
 

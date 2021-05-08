@@ -46,8 +46,10 @@ class Player extends PIXI.Container {
   }
 
   set smiley(id) {
+    if(!ItemManager.smileys[id]) return;
+
     this._smiley = id;
-    let frame = ItemManager.getSmileyById(id).frame(this.smileyRow);
+    let frame = ItemManager.smileys[id].getFrame(this.smileyRow);
 
     this.smileySprite.texture.frame = frame;
     if(Global.base.UI) Global.base.UI.hotbarSmiley.texture.frame = frame;

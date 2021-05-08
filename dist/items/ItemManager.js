@@ -31,8 +31,10 @@ class ItemManager {
     this.smileysBMD = this.baseTexture('smileys');
     this.godmodeBMD = this.baseTexture('godmode');
 
-
-    this.smileys[20] = new ItemSmiley(20, 'New Years 2010', '', 0xFFFFFF, 1, 1);
+    for(let i = 0; i < 40; i++) {
+      this.createSmiley(`smiley${i}`)
+    }
+    // this.smileys[20] = new ItemSmiley(20, 'New Years 2010', '', 0xFFFFFF, 1, 1);
 
 
     let pack;
@@ -89,6 +91,12 @@ class ItemManager {
       if(id == this.blockEmpty[i].id) return true;
     }
     return false;
+  }
+
+  static createSmiley(name, payvaultId = '', minimapColour = 0xFFFFFF, speed = 1, frames = 1) {
+    let smiley = new ItemSmiley(this.smileys.length, name, payvaultId, minimapColour, speed, frames);
+    this.smileys.push(smiley);
+    return smiley;
   }
 
   static lastYOffset = 0;

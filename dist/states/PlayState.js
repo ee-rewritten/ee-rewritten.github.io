@@ -25,7 +25,6 @@ class PlayState extends State {
     this.worldInfo = worldInfo;
 
     this.player = new Player(this, true, 'seb135', Config.blockSize, Config.blockSize);
-    this.player.smiley = 20;
     this.player.godmodeSprite.tint = 0xAAFF00;
     this.target = this.player;
 
