@@ -39,6 +39,10 @@ class ItemBlockPack extends PIXI.Container {
   }
 
   pushBlock(block) {
+    //limit of 2^6 blocks per pack because ID system
+    if(this.blocks.length == 64)
+      throw new Error(`Maximum blocks reached in pack ${this.name}`);
+
     let blockSprite = ItemManager.blockEmpty[1] ? ItemManager.blockEmpty[1].sprite : block.sprite;
     blockSprite.x = this.blocks.length * Config.blockSize;
     blockSprite.setAttr('blockid', block.id);
@@ -77,18 +81,15 @@ class ItemBlockPack extends PIXI.Container {
     this.blockSelector.visible = false;
   }
 
-  addStaticBlock(layer, artOffset = null) {
-    //limit of 2^6 blocks per pack because ID system
-    if(this.blocks.length == 64)
-      throw new Error(`Maximum blocks reached in pack ${this.name}`);
-
-    if(artOffset == null) artOffset = this.usedFrames;
-
-    //adding a regular block to the pack
+  addGenericBlock(layer, artOffset, ...rest) {
     let id = ItemManager.calculateId(this.tab, this.packId, this.blocks.length);
+    this.pushBlock(new ItemBlock(id, layer, artOffset, this.yOffset, ...rest));
+  }
 
+  addStaticBlock(layer, artOffset = null) {
+    if(artOffset == null) artOffset = this.usedFrames;
+    let id = ItemManager.calculateId(this.tab, this.packId, this.blocks.length);
     this.pushBlock(new ItemBlock(id, layer, artOffset, this.yOffset));
-
     this.usedFrames++;
   }
 
@@ -105,7 +106,8 @@ class ItemBlockPack extends PIXI.Container {
 
     this.pushBlock(new ItemBlock(id, layer, artOffset, this.yOffset, frames, speed));
 
-    this.usedFrames += frames;
+    if(!Array.isArray(frames))
+      this.usedFrames += frames;
   }
 
   //class ItemBlockMorphs extends ItemBlockPack?

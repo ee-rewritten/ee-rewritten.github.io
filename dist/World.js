@@ -170,7 +170,7 @@ class World extends PIXI.Container {
         }
 
         if(offscreen || force && (x == null && y == null || x == block.x/Config.blockSize && y == block.y/Config.blockSize)
-          || ItemManager.blocks[id] && ItemManager.blocks[id].isAnimated) {
+          || ItemManager.blocks[id] && ItemManager.blocks[id].requiresUpdate(block, this)) {
           if(offscreen) {
             if(pos.x <= -Config.blockSize) block.x += Config.gameWidthCeil + Config.blockSize;
             if(pos.x > Config.gameWidthCeil) block.x -= Config.gameWidthCeil + Config.blockSize;
@@ -184,15 +184,11 @@ class World extends PIXI.Container {
 
           let blockData = ItemManager.blocks[id];
           if(!blockData) {
-            block.texture.frame = ItemManager.blockError.frame;
-            return;
+            block.texture.frame = ItemManager.blockError[0].frame;
+            continue;
           }
 
-          if(blockData.isAnimated) {
-            block.texture.frame = blockData.animationFrame(this.offset, block.x/Config.blockSize, block.y/Config.blockSize);
-          }
-          else
-            block.texture.frame = blockData.frame;
+          blockData.draw(block, this);
         }
       }
     }

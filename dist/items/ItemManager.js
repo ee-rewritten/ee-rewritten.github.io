@@ -50,7 +50,8 @@ class ItemManager {
 
     this.createBlockPack('basic').addStaticBlocks(10, ItemLayer.BELOW);
 
-    /*pack = */this.createBlockPack('beta').addStaticBlocks(10, ItemLayer.BELOW);
+    this.createBlockPack('beta').addStaticBlocks(10, ItemLayer.BELOW);
+    // pack = this.createBlockPack('beta');
     // pack.addStaticBlocks(3, ItemLayer.ABOVE);
     // pack.addAnimatedBlock(7, ItemLayer.ABOVE, 0.5);
 
@@ -73,6 +74,10 @@ class ItemManager {
 
     // this.lastYOffset = 15;
     this.createBlockPack('sci-fi').addStaticBlocks(9, ItemLayer.BELOW);
+    // pack = this.createBlockPack('sci-fi');
+    // pack.addGenericBlock(ItemLayer.BELOW, 0, 9, 1/10, function(block, world) {
+    //   block.texture.frame = this._frames[Global.randomInt(0, this._frames.length-1)];
+    // });
   }
 
   static getSmileyById(id) {
