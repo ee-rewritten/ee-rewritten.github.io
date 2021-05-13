@@ -14,6 +14,7 @@ class ItemManager {
   static _addingToTab = 0;
 
   static smileys = [];
+  static auraColours = [];
 
   static baseTexture(id) {
     return loader.resources[id].texture.baseTexture;
@@ -24,6 +25,9 @@ class ItemManager {
       .add('blocks', './Assets/blocks.png')
       .add('smileys', './Assets/smileys.png')
       .add('godmode', './Assets/godmode.png')
+
+      .add('aurabutton', './Assets/aurabutton.png')
+      .add('aurabutton_overlay', './Assets/aurabutton_overlay.png')
   }
 
   static init() {
@@ -36,6 +40,8 @@ class ItemManager {
     }
     // this.smileys[20] = new ItemSmiley(20, 'New Years 2010', '', 0xFFFFFF, 1, 1);
 
+    for(let key in ItemAuraColour.colours)
+      this.createAuraColour(key);
 
     let pack;
 
@@ -80,6 +86,15 @@ class ItemManager {
     // pack.addGenericBlock(ItemLayer.BELOW, 0, 9, 1/10, function(block, world) {
     //   block.texture.frame = this._frames[Global.randomInt(0, this._frames.length-1)];
     // });
+  }
+
+  static createAuraColour(name, payvaultId) {
+    let colour = ItemAuraColour.colours[name] || 0x000000;
+    let pid = payvaultId || `aura${name}`;
+
+    let auraColour = new ItemAuraColour(this.auraColours.length, colour, pid);
+    this.auraColours.push(auraColour);
+    return auraColour;
   }
 
   static getSmileyById(id) {

@@ -25,7 +25,6 @@ class PlayState extends State {
     this.worldInfo = worldInfo;
 
     this.player = new Player(this, true, 'seb135', Config.blockSize, Config.blockSize);
-    this.player.godmodeSprite.tint = 0xAAFF00;
     this.target = this.player;
 
     this.camera.x = this.target.x - Config.gameWidthCeil/2;
@@ -91,10 +90,10 @@ class PlayState extends State {
     }
 
     if(Input.isKeyJustPressed(66)) {
-      Global.base.UI.showUI(Global.base.UI.blockMenu, true);
+      Global.base.UI.showUI(Global.base.UI.menus['edit'], true);
     }
     if(Input.isKeyJustReleased(66)) {
-      Global.base.UI.showUI(Global.base.UI.blockMenu, false);
+      Global.base.UI.showUI(Global.base.UI.menus['edit'], false);
     }
 
     if(Input.isMouseDown && Global.base.UI.isMouseInGame) {

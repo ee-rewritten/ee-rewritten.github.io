@@ -90,11 +90,19 @@ class UI extends PIXI.Container {
     bg.addChild(this.hotbarSmiley);
     this.hotbar.addEventListener('smiley', 'pointerdown', ()=>this.showUI(this.menus['smiley']));
 
-
-    // useless buttons
+    // aura customisation button and menu
+    this.createMenu('aura', {
+      items: ItemManager.auraColours,
+      paddingRight: 5,
+      paddingBottom: 5,
+      width: (10 + 5)*6,
+      x: 5,
+      y: 5,
+    });
     this.hotbar.addTextureButton('aura', null, 40, 40);
     this.hotbar.addEventListener('aura', 'pointerdown', ()=>this.showUI(this.menus['aura']));
 
+    // useless buttons
     this.hotbar.addTextureButton('chat', 'chaticon', 28, 28);
     this.hotbar.addEventListener('chat', 'pointerdown', ()=>{});
 
@@ -108,7 +116,6 @@ class UI extends PIXI.Container {
       x: 7,
       y: 7,
     }, 0, 2, this.hotbar.width);
-    // this.showUI(this.menus['edit'], false);
 
     let hotbarblocks = this.createBlockBar();
     let editBtn = this.hotbar.addTextureButton('edit', 'moreless', 43, 28, 0, false, hotbarblocks.width+43, 'right')
