@@ -13,7 +13,6 @@ class UI extends PIXI.Container {
   hotbarSmiley;
   levelBricksPack;
   _selectedBlock; _tempDelete;
-  blockMenu; smileyMenu;
   menus = {};
 
   infoBG; infoBox; info;
@@ -70,29 +69,54 @@ class UI extends PIXI.Container {
     this.hotbar.addTextButton('god\nmode', false, 'god');
     this.hotbar.addEventListener('god', 'pointerdown', ()=>Global.base.state.player.toggleGodMode(), false);
 
-    this.hotbarSmiley = new Sprite(new Texture(ItemManager.smileysBMD, Global.base.state.player.smileySprite.texture.frame));
+
+    // smiley button and menu
+    this.createMenu('smiley', {
+      items: ItemManager.smileys,
+      filter: smiley => smiley.payvaultId == '',
+      paddingRight: -4,
+      paddingBottom: -4,
+      width: (Config.smileySize-4) * 10 + 6,
+      x: 2,
+      y: 2,
+    }, 6, 6);
+
     let bg = this.hotbar.addTextureButton('smiley', 'aura', 40, 40);
-    bg.addChild(this.hotbarSmiley);
+
+    this.hotbarSmiley = new Sprite(new Texture(ItemManager.smileysBMD, Global.base.state.player.smileySprite.texture.frame));
     this.hotbarSmiley.x = (30-Config.smileySize)/2;
     this.hotbarSmiley.y = (this.hotbar.height-Config.smileySize)/2;
 
-    this.redrawSmileyMenu();
-    this.showUI(this.smileyMenu, false);
+    bg.addChild(this.hotbarSmiley);
     this.hotbar.addEventListener('smiley', 'pointerdown', ()=>this.showUI(this.menus['smiley']));
 
+
+    // useless buttons
     this.hotbar.addTextureButton('aura', null, 40, 40);
-    this.hotbar.addEventListener('aura', 'pointerdown', ()=>{});
+    this.hotbar.addEventListener('aura', 'pointerdown', ()=>this.showUI(this.menus['aura']));
 
     this.hotbar.addTextureButton('chat', 'chaticon', 28, 28);
     this.hotbar.addEventListener('chat', 'pointerdown', ()=>{});
 
+
+    // edit menu and button
+    this.createMenu('edit', {
+      items: ItemManager.blockTabs[0],
+      filter: pack => pack.payvaultId == '',
+      paddingRight: 7,
+      paddingBottom: 4,
+      x: 7,
+      y: 7,
+    }, 0, 2, this.hotbar.width);
+    // this.showUI(this.menus['edit'], false);
+
     let hotbarblocks = this.createBlockBar();
-    this.redrawBlockMenu();
-    this.showUI(this.blockMenu, false);
     let editBtn = this.hotbar.addTextureButton('edit', 'moreless', 43, 28, 0, false, hotbarblocks.width+43, 'right')
     editBtn.addChild(hotbarblocks);
     this.hotbar.addEventListener('edit', 'pointerdown', ()=>this.showUI(this.menus['edit']), true, true);
 
+
+    // useless buttons but on the right
     this.hotbar.addTextureButton('map', null, 29, 28, 0, true, 31);
     this.hotbar.addEventListener('map', 'pointerdown', ()=>{});
 
@@ -217,7 +241,7 @@ class UI extends PIXI.Container {
       numcontainer.addChild(blocknum);
     }
     pack.y = (this.hotbar.height-pack.height)/2;
-    numcontainer.y = pack.y + pack.height - numcontainer.height+2;
+    numcontainer.y = pack.y + pack.height - numcontainer.height+4;
 
     this.selectNthBlock(0);
 
@@ -225,6 +249,8 @@ class UI extends PIXI.Container {
   }
 
   repositionUI() {
+    let visibleMenu;
+
     for(let key in this.menus) {
       let menu = this.menus[key];
       menu.y = this.hotbar.y - menu.height + 1;
@@ -234,12 +260,16 @@ class UI extends PIXI.Container {
       menu.x = button.x - Math.floor((menu.width - button.width)/2);
       if(menu.x < 0) menu.x = 0;
       else if(menu.x + menu.width > Config.gameWidth) menu.x = Config.gameWidth - menu.width;
+
+      if(menu.visible) visibleMenu = menu;
     }
 
     if(this.joystick) {
       let offs = this.joystick.width/2 + 10;
       this.joystick.x = offs;
-      this.joystick.y = (this.showingMore ? this.blockMenu.y : Config.gameHeight) - offs;
+      if(visibleMenu && visibleMenu.x < this.joystick.x + this.joystick.width)
+        this.joystick.y = visibleMenu.y - offs;
+      else this.joystick.y = Config.gameHeight - offs;
     }
   }
   showUI(menuObject, visible = null, hideOthers = true) {
@@ -261,80 +291,75 @@ class UI extends PIXI.Container {
     }
   }
 
-  redrawBlockMenu() {
-    if(!this.blockMenu) {
-      this.blockMenu = UI.createNineSlice('menu');
-      ItemManager.blockTabs[0].forEach(pack => {
-        pack.visible = false;
-        this.blockMenu.addChild(pack);
-      });
-      this.addChild(this.blockMenu);
-      this.menus['edit'] = this.blockMenu;
-    }
+  createMenu(name, item, addWidth = 0, addHeight = 0, setWidth = null) {
+    let menu = UI.createNineSlice('menu');
+    this.menus[name] = menu;
 
-    let usedX = 7, usedY = 7;
-    let lastPack;
+    item = Object.assign({
+      items: [],
+      filter: () => true,
+      width: null,
+      paddingRight: 0,
+      paddingBottom: 0,
+      x: 0,
+      y: 0,
+    }, item);
+    if(!item.width && setWidth) item.width = setWidth - item.x;
 
-    this.blockMenu.width = this.hotbar.width;
-    this.blockMenu.children.forEach(pack => {
-      if(pack.payvaultId != '') {
-        pack.visible = false;
-        return;
-      }
-      pack.visible = true;
+    menu.setAttr('item', item);
 
-      if(usedX + pack.width > this.blockMenu.width) {
-        usedX = 7;
-        usedY += pack.height + 2;
-      }
+    let itemContainer = new FillContainer(item.width, item.paddingRight, item.paddingBottom);
+    itemContainer.x = item.x;
+    itemContainer.y = item.y;
 
-      pack.x = usedX; pack.y = usedY;
-      usedX += pack.width + 5;
+    itemContainer.addChildren(item.items);
+    menu.addChild(itemContainer);
 
-      lastPack = pack;
-    });
-    this.blockMenu.height = usedY + lastPack.height + 6;
+    this.addChild(menu);
 
-    this.repositionUI();
+    itemContainer.showChildren(item.filter);
+    menu.width = (setWidth ? setWidth : itemContainer.x + itemContainer.width) + addWidth;
+    menu.height = itemContainer.y + itemContainer.height + addHeight;
+
+    menu.visible = false;
   }
-  get showingMore() {return this.blockMenu && this.blockMenu.visible}
 
-  redrawSmileyMenu() {
-    if(!this.smileyMenu) {
-      this.smileyMenu = UI.createNineSlice('menu');
-      ItemManager.smileys.forEach(smiley => {
-        smiley.visible = false;
-        this.smileyMenu.addChild(smiley);
-      });
-      this.addChild(this.smileyMenu);
-      this.menus['smiley'] = this.smileyMenu;
-    }
-
-    let usedX = 2, usedY = 2;
-    let lastSmiley;
-
-    this.smileyMenu.width = (Config.smileySize-4)*10 + 8;
-    this.smileyMenu.children.forEach(smiley => {
-      if(smiley.payvaultId != '') {
-        smiley.visible = false;
-        return;
-      }
-      smiley.visible = true;
-
-      if(usedX + (smiley.width-4) > this.smileyMenu.width) {
-        usedX = 2;
-        usedY += smiley.height - 4;
-      }
-
-      smiley.x = usedX; smiley.y = usedY;
-      usedX += smiley.width - 4;
-
-      lastSmiley = smiley;
-    });
-    this.smileyMenu.height = usedY + lastSmiley.height + 2;
-
-    this.repositionUI();
-  }
+  // redrawSmileyMenu() {
+  //   if(!this.smileyMenu) {
+  //     this.smileyMenu = UI.createNineSlice('menu');
+  //     ItemManager.smileys.forEach(smiley => {
+  //       smiley.visible = false;
+  //       this.smileyMenu.addChild(smiley);
+  //     });
+  //     this.addChild(this.smileyMenu);
+  //     this.menus['smiley'] = this.smileyMenu;
+  //   }
+  //
+  //   let usedX = 2, usedY = 2;
+  //   let lastSmiley;
+  //
+  //   this.smileyMenu.width = (Config.smileySize-4)*10 + 8;
+  //   this.smileyMenu.children.forEach(smiley => {
+  //     if(smiley.payvaultId != '') {
+  //       smiley.visible = false;
+  //       return;
+  //     }
+  //     smiley.visible = true;
+  //
+  //     if(usedX + (smiley.width-4) > this.smileyMenu.width) {
+  //       usedX = 2;
+  //       usedY += smiley.height - 4;
+  //     }
+  //
+  //     smiley.x = usedX; smiley.y = usedY;
+  //     usedX += smiley.width - 4;
+  //
+  //     lastSmiley = smiley;
+  //   });
+  //   this.smileyMenu.height = usedY + lastSmiley.height + 2;
+  //
+  //   this.repositionUI();
+  // }
 
 
   selectBlock(id) {

@@ -121,4 +121,13 @@ class ItemBlockPack extends PIXI.Container {
     }
     return false;
   }
+
+  //super hacky
+  //I don't know why, but adding text to the blockpack increases width and height by 2
+  get width() {
+    return super.width-2;
+  }
+  get height() {
+    return super.height-2;
+  }
 }
