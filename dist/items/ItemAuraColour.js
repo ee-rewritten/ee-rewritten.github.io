@@ -8,7 +8,7 @@ class ItemAuraColour extends PIXI.Sprite {
     purple:   0xAA00FF,
     orange:   0xFF5500,
     cyan:     0x00FFFF,
-		gold:     0xFFD700,
+		// gold:     0xFFD700,
 		pink:     0xFF80C0,
 		indigo:   0x0000FF,
 		lime:     0xAAFF00,
