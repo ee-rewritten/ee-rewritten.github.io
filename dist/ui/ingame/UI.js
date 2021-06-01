@@ -104,9 +104,10 @@ class UI extends PIXI.Container {
     this.hotbar.addTextureButton('aura', null, 40, 40);
     this.hotbar.addEventListener('aura', 'pointerdown', ()=>this.showUI(this.menus['aura']));
 
-    // useless buttons
+    // chat input
+    this.createChatInput();
     this.hotbar.addTextureButton('chat', 'chaticon', 28, 28);
-    this.hotbar.addEventListener('chat', 'pointerdown', ()=>{});
+    this.hotbar.addEventListener('chat', 'pointerdown', ()=>this.showUI(this.menus['chat']));
 
 
     // edit menu and button
@@ -159,6 +160,12 @@ class UI extends PIXI.Container {
     this.userlist = new ScrollContainer(this.sidebar.width, 100);
     this.userlist.addChild(Global.base.state.player.userlistItem);
     this.sidebar.addChild(this.userlist);
+
+    let top = this.userlist.y + 100;
+    this.chat = new ScrollContainer(this.sidebar.width, this.sidebar.height - top, ChatEntry.padding/2, true, 25);
+    this.chat.y = top;
+    this.sidebar.addChild(this.chat);
+
 
     // top left debug info
     this.debugText = UI.createShadowText('FPS: xx', 'Nokia');
@@ -291,6 +298,9 @@ class UI extends PIXI.Container {
 
     menuObject.visible = visible;
 
+    let onShow = menuObject.getAttr('onShow');
+    if(onShow) onShow(visible);
+
     for(let key in this.menus) {
       if(this.menus[key] == menuObject) {
         this.hotbar.setButtonFrame(key, visible ? 1 : 0);
@@ -298,6 +308,49 @@ class UI extends PIXI.Container {
         return;
       }
     }
+  }
+
+  createChatInput() {
+    let menu = UI.createNineSlice('menu');
+    this.menus['chat'] = menu;
+
+    let input = new PIXI.TextInput({
+      input: {
+        fontFamily: 'Tahoma, "Times New Roman", Arial',
+        fontSize: '12px',
+        padding: '1px',
+        width: '450px',
+        color: 'black'
+      },
+      box: {
+        default: {fill: 0xFFFFFF, rounded: 0, stroke: {color: 0xBFBFBF, width: 1}},
+      }
+    })
+
+
+    input.on('keydown', keycode => {
+      if(keycode == 13) {
+        this.chat.addChild(new ChatEntry('seb135', input.text));
+        this.showUI(this.menus['chat'], false);
+      }
+    });
+    menu.setAttr('onShow', visible => {
+      Input.isGameInFocus = !visible;
+      if(visible) input.focus();
+      if(!visible) {
+        input.text = '';
+        input.blur();
+      }
+    });
+
+    menu.width = input.width + 10;
+    menu.height = input.height + 10;
+    input.x = input.y = 5;
+
+    menu.addChild(input);
+    this.addChild(menu);
+
+    menu.visible = false;
   }
 
   createMenu(name, item, addWidth = 0, addHeight = 0, setWidth = null) {
@@ -389,8 +442,11 @@ class UI extends PIXI.Container {
   }
 
   redrawChat(width) {
-    this.sidebar.width = width-Config.gameWidth;
-    this.userlist.resize(width, 100);
+    let sideWidth = width-Config.gameWidth;
+    this.sidebar.width = sideWidth;
+    this.userlist.resize(sideWidth, this.userlist._height);
+    this.chat.resize(sideWidth, this.chat._height);
+    this.chat.scrollContainer.children.forEach(child => child.setWordWrap(sideWidth));
   }
 
   showInfo(title, body) {
@@ -428,7 +484,12 @@ class UI extends PIXI.Container {
       this.worldInfo.text += `${stat}: ${Global.base.state.worldInfo[stat]}\n`;
     }
 
-    this.userlist.y = this.worldInfo.y + this.worldInfo.height
+    this.userlist.y = this.worldInfo.y + this.worldInfo.height;
+
+    let top = this.userlist.y + this.userlist._height;
+    if(this.chat._height != this.sidebar.height - top)
+      this.chat.resize(this.chat._width, this.sidebar.height - top);
+    this.chat.y = top;
   }
 
   updateDebugMenu() {

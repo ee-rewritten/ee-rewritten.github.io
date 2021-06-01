@@ -1,7 +1,11 @@
 class ScrollContainer extends PIXI.Container {
-  _mask;
-  constructor(width, height) {
+  _mask; _width; _height; scrollToBottom; maxChildren;
+  constructor(width, height, padding = 0, scrollToBottom = false, maxChildren = null) {
     super();
+    this.padding = padding;
+    this.scrollToBottom = scrollToBottom;
+    this.maxChildren = maxChildren;
+
     this.scrollContainer = new Container();
     this.scrollContainer.sortableChildren = true;
     super.addChild(this.scrollContainer);
@@ -11,7 +15,17 @@ class ScrollContainer extends PIXI.Container {
 
   addChild(child) {
     child.y = this.scrollContainer.height;
+    if(this.scrollContainer.children.length) child.y += this.padding;
     this.scrollContainer.addChild(child);
+
+    if(this.scrollContainer.height >= this._height && this.scrollToBottom)
+      this.scrollContainer.y = this._height - this.scrollContainer.height - this.padding;
+
+    if(this.maxChildren && this.scrollContainer.children.length > this.maxChildren) {
+      this.scrollContainer.y = 0;
+      this.scrollContainer.children.shift();
+      this.sort();
+    }
   }
   removeChild(child) {
     this.scrollContainer.removeChild(child);
@@ -25,6 +39,8 @@ class ScrollContainer extends PIXI.Container {
   }
 
   resize(width, height) {
+    this._width = width; this._height = height;
+
     super.removeChild(this._mask);
 
     this._mask = new Graphics();

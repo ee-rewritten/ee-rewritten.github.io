@@ -105,6 +105,9 @@ class PlayState extends State {
     if(Input.isKeyJustReleased(66)) {
       Global.base.UI.showUI(Global.base.UI.menus['edit'], false);
     }
+    if(Input.isKeyJustPressed(84)) {
+      Global.base.UI.showUI(Global.base.UI.menus['chat'], true);
+    }
 
     if(Input.isMouseDown && Global.base.UI.isMouseInGame) {
       let id = Global.base.UI.selectedBlock;
