@@ -41,11 +41,11 @@ class World extends PIXI.Container {
       blockContainer.zIndex = i;
       this.addChild(blockContainer);
     }
-    for (let i = 0; i < playstate.players.length; i++) {
-      this.addChild(playstate.players[i]);
-      this.addChild(playstate.names[i]);
-      playstate.players[i].zIndex = ItemLayer.PLAYER_LAYERS[i];
-      playstate.names[i].zIndex = ItemLayer.NAME_LAYERS[i];
+    for (let i = 0; i < playstate.playerContainers.length; i++) {
+      this.addChild(playstate.playerContainers[i]);
+      this.addChild(playstate.nameContainers[i]);
+      playstate.playerContainers[i].zIndex = ItemLayer.PLAYER_LAYERS[i];
+      playstate.nameContainers[i].zIndex = ItemLayer.NAME_LAYERS[i];
     }
 
     //init realmap

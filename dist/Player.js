@@ -1,4 +1,6 @@
 class Player extends PIXI.Container {
+  userlistItem;
+
   nameText;
   smileySprite;
   _smileyRow = 0;
@@ -6,6 +8,7 @@ class Player extends PIXI.Container {
   godmodeSprite;
 
   isme = false;
+  id = 0;
   name = '';
   playstate;
   x = 0; y = 0;
@@ -22,14 +25,24 @@ class Player extends PIXI.Container {
 
   static smileyOffset = Math.round(-(Config.smileySize-Config.blockSize)/2);
   static godmodeOffset = Math.round(-(Config.godmodeSize-Config.smileySize)/2) + this.smileyOffset;
+  static getNameColour(name) {
+    switch (name) {
+      case 'seb135':
+        return 0xFFB400;
+      default:
+        return 0xEEEEEE;
+    }
+  }
 
-  constructor(playstate, isme, name, x, y) {
+  constructor(playstate, isme, id, name, x, y, nameColour) {
     super();
-    this.isme = isme;
     this.playstate = playstate;
+    this.isme = isme;
+    this.id = id;
     this.name = name;
     this.x = x;
     this.y = y;
+    if(!nameColour) nameColour = Player.getNameColour(name);
 
     let godmodeTexture = new Texture(ItemManager.godmodeBMD, new Rectangle(Config.godmodeSize,0,Config.godmodeSize,Config.godmodeSize));
     this.godmodeSprite = new Sprite(godmodeTexture);
@@ -40,6 +53,18 @@ class Player extends PIXI.Container {
     this.addChild(this.smileySprite);
 
     this.nameText = UI.createShadowText(name, 'Visitor');
+    this.nameText.bmtext.tint = nameColour;
+
+    this.zIndex = this.nameText.zIndex = (isme ? 0 : -id);
+
+    playstate.players[id] = this;
+
+    this.userlistItem = new UserlistItem(name, nameColour);
+    this.userlistItem.zIndex = (isme ? 0 : -id);
+    if(Global.base.UI) {
+      Global.base.UI.userlist.addChild(this.userlistItem);
+      Global.base.UI.userlist.sort();
+    }
 
     this.toggleGodMode(false);
     this.enterFrame();
@@ -52,7 +77,7 @@ class Player extends PIXI.Container {
     let frame = ItemManager.smileys[id].getFrame(this.smileyRow);
 
     this.smileySprite.texture.frame = frame;
-    if(Global.base.UI) Global.base.UI.hotbarSmiley.texture.frame = frame;
+    if(this.isme && Global.base.UI) Global.base.UI.hotbarSmiley.texture.frame = frame;
   }
   get smiley() {
     return this._smiley;

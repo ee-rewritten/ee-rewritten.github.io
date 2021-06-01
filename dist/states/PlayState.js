@@ -1,8 +1,8 @@
 class PlayState extends State {
   target;
   world; worldName; worldInfo;
-  player;
-  players; names;
+  player; players = [];
+  playerContainers; nameContainers;
 
   layerlock = 0;
 
@@ -13,18 +13,21 @@ class PlayState extends State {
   constructor(width, height, depth, worldName, worldInfo) {
     super();
 
-    this.players = new Array(ItemLayer.PLAYER_LAYERS.length);
-    this.names = new Array(ItemLayer.NAME_LAYERS.length);
-    for (let i = 0; i < this.players.length; i++) {
-      this.players[i] = new Container();
-      this.names[i] = new Container();
+    this.playerContainers = new Array(ItemLayer.PLAYER_LAYERS.length);
+    this.nameContainers = new Array(ItemLayer.NAME_LAYERS.length);
+    for (let i = 0; i < this.playerContainers.length; i++) {
+      this.playerContainers[i] = new Container();
+      this.nameContainers[i] = new Container();
+
+      this.playerContainers[i].sortableChildren = true;
+      this.nameContainers[i].sortableChildren = true;
     }
 
     this.world = new World(this, width, height, depth);
     this.worldName = worldName;
     this.worldInfo = worldInfo;
 
-    this.player = new Player(this, true, 'seb135', Config.blockSize, Config.blockSize);
+    this.player = new Player(this, true, 0, 'seb135', Config.blockSize, Config.blockSize);
     this.target = this.player;
 
     this.camera.x = this.target.x - Config.gameWidthCeil/2;
@@ -34,12 +37,19 @@ class PlayState extends State {
 
   movePlayer(p) {
     if(p.layer != null) {
-      this.players[p.layer].removeChild(p);
-      this.names[p.layer].removeChild(p.nameText);
+      this.playerContainers[p.layer].removeChild(p);
+      this.nameContainers[p.layer].removeChild(p.nameText);
     }
     p.layer = p.isInGodMode ? 1 : 0;
-    this.players[p.layer].addChild(p);
-    this.names[p.layer].addChild(p.nameText);
+    this.playerContainers[p.layer].addChild(p);
+    this.nameContainers[p.layer].addChild(p.nameText);
+  }
+  deletePlayer(p) {
+    Global.base.UI.userlist.removeChild(p.userlistItem);
+
+    this.playerContainers[p.layer].removeChild(p);
+    this.nameContainers[p.layer].removeChild(p.nameText);
+    delete this.players[p.id];
   }
 
   enterFrame() {
@@ -47,8 +57,8 @@ class PlayState extends State {
     this.world.y = -Math.round(this.camera.y);
     this.world.redraw();
 
-    for(let i = 0; i < this.players.length; i++) {
-      this.players[i].children.forEach(p => {
+    for(let i = 0; i < this.playerContainers.length; i++) {
+      this.playerContainers[i].children.forEach(p => {
         p.enterFrame();
       });
     }
@@ -112,12 +122,10 @@ class PlayState extends State {
       this.world.setTile(id, x, y);
     }
 
+    this.players.forEach(p => {
+      p.tick();
+    });
 
-    for(let i = 0; i < this.players.length; i++) {
-      this.players[i].children.forEach(p => {
-        p.tick();
-      });
-    }
     this.world.tick();
     if(this.target != null) {
       this.camera.x -= (this.camera.x - (this.target.x - Config.gameWidthCeil/2)) * Config.camera_lag;

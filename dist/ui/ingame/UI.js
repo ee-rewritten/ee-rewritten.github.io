@@ -7,7 +7,9 @@ class UI extends PIXI.Container {
   joystick;
   joystickPointerId = -1;
 
-  chat; worldName; worldInfo;
+  sidebar; worldName; worldInfo;
+  userlist;
+  chat;
 
   hotbar;
   hotbarSmiley;
@@ -22,7 +24,7 @@ class UI extends PIXI.Container {
       //9-slices
       .add('hotbar', './Assets/UI/hotbar.png') //borders: 1
       .add('info', './Assets/UI/info.png') //12
-      .add('chat', './Assets/UI/chat.png') //1
+      .add('sidebar', './Assets/UI/sidebar.png') //1
       .add('menu', './Assets/UI/menu.png') //1
 
       //joystick
@@ -136,27 +138,27 @@ class UI extends PIXI.Container {
     this.addChild(this.hotbar);
 
 
-    // right chat panel
-    this.chat = UI.createNineSlice('chat');
-    this.chat.width = Config.fullWidth-Config.gameWidth;
-    this.chat.height = Config.fullHeight;
-    this.chat.x = Config.gameWidth;
-    this.addChild(this.chat);
+    // right sidebar panel
+    this.sidebar = UI.createNineSlice('sidebar');
+    this.sidebar.width = Config.fullWidth-Config.gameWidth;
+    this.sidebar.height = Config.fullHeight;
+    this.sidebar.x = Config.gameWidth;
+    this.addChild(this.sidebar);
 
     this.worldName = UI.createText(Global.base.state.worldName, 'Visitor', 2);
     this.worldName.x = 4;
     this.worldName.y = 1;
-    this.chat.addChild(this.worldName);
+    this.sidebar.addChild(this.worldName);
 
     this.worldInfo = UI.createText('', 'Visitor');
     this.worldInfo.tint = 0xA9A9A9;
     this.worldInfo.x = 5;
     this.worldInfo.y = 19;
-    for (const stat in Global.base.state.worldInfo) {
-      this.worldInfo.text += `${stat}: ${Global.base.state.worldInfo[stat]}\n`;
-    }
-    this.chat.addChild(this.worldInfo);
+    this.sidebar.addChild(this.worldInfo);
 
+    this.userlist = new ScrollContainer(this.sidebar.width, 100);
+    this.userlist.addChild(Global.base.state.player.userlistItem);
+    this.sidebar.addChild(this.userlist);
 
     // top left debug info
     this.debugText = UI.createShadowText('FPS: xx', 'Nokia');
@@ -190,7 +192,7 @@ class UI extends PIXI.Container {
       this.createJoyStick();
     }
 
-    this.repositionUI();
+    this.repositionMenus();
   }
 
   createJoyStick() {
@@ -255,7 +257,7 @@ class UI extends PIXI.Container {
     return hotbarblocks;
   }
 
-  repositionUI() {
+  repositionMenus() {
     let visibleMenu;
 
     for(let key in this.menus) {
@@ -292,7 +294,7 @@ class UI extends PIXI.Container {
     for(let key in this.menus) {
       if(this.menus[key] == menuObject) {
         this.hotbar.setButtonFrame(key, visible ? 1 : 0);
-        this.repositionUI();
+        this.repositionMenus();
         return;
       }
     }
@@ -330,44 +332,6 @@ class UI extends PIXI.Container {
 
     menu.visible = false;
   }
-
-  // redrawSmileyMenu() {
-  //   if(!this.smileyMenu) {
-  //     this.smileyMenu = UI.createNineSlice('menu');
-  //     ItemManager.smileys.forEach(smiley => {
-  //       smiley.visible = false;
-  //       this.smileyMenu.addChild(smiley);
-  //     });
-  //     this.addChild(this.smileyMenu);
-  //     this.menus['smiley'] = this.smileyMenu;
-  //   }
-  //
-  //   let usedX = 2, usedY = 2;
-  //   let lastSmiley;
-  //
-  //   this.smileyMenu.width = (Config.smileySize-4)*10 + 8;
-  //   this.smileyMenu.children.forEach(smiley => {
-  //     if(smiley.payvaultId != '') {
-  //       smiley.visible = false;
-  //       return;
-  //     }
-  //     smiley.visible = true;
-  //
-  //     if(usedX + (smiley.width-4) > this.smileyMenu.width) {
-  //       usedX = 2;
-  //       usedY += smiley.height - 4;
-  //     }
-  //
-  //     smiley.x = usedX; smiley.y = usedY;
-  //     usedX += smiley.width - 4;
-  //
-  //     lastSmiley = smiley;
-  //   });
-  //   this.smileyMenu.height = usedY + lastSmiley.height + 2;
-  //
-  //   this.repositionUI();
-  // }
-
 
   selectBlock(id) {
     //select in the old pack to hide blockSelector
@@ -425,7 +389,8 @@ class UI extends PIXI.Container {
   }
 
   redrawChat(width) {
-    this.chat.width = width-Config.gameWidth;
+    this.sidebar.width = width-Config.gameWidth;
+    this.userlist.resize(width, 100);
   }
 
   showInfo(title, body) {
@@ -452,6 +417,21 @@ class UI extends PIXI.Container {
   }
 
   enterFrame() {
+    this.updateDebugMenu();
+    this.updateSidebar();
+  }
+
+  updateSidebar() {
+    this.worldName.text = Global.base.state.worldName;
+    this.worldInfo.text = '';
+    for (const stat in Global.base.state.worldInfo) {
+      this.worldInfo.text += `${stat}: ${Global.base.state.worldInfo[stat]}\n`;
+    }
+
+    this.userlist.y = this.worldInfo.y + this.worldInfo.height
+  }
+
+  updateDebugMenu() {
     let player = Global.base.state.player;
 
     if(this.debugText.visible != this.showDebug) this.debugText.visible = this.showDebug;
@@ -486,7 +466,7 @@ class UI extends PIXI.Container {
     return fps < 1 ? `SPF: ${(1/fps).toFixed(1)}` : `${fps.toFixed(1)}`;
   }
   getPosText(player) {
-    return `(${player.x.toFixed(3)}, ${player.y.toFixed(3)})`;
+    return `(${(player.x/16).toFixed(3)}, ${(player.y/16).toFixed(3)})`;
   }
 
   drawUIRect(localx, localy, width, height, x, y, colour) {
