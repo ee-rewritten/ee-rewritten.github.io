@@ -3,7 +3,7 @@ class ShadowText extends PIXI.Container {
   bmshadows;
   blurfilter;
 
-  constructor(text, style, blur = 2, amount = 3, shadowColour = 0) {
+  constructor(text, style, blur = 2, amount = 2, shadowColour = 0) {
     super();
     this.bmtext = new BMText(text, style);
 
