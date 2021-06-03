@@ -1,7 +1,7 @@
 class UI extends PIXI.Container {
   debugText;
   showDebug = true;
-  fps = new Array(10);
+  fps = new Array(20);
   report = {};
 
   joystick;
@@ -525,21 +525,23 @@ class UI extends PIXI.Container {
 
   getFPSText() {
     //overengineered fps counter let's go
-    let fps;
-    if(fps < 1) fps = ticker.FPS;
-    else {
-      this.fps.shift();
-      this.fps.push(ticker.FPS);
-      fps = this.fps.reduce((a,b) => a+b)/this.fps.length;
-      let diff = Math.abs(ticker.FPS-fps);
+    let now = performance.now();
+    let fps = 1000/(Global.thisFrameTime-Global.lastFrameTime);
+    let avgFps = fps;
 
+    if(fps > 1) {
+      this.fps.shift();
+      this.fps.push(fps);
+      avgFps = this.fps.reduce((a,b) => a+b)/this.fps.length;
+
+      let diff = Math.abs(fps-avgFps);
       if(diff > 5)
-        for(let i; i < this.fps.length/2; i++) {
+        for(let i; i < this.fps.length/4; i++) {
           this.fps.shift();
-          this.fps.push(ticker.FPS);
+          this.fps.push(fps);
         }
     }
-    return fps < 1 ? `SPF: ${(1/fps).toFixed(1)}` : `${fps.toFixed(1)}`;
+    return fps < 1 ? `${(1/avgFps).toFixed(1)} (SPF)` : `${avgFps.toFixed(1)}`;
   }
   getPosText(player) {
     return `(${(player.x/16).toFixed(3)}, ${(player.y/16).toFixed(3)})`;

@@ -1,4 +1,4 @@
-const ticker = new PIXI.Ticker();
+// const ticker = new PIXI.Ticker();
 const loader = PIXI.Loader.shared;
 const Sprite = PIXI.Sprite;
 const Rectangle = PIXI.Rectangle;

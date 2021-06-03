@@ -70,14 +70,25 @@ class Game {
     Global.base.UI.zIndex = 1;
     Global.stage.addChild(Global.base.UI);
 
-    ticker.add(Global.base.enterFrame);
-    ticker.start();
+    Global.base.time = performance.now();
+    setInterval(Global.base.enterFrame, 1000/60);
   }
 
+  time = 0;
   enterFrame() {
     if(Global.base.state != null && !Global.base.state.stoppedRendering) {
-      let ticks = ticker.elapsedMS/Config.physics.ms_per_tick;
-      for (let i = 0; i < ticks; i++) {
+      let now = performance.now();
+      Global.lastFrameTime = Global.thisFrameTime;
+      Global.thisFrameTime = now;
+
+      // limits ticks to max_ticks_per_frame so as to not lag out already laggy players
+      if((now - Global.base.time) / Config.physics.ms_per_tick > Config.physics.max_ticks_per_frame) {
+        Global.base.time = now - Config.physics.ms_per_tick * Config.physics.max_ticks_per_frame;
+      }
+
+      while(Global.base.time < now) {
+        Global.base.time += Config.physics.ms_per_tick;
+
         Global.base.state.tick();
         Input.resetJustPressed();
       }

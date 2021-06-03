@@ -23,6 +23,7 @@ class Config {
 
   static physics = {
     ms_per_tick: 10,
+    max_ticks_per_frame: 150,
     variable_multiplyer: 7.752,
 
     base_drag: Math.pow(.9981, 10) * 1.00016093,

@@ -407,7 +407,7 @@ class Player extends PIXI.Container {
   }
 
   get moving() {
-    return this.ticks - this.lastMoved < 100;
+    return this.ticks - this.lastMoved < 50;
   }
   set moving(value) {
     if(value) this.lastMoved = this.ticks;

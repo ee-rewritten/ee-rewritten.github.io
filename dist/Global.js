@@ -14,6 +14,9 @@ class Global {
 
   static isMobile = false;
 
+  static lastFrameTime = 0;
+  static thisFrameTime = 0;
+
   static resize(width) {
     if(this.base && this.base.UI) this.base.UI.redrawChat(width);
     this.canvas.width = width;
