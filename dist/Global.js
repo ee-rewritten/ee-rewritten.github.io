@@ -9,68 +9,64 @@ class Global {
 
   static _isFullscreen = false;
   static scale = 1;
-  static screenWidth;
-  static screenHeight;
 
   static isMobile = false;
 
   static lastFrameTime = 0;
   static thisFrameTime = 0;
 
-  static resize(width) {
-    if(this.base && this.base.UI) this.base.UI.redrawChat(width);
-    this.canvas.width = width;
-    // this.canvas.height = height;
-    this.app.renderer.resize(width, Config.fullHeight);
-  }
-
-  static rotate() {
-    Input.allowInput = true;
-    let nothing = () => {};
-    screen.orientation.lock('landscape').then(nothing, nothing);
-  }
   static set fullscreen(bool) {
-    Input.allowInput = false;
-    let allowInput = () => Input.allowInput = true;
-    if(bool) {
-      if (this.canvas.requestFullscreen) {
-        this.canvas.requestFullscreen().then(this.rotate);
-      } else if (this.canvas.webkitRequestFullscreen) { /* Safari */
-        this.canvas.webkitRequestFullscreen().then(this.rotate);
-      } else if (this.canvas.msRequestFullscreen) { /* IE11 */
-        this.canvas.msRequestFullscreen().then(this.rotate);
-      }
-    }
-    else {
-      if (document.exitFullscreen) {
-        document.exitFullscreen().then(allowInput);
-      } else if (document.webkitExitFullscreen) { /* Safari */
-        document.webkitExitFullscreen().then(allowInput);
-      } else if (document.msExitFullscreen) { /* IE11 */
-        document.msExitFullscreen().then(allowInput);
-      }
-    }
+    if(bool) this.goFullscreen();
+    else this.leaveFullscreen();
+  }
+  static get fullscreen() {
+    return this._isFullscreen;
   }
 
-  static set isFullscreen(value) {
-    this._isFullscreen = value;
+  static goFullscreen() {
+    Input.allowInput = false;
+    this._isFullscreen = true;
 
-    if(value) {
-      var orientation = (screen.orientation || {}).type || screen.mozOrientation || screen.msOrientation;
-      if(this.isMobile && orientation.includes('landscape')) {
-        this.screenWidth = window.screen.width;
-        this.screenHeight = window.screen.height;
-      }
-      let ratio = this.screenWidth/this.screenHeight;
-      this.resize(Math.floor(Config.fullHeight*ratio));
-      this.scale = this.screenHeight / Config.fullHeight;
-    } else {
+    let onFullscreen = () => {
+      let resize = () => {
+        this.resize(screen.width/screen.height * Config.fullHeight);
+        this.scale = screen.height / Config.fullHeight;
+      };
+      screen.orientation.lock('landscape').then(resize, resize);
+      Input.allowInput = true;
+    }
+    let allowInput = () => Input.allowInput = true;
+
+    if (this.canvas.requestFullscreen)
+      this.canvas.requestFullscreen().then(onFullscreen, allowInput);
+    else if (this.canvas.webkitRequestFullscreen)
+      this.canvas.webkitRequestFullscreen().then(onFullscreen, allowInput); /* Safari */
+    else if (this.canvas.msRequestFullscreen)
+      this.canvas.msRequestFullscreen().then(onFullscreen, allowInput); /* IE11 */
+  }
+
+  static leaveFullscreen() {
+    Input.allowInput = false;
+    this._isFullscreen = false;
+
+    let onExit = () => {
       this.resize(Config.fullWidth);
       this.scale = 1;
+      Input.allowInput = true;
     }
+
+    if (document.exitFullscreen)
+      document.exitFullscreen().then(onExit, onExit);
+    else if (document.webkitExitFullscreen)
+      document.webkitExitFullscreen().then(onExit, onExit); /* Safari */
+    else if (document.msExitFullscreen)
+      document.msExitFullscreen().then(onExit, onExit); /* IE11 */
   }
-  static get isFullscreen() {
-    return this._isFullscreen;
+
+  static resize(width) {
+    this.base.UI.redrawChat(width);
+    this.canvas.width = width;
+    this.app.renderer.resize(width, Config.fullHeight);
   }
 
   static get scale() {

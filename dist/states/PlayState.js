@@ -73,8 +73,8 @@ class PlayState extends State {
   }
 
   tick() {
-    if(Input.isKeyJustPressed(122)) {
-      Global.fullscreen = !Global.isFullscreen;
+    if(Input.isKeyJustPressed(122) && !Global.fullscreen) {
+      Global.fullscreen = true;
     }
 
     if(Input.isKeyDown(Key.lookLeft)) {

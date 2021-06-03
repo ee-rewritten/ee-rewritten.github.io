@@ -142,7 +142,7 @@ class UI extends PIXI.Container {
     this.hotbar.addTextButton('options', true);
 
     this.hotbar.addTextureButton('fullscreen', null, null, null, 0, true);
-    this.hotbar.onClick('fullscreen', e=>Global.fullscreen = !Global.isFullscreen);
+    this.hotbar.onClick('fullscreen', e=>Global.fullscreen = !Global.fullscreen);
 
     this.addChild(this.hotbar);
 

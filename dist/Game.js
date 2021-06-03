@@ -40,7 +40,7 @@ class Game {
           document.fullscreenElement || /* Standard syntax */
           document.webkitFullscreenElement || /* Safari and Opera syntax */
           document.msFullscreenElement; /* IE11 syntax */
-        Global.isFullscreen = (element != null);
+        if(element == null) Global.fullscreen = false;
       });
     }
 
