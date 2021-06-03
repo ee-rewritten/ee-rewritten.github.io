@@ -52,6 +52,14 @@ class PlayState extends State {
     delete this.players[p.id];
   }
 
+  _fPid = 10000;
+  addFakePlayer(name = 'seb135') {
+    let p = new Player(this, false, this._fPid++, name, this.player.x, this.player.y);
+    p.toggleGodMode(this.player.isInGodMode);
+    p.smiley = this.player.smiley;
+    p.auraColour = this.player.auraColour;
+  }
+
   enterFrame() {
     this.world.x = -Math.round(this.camera.x);
     this.world.y = -Math.round(this.camera.y);
@@ -107,6 +115,10 @@ class PlayState extends State {
     }
     if(Input.isKeyJustPressed(84)) {
       Global.base.UI.showUI(Global.base.UI.menus['chat'], true);
+    }
+
+    if(Input.isKeyJustPressed(72)) {
+      this.addFakePlayer();
     }
 
     if(Input.isMouseDown && Global.base.UI.isMouseInGame) {
