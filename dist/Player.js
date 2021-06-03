@@ -5,6 +5,7 @@ class Player extends PIXI.Container {
   smileySprite;
   _smileyRow = 0;
   _smiley = 0;
+  _auraColour = 0;
   godmodeSprite;
 
   isme = false;
@@ -90,6 +91,16 @@ class Player extends PIXI.Container {
   }
   get smileyRow() {
     return this._smileyRow;
+  }
+
+  set auraColour(id) {
+    if(!ItemManager.auraColours[id]) return;
+
+    this._auraColour = id;
+    this.godmodeSprite.tint = ItemManager.auraColours[id].tint;
+  }
+  get auraColour() {
+    return this._auraColour;
   }
 
   toggleGodMode(bool = null) {

@@ -31,7 +31,7 @@ class ItemAuraColour extends PIXI.Sprite {
     this.id = id; this.tint = colour; this.payvaultId = payvaultId;
 
     UI.makeButton(this, e => {
-      Global.base.state.player.godmodeSprite.tint = e.target.tint;
+      Global.base.state.player.auraColour = e.target.id;
     });
   }
 }
