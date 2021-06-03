@@ -30,11 +30,8 @@ class ItemAuraColour extends PIXI.Sprite {
 
     this.id = id; this.tint = colour; this.payvaultId = payvaultId;
 
-    this.interactive = true;
-    this.on('pointerdown', e => {
+    UI.makeButton(this, e => {
       Global.base.state.player.godmodeSprite.tint = e.target.tint;
     });
-    this.on('pointerover', e=>document.body.style.cursor = 'pointer');
-    this.on('pointerout', e=>document.body.style.cursor = '');
   }
 }

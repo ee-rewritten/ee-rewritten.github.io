@@ -47,12 +47,9 @@ class ItemBlockPack extends PIXI.Container {
     blockSprite.x = this.blocks.length * Config.blockSize;
     blockSprite.setAttr('blockid', block.id);
 
-    blockSprite.interactive = true;
-    blockSprite.on('pointerdown', e => {
+    UI.makeButton(blockSprite, e => {
       Global.base?.UI?.selectBlock(e.target.getAttr('blockid'));
     });
-    blockSprite.on('pointerover', e=>document.body.style.cursor = 'pointer');
-    blockSprite.on('pointerout', e=>document.body.style.cursor = '');
 
     if(ItemManager.blockEmpty[1]) {
       let actualBlockSprite = block.sprite;

@@ -128,18 +128,15 @@ class Hotbar extends PIXI.NineSlicePlane {
     }
   }
 
-  addEventListener(name, eventName, callback, toggleFrame = true, childOnly = false, ...args) {
+  onClick(name, callback, toggleFrame = true, childOnly = false, ...args) {
     let button = this.buttons[name]
     if(!button) return;
     if(childOnly) button = button.children[0];
 
-    button.interactive = true;
-    button.on(eventName, e=>{
+    UI.makeButton(button, (...rest) => {
       if(toggleFrame) this.toggleButtonFrame(name);
-      callback(e, ...args);
-    });
-    button.on('pointerover', e=>document.body.style.cursor = 'pointer');
-    button.on('pointerout', e=>document.body.style.cursor = '');
+      callback(...rest)
+    }, ...args);
   }
   toggleButtonFrame(name) {
     this.setButtonFrame(name, 1 - this.getButtonFrame(name));

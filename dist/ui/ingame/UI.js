@@ -57,6 +57,14 @@ class UI extends PIXI.Container {
                  font == 'Nokia' ? Config.fontNokiaSize : 1) * scale},
       ...rest);
   }
+  static makeButton(object, callback, ...args) {
+    object.interactive = true;
+    object.on('pointerdown', e=>{
+      callback(e, ...args);
+    });
+    object.on('pointerover', e=>document.body.style.cursor = 'pointer');
+    object.on('pointerout', e=>document.body.style.cursor = '');
+  }
 
   constructor() {
     super();
@@ -69,7 +77,7 @@ class UI extends PIXI.Container {
     this.hotbar.addTextureButton('share');
 
     this.hotbar.addTextButton('god\nmode', false, 'god');
-    this.hotbar.addEventListener('god', 'pointerdown', ()=>Global.base.state.player.toggleGodMode(), false);
+    this.hotbar.onClick('god', ()=>Global.base.state.player.toggleGodMode(), false);
 
 
     // smiley button and menu
@@ -90,7 +98,7 @@ class UI extends PIXI.Container {
     this.hotbarSmiley.y = (this.hotbar.height-Config.smileySize)/2;
 
     bg.addChild(this.hotbarSmiley);
-    this.hotbar.addEventListener('smiley', 'pointerdown', ()=>this.showUI(this.menus['smiley']));
+    this.hotbar.onClick('smiley', ()=>this.showUI(this.menus['smiley']));
 
     // aura customisation button and menu
     this.createMenu('aura', {
@@ -102,12 +110,12 @@ class UI extends PIXI.Container {
       y: 5,
     });
     this.hotbar.addTextureButton('aura', null, 40, 40);
-    this.hotbar.addEventListener('aura', 'pointerdown', ()=>this.showUI(this.menus['aura']));
+    this.hotbar.onClick('aura', ()=>this.showUI(this.menus['aura']));
 
     // chat input
     this.createChatInput();
     this.hotbar.addTextureButton('chat', 'chaticon', 28, 28);
-    this.hotbar.addEventListener('chat', 'pointerdown', ()=>this.showUI(this.menus['chat']));
+    this.hotbar.onClick('chat', ()=>this.showUI(this.menus['chat']));
 
 
     // edit menu and button
@@ -123,18 +131,18 @@ class UI extends PIXI.Container {
     let hotbarblocks = this.createBlockBar();
     let editBtn = this.hotbar.addTextureButton('edit', 'moreless', 43, 28, 0, false, hotbarblocks.width+43, 'right')
     editBtn.addChild(hotbarblocks);
-    this.hotbar.addEventListener('edit', 'pointerdown', ()=>this.showUI(this.menus['edit']), true, true);
+    this.hotbar.onClick('edit', ()=>this.showUI(this.menus['edit']), true, true);
 
 
     // useless buttons but on the right
     this.hotbar.addTextureButton('map', null, 29, 28, 0, true, 31);
-    this.hotbar.addEventListener('map', 'pointerdown', ()=>{});
+    this.hotbar.onClick('map', ()=>{});
 
     this.hotbar.addTextureButton('favlike', null, 43, 28, 0, true, 43);
     this.hotbar.addTextButton('options', true);
 
     this.hotbar.addTextureButton('fullscreen', null, null, null, 0, true);
-    this.hotbar.addEventListener('fullscreen', 'pointerdown', e=>Global.fullscreen = !Global.isFullscreen);
+    this.hotbar.onClick('fullscreen', e=>Global.fullscreen = !Global.isFullscreen);
 
     this.addChild(this.hotbar);
 
@@ -322,32 +330,39 @@ class UI extends PIXI.Container {
         width: '450px',
         color: 'black'
       },
-      box: {
-        default: {fill: 0xFFFFFF, rounded: 0, stroke: {color: 0xBFBFBF, width: 1}},
-      }
+      box: {fill: 0xFFFFFF, rounded: 0, stroke: {color: 0xBFBFBF, width: 1}}
     })
 
+    let sendMsg = () => {
+      this.chat.addChild(new ChatEntry('seb135', input.text));
+      this.showUI(this.menus['chat'], false);
+    }
 
     input.on('keydown', keycode => {
-      if(keycode == 13) {
-        this.chat.addChild(new ChatEntry('seb135', input.text));
-        this.showUI(this.menus['chat'], false);
-      }
+      if(keycode == 13) sendMsg();
     });
+
+    let sendBtn = UI.createText('send', 'Visitor');
+    UI.makeButton(sendBtn, sendMsg);
+
     menu.setAttr('onShow', visible => {
       Input.isGameInFocus = !visible;
-      if(visible) input.focus();
+      // if(visible) input.focus();
       if(!visible) {
         input.text = '';
         input.blur();
       }
     });
 
-    menu.width = input.width + 10;
+    menu.width = 5 + input.width + 3 + sendBtn.width + 5;
     menu.height = input.height + 10;
     input.x = input.y = 5;
+    sendBtn.x = input.x + input.width + 5;
+    sendBtn.y = 1+(menu.height-sendBtn.height)>>1;
 
     menu.addChild(input);
+    menu.addChild(sendBtn);
+
     this.addChild(menu);
 
     menu.visible = false;

@@ -15,12 +15,9 @@ class ItemSmiley extends PIXI.Sprite {
     else this._frames = [this.generateFrame(ItemManager.smileysBMD)];
     this.texture.frame = this.getFrame(0);
 
-    this.interactive = true;
-    this.on('pointerdown', e => {
+    UI.makeButton(this, e => {
       Global.base.state.player.smiley = e.target.id;
     });
-    this.on('pointerover', e=>document.body.style.cursor = 'pointer');
-    this.on('pointerout', e=>document.body.style.cursor = '');
   }
 
   generateFrame(image, offset = 0) {
