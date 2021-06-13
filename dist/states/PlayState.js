@@ -5,6 +5,7 @@ class PlayState extends State {
   playerContainers; nameContainers;
 
   layerlock = 0;
+  lastPlacedX; lastPlacedY;
 
   camera = {
     x: 0,
@@ -124,7 +125,7 @@ class PlayState extends State {
     if(Input.isMouseDown && Global.base.UI.isMouseInGame) {
       let id = Global.base.UI.selectedBlock;
       let pos = this.world.toLocal({x: Input.mouseX, y: Input.mouseY}, Global.stage);
-      let x = Math.floor(pos.x/Config.blockSize), y = Math.floor(pos.y/Config.blockSize)
+      let x = Math.floor(pos.x/Config.blockSize), y = Math.floor(pos.y/Config.blockSize);
 
       if(ItemManager.isBlockEmpty(id)) {
         if(Input.isMouseJustPressed) {
@@ -133,8 +134,15 @@ class PlayState extends State {
         }
         id = ItemManager.blockEmpty[this.layerlock].id;
       }
+      if(Input.isMouseJustPressed)
+        this.lastPlacedX = x; this.lastPlacedY = y;
 
-      this.world.setTile(id, x, y);
+      if(x == this.lastPlacedX && y == this.lastPlacedY) this.world.setTile(id, x, y);
+      else {
+        let coords = bresenhamsLine(this.lastPlacedX, this.lastPlacedY, x, y)
+        coords.forEach(coord => this.world.setTile(id, coord[0], coord[1]));
+      }
+      this.lastPlacedX = x; this.lastPlacedY = y;
     }
 
     this.players.forEach(p => {
