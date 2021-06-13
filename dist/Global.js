@@ -28,10 +28,10 @@ class Global {
     this._isFullscreen = true;
 
     let onFullscreen = () => {
-      let resize = () => {
+      let resize = () => setTimeout(() => {
         this.resize(screen.width/screen.height * Config.fullHeight);
         this.scale = screen.height / Config.fullHeight;
-      };
+      }, 1000/60);
       screen.orientation.lock('landscape').then(resize, resize);
       Input.allowInput = true;
     }

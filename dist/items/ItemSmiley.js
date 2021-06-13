@@ -1,4 +1,4 @@
-class ItemSmiley extends PIXI.Sprite {
+class ItemSmiley extends Sprite {
   id; name; payvaultId; minimapColour;
   frames = []; speed = 1; isAnimated = false;
   constructor(id, name, payvaultId, minimapColour, speed, frames) {

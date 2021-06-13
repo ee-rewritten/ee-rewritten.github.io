@@ -1,4 +1,4 @@
-class ItemAuraColour extends PIXI.Sprite {
+class ItemAuraColour extends Sprite {
   static colours = {
     white:    0xFFFFFF,
     red:      0xFF0000,

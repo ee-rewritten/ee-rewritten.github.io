@@ -1,4 +1,4 @@
-class ShadowText extends PIXI.Container {
+class ShadowText extends Container {
   bmtext;
   bmshadows;
   blurfilter;

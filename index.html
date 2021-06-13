@@ -127,8 +127,10 @@
 
 	<script src="dist/libs/PlayerIOClient.minified.js"></script>
 	<script src="dist/libs/pixi.js"></script>
-	<script src="dist/libs/PIXI.TextInput.min.js"></script>
+	<script src="dist/libs/PIXI.TextInput.js"></script>
 	<script src="dist/libs/PIXI.Joystick.js"></script>
+
+	<script src="dist/Start.js"></script>
 
 	<script src="dist/Game.js"></script>
 
@@ -160,7 +162,9 @@
 	<script src="dist/states/State.js"></script>
 	<script src="dist/states/PlayState.js"></script>
 
-	<script src="dist/Start.js"></script>
+	<script>
+		Global.base = new Game();
+	</script>
 </head>
 
 <body>
@@ -169,7 +173,7 @@
 		<div id="ee" width="850px" height="500px"></div>
 		<div id="spacer"></div>
 	</div>
-	<div id="footer">Made by Seb135</div>
+	<!-- <div id="footer">Made by Seb135</div> -->
 	<div id="cn">
 		<div id="cn-head">Our website uses cookies</div>
 		<div id="cn-body">We use services that require the use of cookies to improve user experience. By using our website, you consent to all cookies used in accordance with our policy.</div><a href="https://everybodyedits.com/cookies.html"

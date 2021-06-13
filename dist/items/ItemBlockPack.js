@@ -1,4 +1,4 @@
-class ItemBlockPack extends PIXI.Container {
+class ItemBlockPack extends Container {
   name = '';
   payvaultId = '';
   tab = 0;

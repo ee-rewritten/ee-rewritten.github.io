@@ -1,4 +1,4 @@
-class Player extends PIXI.Container {
+class Player extends Container {
   userlistItem;
 
   nameText;

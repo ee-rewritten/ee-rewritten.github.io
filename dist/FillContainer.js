@@ -1,4 +1,4 @@
-class FillContainer extends PIXI.Container {
+class FillContainer extends Container {
   maxWidth; paddingRight; paddingBottom;
   constructor(maxWidth, paddingRight = 0, paddingBottom = 0) {
     super();

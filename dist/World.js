@@ -1,4 +1,4 @@
-class World extends PIXI.Container {
+class World extends Container {
   depth;
   width;
   height;

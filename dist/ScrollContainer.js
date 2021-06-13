@@ -1,4 +1,4 @@
-class ScrollContainer extends PIXI.Container {
+class ScrollContainer extends Container {
   _mask; _width; _height; scrollToBottom; maxChildren;
   constructor(width, height, padding = 0, scrollToBottom = false, maxChildren = null) {
     super();

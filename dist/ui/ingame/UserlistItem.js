@@ -1,4 +1,4 @@
-class UserlistItem extends PIXI.Container {
+class UserlistItem extends Container {
   nameText;
   constructor(name, colour) {
     super();

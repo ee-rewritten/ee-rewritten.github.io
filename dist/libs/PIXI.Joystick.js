@@ -1,4 +1,4 @@
-class Joystick extends PIXI.Container {
+class Joystick extends Container {
   settings;
 
   outerRadius = 0;

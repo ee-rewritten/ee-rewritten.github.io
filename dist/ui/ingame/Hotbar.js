@@ -1,4 +1,4 @@
-class Hotbar extends PIXI.NineSlicePlane {
+class Hotbar extends NineSlice {
   buttons = {};
 
   constructor() {

@@ -1,4 +1,4 @@
-class State extends PIXI.Container {
+class State extends Container {
   stoppedRendering = false;
   constructor() {
     super();
