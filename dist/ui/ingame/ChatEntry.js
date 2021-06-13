@@ -1,10 +1,11 @@
-class ChatEntry extends PIXI.Text {
+class ChatEntry extends Text {
   static padding = 8;
   static style = {
     fill: 0x888888,
     fontSize: 9,
     fontFamily: ['Tahoma', 'Times New Roman', 'Arial'],
     wordWrap: true,
+    breakWords: true,
   }
   constructor(name, text) {
     text = text.replace(/\n/g, '\\n');

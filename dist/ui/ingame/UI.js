@@ -1,4 +1,4 @@
-class UI extends PIXI.Container {
+class UI extends Container {
   debugText;
   showDebug = true;
   fps = new Array(20);
@@ -9,7 +9,7 @@ class UI extends PIXI.Container {
 
   sidebar; worldName; worldInfo;
   userlist;
-  chat;
+  chat; chatInput;
 
   hotbar;
   hotbarSmiley;
@@ -322,7 +322,7 @@ class UI extends PIXI.Container {
     let menu = UI.createNineSlice('menu');
     this.menus['chat'] = menu;
 
-    let input = new PIXI.TextInput({
+    this.chatInput = new PIXI.TextInput({
       input: {
         fontFamily: 'Tahoma, "Times New Roman", Arial',
         fontSize: '12px',
@@ -334,11 +334,11 @@ class UI extends PIXI.Container {
     })
 
     let sendMsg = () => {
-      this.chat.addChild(new ChatEntry('seb135', input.text));
+      this.chat.addChild(new ChatEntry('seb135', this.chatInput.text));
       this.showUI(this.menus['chat'], false);
     }
 
-    input.on('keydown', keycode => {
+    this.chatInput.on('keydown', keycode => {
       if(keycode == 13) sendMsg();
     });
 
@@ -347,20 +347,20 @@ class UI extends PIXI.Container {
 
     menu.setAttr('onShow', visible => {
       Input.isGameInFocus = !visible;
-      // if(visible) input.focus();
+      if(visible) this.chatInput.focus();
       if(!visible) {
-        input.text = '';
-        input.blur();
+        this.chatInput.text = '';
+        this.chatInput.blur();
       }
     });
 
-    menu.width = 5 + input.width + 3 + sendBtn.width + 5;
-    menu.height = input.height + 10;
-    input.x = input.y = 5;
-    sendBtn.x = input.x + input.width + 5;
+    menu.width = 5 + this.chatInput.width + 3 + sendBtn.width + 5;
+    menu.height = this.chatInput.height + 10;
+    this.chatInput.x = this.chatInput.y = 5;
+    sendBtn.x = this.chatInput.x + this.chatInput.width + 5;
     sendBtn.y = 1+(menu.height-sendBtn.height)>>1;
 
-    menu.addChild(input);
+    menu.addChild(this.chatInput);
     menu.addChild(sendBtn);
 
     this.addChild(menu);
