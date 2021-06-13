@@ -86,6 +86,13 @@ class ItemManager {
     // pack.addGenericBlock(ItemLayer.BELOW, 0, 9, 1/10, function(block, world) {
     //   block.texture.frame = this._frames[Global.randomInt(0, this._frames.length-1)];
     // });
+
+
+    this._addingToTab = ItemTab.BACKGROUND;
+    this.lastYOffset = 135;
+    this.createBlockPack('basic').addStaticBlocks(10, ItemLayer.BACKGROUND);
+    this.createBlockPack('beta').addStaticBlocks(10, ItemLayer.BACKGROUND);
+    this.createBlockPack('brick').addStaticBlocks(10, ItemLayer.BACKGROUND);
   }
 
   static createAuraColour(name, payvaultId) {

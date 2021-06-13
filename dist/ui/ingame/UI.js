@@ -120,7 +120,7 @@ class UI extends Container {
 
     // edit menu and button
     this.createMenu('edit', {
-      items: ItemManager.blockTabs[0],
+      items: [...ItemManager.blockTabs[ItemTab.BLOCKS], ...ItemManager.blockTabs[ItemTab.BACKGROUND]],
       filter: pack => pack.payvaultId == '',
       paddingRight: 7,
       paddingBottom: 4,
