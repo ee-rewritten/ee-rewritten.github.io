@@ -55,15 +55,18 @@ class Global {
 
   static resize(width, height) {
     this.base.UI.redrawChat(width/height * Config.fullHeight);
-    this.app.renderer.resize(width, height);
+    this.app.renderer.resize(width/height * Config.fullHeight, Config.fullHeight);
 
-    this.scale = height / Config.fullHeight;
-    this.stage.scale.set(height / Config.fullHeight);
+    this.canvas.style.width = `${width}px`;
+    this.canvas.style.height = `${height}px`;
+
+    this.scale = height/Config.fullHeight;
+    // this.stage.scale.set(height / Config.fullHeight);
   }
 
-  static get scale() {
-    return this.stage.scale.x;
-  }
+  // static get scale() {
+  //   return this.stage.scale.x;
+  // }
 
   static randomInt(min, max) {
     return Math.floor(Math.random() * (max+1 - min)) + min;

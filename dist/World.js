@@ -160,8 +160,6 @@ class World extends Container {
       for (let i = 0; i < blockContainer.children.length; i++) {
         let block = blockContainer.children[i];
         let pos = block.getGlobalPosition();
-        pos.x /= Global.scale;
-        pos.y /= Global.scale;
 
         let offscreen = pos.x <= -Config.blockSize || pos.x > Config.gameWidthCeil
                      || pos.y <= -Config.blockSize || pos.y > Config.gameHeightCeil;
