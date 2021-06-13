@@ -15,6 +15,8 @@ class Global {
   static lastFrameTime = 0;
   static thisFrameTime = 0;
 
+  static queue = [];
+
   static set fullscreen(bool) {
     if(bool == this.fullscreen) return;
     if(bool) this.goFullscreen();
@@ -54,7 +56,10 @@ class Global {
   }
 
   static resize(width, height) {
-    this.base.UI.redrawChat(width/height * Config.fullHeight);
+    // subtracting for div border
+    width -= 2;
+    height -= 2;
+
     this.app.renderer.resize(width/height * Config.fullHeight, Config.fullHeight);
 
     // https://stackoverflow.com/a/50915858
@@ -62,6 +67,8 @@ class Global {
     this.canvas.style.height = `${height}px`;
 
     this.scale = height/Config.fullHeight;
+
+    this.base.UI.redrawChat(width/height * Config.fullHeight);
   }
 
   static randomInt(min, max) {

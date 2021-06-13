@@ -74,53 +74,45 @@ class PlayState extends State {
   }
 
   tick() {
-    if(Input.isKeyJustPressed(122)) {
+    if(Input.isKeyJustPressed(122))
       Global.fullscreen = true;
-    }
 
-    if(Input.isKeyDown(Key.lookLeft)) {
+    if(Input.isKeyDown(Key.lookLeft))
       this.camera.x -= 15;
-    }
-    if(Input.isKeyDown(Key.lookRight)) {
+    if(Input.isKeyDown(Key.lookRight))
       this.camera.x += 15;
-    }
-    if(Input.isKeyDown(Key.lookUp)) {
+    if(Input.isKeyDown(Key.lookUp))
       this.camera.y -= 15;
-    }
-    if(Input.isKeyDown(Key.lookDown)) {
+    if(Input.isKeyDown(Key.lookDown))
       this.camera.y += 15;
-    }
-    if(Input.isKeyJustPressed(Key.lockCamera)) {
+
+    if(Input.isKeyJustPressed(Key.lockCamera))
       this.target = this.target ? null : this.player;
-    }
-    if(Input.isKeyJustPressed(Key.hideUI)) {
+    if(Input.isKeyJustPressed(Key.hideUI))
       Global.base.UI.visible = !Global.base.UI.visible;
-    }
 
-    if(Input.isKeyJustPressed(Key.godmode)) {
+    if(Input.isKeyJustPressed(Key.godmode))
       this.player.toggleGodMode();
-    }
 
-    if(Input.isKeyJustPressed(16)) {
+    if(Input.isKeyJustPressed(16))
       Global.base.UI.tempSelectDelete();
-    }
-    else if(Input.isKeyJustReleased(16)) {
+    else if(Input.isKeyJustReleased(16))
       Global.base.UI.selectBlock(Global.base.UI._selectedBlock);
-    }
 
-    if(Input.isKeyJustPressed(66)) {
+    if(Input.isKeyJustPressed(66)) // B
       Global.base.UI.showUI(Global.base.UI.menus['edit'], true);
-    }
-    if(Input.isKeyJustReleased(66)) {
-      Global.base.UI.showUI(Global.base.UI.menus['edit'], false);
-    }
-    if(Input.isKeyJustPressed(84)) {
-      Global.base.UI.showUI(Global.base.UI.menus['chat'], true);
-    }
 
-    if(Input.isKeyJustPressed(72)) {
+    if(Input.isKeyJustReleased(66))
+      Global.base.UI.showUI(Global.base.UI.menus['edit'], false);
+
+    if(Input.isKeyJustPressed(13)) // enter
+      Global.base.UI.showUI(Global.base.UI.menus['chat'], true);
+
+    if(Input.isKeyJustPressed(27)) // esc
+      Global.base.UI.hideUI();
+
+    if(Input.isKeyJustPressed(72))
       this.addFakePlayer();
-    }
 
     if(Input.isMouseDown && Global.base.UI.isMouseInGame) {
       let id = Global.base.UI.selectedBlock;
@@ -134,8 +126,9 @@ class PlayState extends State {
         }
         id = ItemManager.blockEmpty[this.layerlock].id;
       }
-      if(Input.isMouseJustPressed)
+      if(Input.isMouseJustPressed) {
         this.lastPlacedX = x; this.lastPlacedY = y;
+      }
 
       if(x == this.lastPlacedX && y == this.lastPlacedY) this.world.setTile(id, x, y);
       else {
@@ -145,9 +138,7 @@ class PlayState extends State {
       this.lastPlacedX = x; this.lastPlacedY = y;
     }
 
-    this.players.forEach(p => {
-      p.tick();
-    });
+    this.players.forEach(p => p.tick());
 
     this.world.tick();
     if(this.target != null) {

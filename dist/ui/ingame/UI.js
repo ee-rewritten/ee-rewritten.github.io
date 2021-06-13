@@ -272,30 +272,48 @@ class UI extends Container {
     return hotbarblocks;
   }
 
+  repositionMenu(key, joystick = true) {
+    let menu = this.menus[key];
+
+    let bottomY = (Global.canvas.parentElement.offsetHeight-2)/Global.scale>>0;
+    if(bottomY != parseInt(Global.canvas.style.height)/Global.scale>>0)
+      menu.y = bottomY - menu.height + 1;
+    else menu.y = this.hotbar.y - menu.height + 1;
+
+    let button = this.hotbar.buttons[key];
+    if(!button) return;
+
+    menu.x = button.x - Math.floor((menu.width - button.width)/2);
+    if(menu.x < 0) menu.x = 0;
+    else if(menu.x + menu.width > Config.gameWidth) menu.x = Config.gameWidth - menu.width;
+
+    if(joystick) this.repositionJoystick();
+  }
+
   repositionMenus() {
-    let visibleMenu;
-
     for(let key in this.menus) {
-      let menu = this.menus[key];
-      menu.y = this.hotbar.y - menu.height + 1;
-
-      let button = this.hotbar.buttons[key];
-      if(!button) continue;
-      menu.x = button.x - Math.floor((menu.width - button.width)/2);
-      if(menu.x < 0) menu.x = 0;
-      else if(menu.x + menu.width > Config.gameWidth) menu.x = Config.gameWidth - menu.width;
-
-      if(menu.visible) visibleMenu = menu;
+      this.repositionMenu(key, false);
     }
+    this.repositionJoystick();
+  }
+
+  repositionJoystick() {
+    let visibleMenu;
+    for(let key in this.menus)
+      if(this.menus[key].visible) {
+        visibleMenu = this.menus[key];
+        break;
+      }
 
     if(this.joystick) {
-      let offs = this.joystick.width/2 + 10;
-      this.joystick.x = offs;
-      if(visibleMenu && visibleMenu.x < this.joystick.x + this.joystick.width)
-        this.joystick.y = visibleMenu.y - offs;
-      else this.joystick.y = Config.gameHeight - offs;
+        let offs = this.joystick.width/2 + 10;
+        this.joystick.x = offs;
+        if(visibleMenu && visibleMenu.x < this.joystick.x + this.joystick.width)
+          this.joystick.y = visibleMenu.y - offs;
+        else this.joystick.y = Config.gameHeight - offs;
     }
   }
+
   showUI(menuObject, visible = null, hideOthers = true) {
     if(!menuObject) return;
     if(visible == null) visible = !menuObject.visible;
@@ -312,9 +330,14 @@ class UI extends Container {
     for(let key in this.menus) {
       if(this.menus[key] == menuObject) {
         this.hotbar.setButtonFrame(key, visible ? 1 : 0);
-        this.repositionMenus();
+        this.repositionMenu(key);
         return;
       }
+    }
+  }
+  hideUI() {
+    for(let key in this.menus) {
+      this.showUI(this.menus[key], false, false)
     }
   }
 
@@ -339,19 +362,22 @@ class UI extends Container {
     }
 
     this.chatInput.on('keydown', keycode => {
-      if(keycode == 13) sendMsg();
+      if(keycode == 13) Global.queue.push(sendMsg);
     });
+
+    window.onresize = () => {
+      this.repositionMenu('chat', false);
+    };
 
     let sendBtn = UI.createText('send', 'Visitor');
     UI.makeButton(sendBtn, sendMsg);
 
     menu.setAttr('onShow', visible => {
-      Input.isGameInFocus = !visible;
-      if(visible) this.chatInput.focus();
-      if(!visible) {
-        this.chatInput.text = '';
-        this.chatInput.blur();
-      }
+      if(!visible) this.chatInput.text = '';
+      setTimeout(() => {
+        Input.isGameInFocus = !visible;
+        visible ? this.chatInput.focus() : this.chatInput.blur()
+      }, 1000/15);
     });
 
     menu.width = 5 + this.chatInput.width + 3 + sendBtn.width + 5;
@@ -462,6 +488,8 @@ class UI extends Container {
     this.userlist.resize(sideWidth, this.userlist._height);
     this.chat.resize(sideWidth, this.chat._height);
     this.chat.scrollContainer.children.forEach(child => child.setWordWrap(sideWidth));
+
+    this.repositionMenus();
   }
 
   showInfo(title, body) {

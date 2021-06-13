@@ -21,15 +21,14 @@ class Game {
       Global.canvas = Global.app.view;
       Global.stage = Global.app.stage;
 
+      Global.canvas.style.height = `${Config.fullHeight}px`;
+
       //https://github.com/pixijs/pixi.js/issues/7407#issuecomment-820444887
       const interaction = Global.app.renderer.plugins.interaction;
       interaction.removeEvents();
       interaction.supportsTouchEvents = !interaction.supportsPointerEvents && 'ontouchstart' in window;
       interaction.interactionDOMElement = Global.app.view;
       interaction.addEvents();
-
-      Global.screenWidth = window.screen.width;
-      Global.screenHeight = window.screen.height;
 
       //negative margin hack because pixi's canvas is 5px taller than specified and I can't fix it
       Global.canvas.style.marginBottom = "-5px";
@@ -88,6 +87,9 @@ class Game {
 
         Global.base.state.tick();
         Input.resetJustPressed();
+
+        while(Global.queue.length)
+          Global.queue.shift()();
       }
       Global.base.state.enterFrame();
       Global.base.UI.enterFrame();
