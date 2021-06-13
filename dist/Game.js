@@ -36,11 +36,8 @@ class Game {
       //Add the canvas that Pixi automatically created for you to the HTML document
       document.getElementById('ee').appendChild(Global.canvas);
       document.addEventListener('fullscreenchange', () => {
-        let element =
-          document.fullscreenElement || /* Standard syntax */
-          document.webkitFullscreenElement || /* Safari and Opera syntax */
-          document.msFullscreenElement; /* IE11 syntax */
-        if(element == null) Global.fullscreen = false;
+        //fullscreen was left via esc/f11 without pressing the in-game button
+        if(document.fullscreenElement == null) Global.fullscreen = false;
       });
     }
 

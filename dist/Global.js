@@ -16,6 +16,7 @@ class Global {
   static thisFrameTime = 0;
 
   static set fullscreen(bool) {
+    if(bool == this.fullscreen) return;
     if(bool) this.goFullscreen();
     else this.leaveFullscreen();
   }
@@ -27,22 +28,17 @@ class Global {
     Input.allowInput = false;
     this._isFullscreen = true;
 
-    let onFullscreen = () => {
-      let resize = () => setTimeout(() => {
-        this.resize(screen.width/screen.height * Config.fullHeight);
-        this.scale = screen.height / Config.fullHeight;
-      }, 1000/60);
-      screen.orientation.lock('landscape').then(resize, resize);
-      Input.allowInput = true;
-    }
-    let allowInput = () => Input.allowInput = true;
+    document.getElementById('ee').requestFullscreen().then(
+      () => {
+        let resize = () => setTimeout(() => {
+          this.resize(screen.width, screen.height);
+        }, 1000/60);
+        screen.orientation.lock('landscape').then(resize, resize);
+        Input.allowInput = true;
+      },
 
-    if (this.canvas.requestFullscreen)
-      this.canvas.requestFullscreen().then(onFullscreen, allowInput);
-    else if (this.canvas.webkitRequestFullscreen)
-      this.canvas.webkitRequestFullscreen().then(onFullscreen, allowInput); /* Safari */
-    else if (this.canvas.msRequestFullscreen)
-      this.canvas.msRequestFullscreen().then(onFullscreen, allowInput); /* IE11 */
+      //fullscreen failed, return input to player
+      () => Input.allowInput = true);
   }
 
   static leaveFullscreen() {
@@ -50,23 +46,19 @@ class Global {
     this._isFullscreen = false;
 
     let onExit = () => {
-      this.resize(Config.fullWidth);
-      this.scale = 1;
+      this.resize(Config.fullWidth, Config.fullHeight);
       Input.allowInput = true;
     }
 
-    if (document.exitFullscreen)
-      document.exitFullscreen().then(onExit, onExit);
-    else if (document.webkitExitFullscreen)
-      document.webkitExitFullscreen().then(onExit, onExit); /* Safari */
-    else if (document.msExitFullscreen)
-      document.msExitFullscreen().then(onExit, onExit); /* IE11 */
+    document.exitFullscreen().then(onExit, onExit);
   }
 
-  static resize(width) {
-    this.base.UI.redrawChat(width);
-    this.canvas.width = width;
-    this.app.renderer.resize(width, Config.fullHeight);
+  static resize(width, height) {
+    this.base.UI.redrawChat(width/height * Config.fullHeight);
+    this.app.renderer.resize(width, height);
+
+    this.scale = height / Config.fullHeight;
+    this.stage.scale.set(height / Config.fullHeight);
   }
 
   static get scale() {
