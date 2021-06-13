@@ -57,16 +57,12 @@ class Global {
     this.base.UI.redrawChat(width/height * Config.fullHeight);
     this.app.renderer.resize(width/height * Config.fullHeight, Config.fullHeight);
 
+    // https://stackoverflow.com/a/50915858
     this.canvas.style.width = `${width}px`;
     this.canvas.style.height = `${height}px`;
 
     this.scale = height/Config.fullHeight;
-    // this.stage.scale.set(height / Config.fullHeight);
   }
-
-  // static get scale() {
-  //   return this.stage.scale.x;
-  // }
 
   static randomInt(min, max) {
     return Math.floor(Math.random() * (max+1 - min)) + min;
