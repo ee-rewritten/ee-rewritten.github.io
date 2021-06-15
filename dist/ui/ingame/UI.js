@@ -10,6 +10,7 @@ class UI extends Container {
   sidebar; worldName; worldInfo;
   userlist;
   chat; chatInput;
+  minimap;
 
   hotbar;
   hotbarSmiley;
@@ -133,11 +134,12 @@ class UI extends Container {
     editBtn.addChild(hotbarblocks);
     this.hotbar.onClick('edit', ()=>this.showUI(this.menus['edit']), true, true);
 
+    // buttons on the right
+    this.createMinimap();
+    this.hotbar.addTextureButton('map', null, 29, 28, 0, true, 31);
+    this.hotbar.onClick('map', ()=>this.showUI(this.menus['map']), true, true);
 
     // useless buttons but on the right
-    this.hotbar.addTextureButton('map', null, 29, 28, 0, true, 31);
-    this.hotbar.onClick('map', ()=>{});
-
     this.hotbar.addTextureButton('favlike', null, 43, 28, 0, true, 43);
     this.hotbar.addTextButton('options', true);
 
@@ -339,6 +341,18 @@ class UI extends Container {
     for(let key in this.menus) {
       this.showUI(this.menus[key], false, false)
     }
+  }
+
+  createMinimap() {
+    let menu = new Container();
+    this.menus['map'] = menu;
+
+    this.minimap = new Minimap();
+
+    menu.addChild(this.minimap.mapSprite);
+    this.addChild(menu);
+
+    menu.visible = false;
   }
 
   createChatInput() {
