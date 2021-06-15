@@ -5,7 +5,7 @@ class PlayState extends State {
   playerContainers; nameContainers;
 
   layerlock = 0;
-  lastPlacedX; lastPlacedY;
+  lastPlacedX = null; lastPlacedY = null;
 
   camera = {
     x: 0,
@@ -126,7 +126,7 @@ class PlayState extends State {
         }
         id = ItemManager.blockEmpty[this.layerlock].id;
       }
-      if(Input.isMouseJustPressed) {
+      if(this.lastPlacedX == null || this.lastPlacedY == null) {
         this.lastPlacedX = x; this.lastPlacedY = y;
       }
 
@@ -137,6 +137,7 @@ class PlayState extends State {
       }
       this.lastPlacedX = x; this.lastPlacedY = y;
     }
+    else this.lastPlacedX = this.lastPlacedY = null;
 
     this.players.forEach(p => p.tick());
 

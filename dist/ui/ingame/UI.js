@@ -466,8 +466,8 @@ class UI extends Container {
         break;
       }
     }
-    return Input.mouseX <= Config.gameWidth && Input.mouseY <= Config.gameHeight
-    && !isMouseOnMenu;
+    return !isMouseOnMenu && Input.isMouseOnCanvas
+    && Input.mouseX <= Config.gameWidth && Input.mouseY <= Config.gameHeight;
   }
 
   handleKey(e) {

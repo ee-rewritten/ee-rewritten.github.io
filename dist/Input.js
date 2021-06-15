@@ -13,6 +13,7 @@ class Input {
 
   static isGameInFocus = false;
   static allowInput = true;
+  static ouseOnCanvas = false;
 
   static joystickDirection = '';
 
@@ -47,7 +48,8 @@ class Input {
     });
     window.addEventListener('pointermove', e => {
       if(e.pointerId == Global.base?.UI?.joystickPointerId || e.buttons & 0b10) return;
-      if(e.target == Global.canvas) {
+      this.mouseOnCanvas = e.target == Global.canvas;
+      if(this.mouseOnCanvas) {
         this.mouseX = e.offsetX;
         this.mouseY = e.offsetY;
       }
@@ -55,8 +57,7 @@ class Input {
     window.addEventListener('pointerup', e => {
       if(e.pointerId == Global.base?.UI?.joystickPointerId || e.buttons & 0b10) return;
       this.mouseDown = false;
-      this.isGameInFocus = e.target == Global.canvas;
-        if(this.isGameInFocus && this.allowInput) {
+      if(this.isGameInFocus && this.allowInput) {
         this.mouseX = e.offsetX;
         this.mouseY = e.offsetY;
       }
@@ -68,6 +69,8 @@ class Input {
   static get mouseY() {return this._mouseY;}
   static set mouseX(value) {this._mouseX = value/Global.scale;}
   static set mouseY(value) {this._mouseY = value/Global.scale;}
+
+  static get isMouseOnCanvas() {return this.mouseX > 0 && this.mouseOnCanvas;}
 
   static resetJustPressed() {
     this.justPressedKeys = {};
