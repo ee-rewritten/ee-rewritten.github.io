@@ -139,6 +139,8 @@ class World extends Container {
 
     this.sortIntoRenderLayer(layer, x, y, id);
     this.redraw(true, x, y);
+
+    Global.base.UI.minimap.update(x, y);
   }
 
   sortIntoRenderLayer(layer, x, y, id) {

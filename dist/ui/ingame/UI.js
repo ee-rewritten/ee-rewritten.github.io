@@ -350,6 +350,7 @@ class UI extends Container {
     this.minimap = new Minimap();
 
     menu.addChild(this.minimap.mapSprite);
+    this.minimap.mapSprite.alpha = 0.9;
     this.addChild(menu);
 
     menu.visible = false;
@@ -532,6 +533,7 @@ class UI extends Container {
   enterFrame() {
     this.updateDebugMenu();
     this.updateSidebar();
+    this.minimap.updatePlayerTrails();
   }
 
   updateSidebar() {
@@ -555,7 +557,7 @@ class UI extends Container {
     if(this.debugText.visible != this.showDebug) this.debugText.visible = this.showDebug;
     if(this.showDebug) {
       this.debugText.text = `Everybody Edits: Rewritten (vAlpha)`
-      this.report.Ping = 'xx';
+      this.report.Ping = 'xxx >w<';
       this.report.FPS = this.getFPSText();
       this.report.Position = this.getPosText(player)
       this.report.Time = (player.ticks * Config.physics.ms_per_tick/1000).toFixed(2) + 's';
