@@ -22,8 +22,7 @@ class Minimap {
       for(let y = 0; y < this.world.width; y++) {
         let pixelindex = (y * this.world.width + x) * 4;
         let id = this.world.realmap[0][x][y];
-        if(id) this.setColour(pixelindex, 0xFFFFFF)
-        else   this.setColour(pixelindex, 0x000000)
+        if(ItemManager.blocks[id]) this.setColour(pixelindex, ItemManager.blocks[id].minimapColour)
       }
     }
 
@@ -32,10 +31,10 @@ class Minimap {
     this.mapSprite.texture.baseTexture.update();
   }
 
-  setColour(index, colour) {
-    this.mapData.data[index]   = colour>>16; // red
-    this.mapData.data[index+1] = colour>>8 & 0xFF; // green
-    this.mapData.data[index+2] = colour & 0xFF; // blue
-    this.mapData.data[index+3] = 255; // alpha
+  setColour(index, colour, visible = true) {
+    this.mapData.data[index]   = (colour & 0xFF0000) >> 16; // red
+    this.mapData.data[index+1] = (colour & 0x00FF00) >> 8; // green
+    this.mapData.data[index+2] = (colour & 0x0000FF); // blue
+    this.mapData.data[index+3] = visible ? 255 : 0; // alpha
   }
 }

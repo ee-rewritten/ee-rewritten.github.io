@@ -5,6 +5,7 @@ class ItemBlock {
   speed = 1;
   requiresUpdate;
   draw;
+  minimapColour;
 
   vars = {};
 
@@ -44,6 +45,8 @@ class ItemBlock {
 
     else this._frames = [this.generateFrame(artOffset, yOffset)];
 
+    this.minimapColour = this.generateMapColour();
+
     if(draw == null)
       draw = anim ? ItemBlock.drawDefaultAnim : ItemBlock.drawDefaultAnim;
     this.draw = draw;
@@ -64,5 +67,20 @@ class ItemBlock {
 
   get sprite() {
     return new Sprite(new Texture(ItemManager.blocksBMD, this.frame));
+  }
+
+  generateMapColour() {
+    let pixelData = Global.app.renderer.plugins.extract.pixels(this.sprite);
+    let r = 0, g = 0, b = 0;
+    let pixels = Config.blockSize**2;
+
+    for(let i = 0; i < pixels * 4; i+=4) {
+      r += pixelData[i];
+      g += pixelData[i+1];
+      b += pixelData[i+2];
+    }
+    r /= pixels; g /= pixels; b /= pixels;
+
+    return  (r<<16) | (g<<8) | b;
   }
 }
