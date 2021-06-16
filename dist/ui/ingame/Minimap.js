@@ -3,6 +3,7 @@ class Minimap {
   mapData; mapSprite;
   pctx;
   playerTrails;
+  clearedTrails = false;
   world;
 
   constructor() {
@@ -61,6 +62,20 @@ class Minimap {
 
     this.pctx.putImageData(this.playerTrails, 0, 0);
     this.redraw();
+
+    this.clearedTrails = false;
+  }
+  clearPlayerTrails() {
+    if(this.clearedTrails) return;
+
+    for(let x = 0; x < this.world.width; x++)
+      for(let y = 0; y < this.world.height; y++)
+        this.playerTrails.data[(x+y*this.world.width)*4 + 3] = 0;
+    this.pctx.putImageData(this.playerTrails, 0, 0);
+
+    this.redraw();
+
+    this.clearedTrails = true;
   }
 
   redraw() {

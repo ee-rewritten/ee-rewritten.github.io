@@ -274,7 +274,7 @@ class UI extends Container {
     return hotbarblocks;
   }
 
-  repositionMenu(key, joystick = true) {
+  repositionMenu(key, others = true) {
     let menu = this.menus[key];
 
     let bottomY = (Global.canvas.parentElement.offsetHeight-2)/Global.scale>>0;
@@ -289,23 +289,30 @@ class UI extends Container {
     if(menu.x < 0) menu.x = 0;
     else if(menu.x + menu.width > Config.gameWidth) menu.x = Config.gameWidth - menu.width;
 
-    if(joystick) this.repositionJoystick();
+    if(others) this.repositionJoystickAndMap();
   }
 
   repositionMenus() {
     for(let key in this.menus) {
       this.repositionMenu(key, false);
     }
-    this.repositionJoystick();
+    this.repositionJoystickAndMap();
   }
 
-  repositionJoystick() {
+  repositionJoystickAndMap() {
     let visibleMenu;
     for(let key in this.menus)
       if(this.menus[key].visible) {
         visibleMenu = this.menus[key];
         break;
       }
+
+    let map = this.menus['map'];
+    if(map.visible) {
+      if(visibleMenu == this.menus['edit'])
+        map.y = visibleMenu.y - map.height;
+      else map.y = this.hotbar.y - map.height + 1;
+    }
 
     if(this.joystick) {
         let offs = this.joystick.width/2 + 10;
@@ -320,9 +327,7 @@ class UI extends Container {
     if(!menuObject) return;
     if(visible == null) visible = !menuObject.visible;
 
-    if(hideOthers) for(let key in this.menus) {
-      this.showUI(this.menus[key], false, false)
-    }
+    if(hideOthers) this.hideUI(menuObject != this.menus['edit'] && menuObject != this.menus['map'])
 
     menuObject.visible = visible;
 
@@ -337,9 +342,9 @@ class UI extends Container {
       }
     }
   }
-  hideUI() {
+  hideUI(hideMap = true) {
     for(let key in this.menus) {
-      this.showUI(this.menus[key], false, false)
+      if(hideMap || key != 'map' && key != 'edit') this.showUI(this.menus[key], false, false)
     }
   }
 
@@ -475,7 +480,7 @@ class UI extends Container {
     let isMouseOnMenu = false;
     if(this.visible) for(let key in this.menus) {
       let menu = this.menus[key]
-      if(!menu.visible) continue;
+      if(!menu.visible || key == 'map') continue;
       if(Input.mouseY >= menu.y && Input.mouseX >= menu.x && Input.mouseX <= menu.x + menu.width) {
         isMouseOnMenu = true;
         break;
@@ -533,7 +538,8 @@ class UI extends Container {
   enterFrame() {
     this.updateDebugMenu();
     this.updateSidebar();
-    this.minimap.updatePlayerTrails();
+    if(this.menus['map'].visible) this.minimap.updatePlayerTrails();
+    else this.minimap.clearPlayerTrails();
   }
 
   updateSidebar() {
