@@ -173,6 +173,9 @@ class UI extends Container {
 
     let top = this.userlist.y + 100;
     this.chat = new ScrollContainer(this.sidebar.width, this.sidebar.height - top, ChatEntry.padding/2, true, 25);
+    this.chat.sendMessage = (name, text) => {
+      this.chat.addChild(new ChatEntry(name, text));
+    }
     this.chat.y = top;
     this.sidebar.addChild(this.chat);
 
@@ -376,13 +379,8 @@ class UI extends Container {
       box: {fill: 0xFFFFFF, rounded: 0, stroke: {color: 0xBFBFBF, width: 1}}
     })
 
-    let sendMsg = () => {
-      this.chat.addChild(new ChatEntry('seb135', this.chatInput.text));
-      this.showUI(this.menus['chat'], false);
-    }
-
     this.chatInput.on('keydown', keycode => {
-      if(keycode == 13) Global.queue.push(sendMsg);
+      if(keycode == 13) Global.queue.push(this.sendChat.bind(this));
     });
 
     window.onresize = () => {
@@ -390,7 +388,7 @@ class UI extends Container {
     };
 
     let sendBtn = UI.createText('send', 'Visitor');
-    UI.makeButton(sendBtn, sendMsg);
+    UI.makeButton(sendBtn, this.sendChat.bind(this));
 
     menu.setAttr('onShow', visible => {
       if(!visible) this.chatInput.text = '';
@@ -540,6 +538,34 @@ class UI extends Container {
     this.updateSidebar();
     if(this.menus['map'].visible) this.minimap.updatePlayerTrails();
     else this.minimap.clearPlayerTrails();
+  }
+
+  sendChat() {
+    let text = this.chatInput.text;
+    this.showUI(this.menus['chat'], false);
+
+    if(!text) return;
+    if(text.charAt(0) == '/') {
+      let cmd = text.substr(1).split(' ')
+      switch(cmd[0]) {
+        case 'help':
+        case 'cmds':
+        case 'commands': {
+          this.chat.sendMessage('* system', 'nothing can help you now.');
+          break;
+        }
+
+
+        case 'debug':
+        case 'fps': {
+          this.showDebug = !this.showDebug;
+          break;
+        }
+      }
+    }
+    else {
+      this.chat.sendMessage('seb135', text);
+    }
   }
 
   updateSidebar() {

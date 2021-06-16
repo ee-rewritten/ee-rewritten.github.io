@@ -11,6 +11,10 @@ class ChatEntry extends Text {
     text = text.replace(/\n/g, '\\n');
     super(`${name.toUpperCase()}: ${text}`, ChatEntry.style);
 
+    let nameTxt = new Text(name.toUpperCase() + ': ', ChatEntry.style);
+    nameTxt.style.fill = Player.getNameColour(name);
+    this.addChild(nameTxt);
+
     this.setWordWrap(Global.base.UI?.sidebar?.width);
   }
 
