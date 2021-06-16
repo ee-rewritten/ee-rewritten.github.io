@@ -171,7 +171,7 @@ class UI extends Container {
     this.userlist.addChild(Global.base.state.player.userlistItem);
     this.sidebar.addChild(this.userlist);
 
-    let top = this.userlist.y + 100;
+    let top = this.userlist.y + 100 + ChatEntry.padding;
     this.chat = new ScrollContainer(this.sidebar.width, this.sidebar.height - top, 0, true, 25);
     this.chat.sendMessage = (name, text) => {
       this.chat.addChild(new ChatEntry(name, text));
@@ -577,7 +577,7 @@ class UI extends Container {
 
     this.userlist.y = this.worldInfo.y + this.worldInfo.height;
 
-    let top = this.userlist.y + this.userlist._height;
+    let top = this.userlist.y + this.userlist._height + ChatEntry.padding;
     if(this.chat._height != this.sidebar.height - top)
       this.chat.resize(this.chat._width, this.sidebar.height - top);
     this.chat.y = top;
