@@ -18,12 +18,13 @@ class ChatEntry extends BMText {
     super(name.toUpperCase(), ChatEntry.style);
     this.tint = Player.getNameColour(name);
 
-    text = `${name.toUpperCase()}: ${text}`;
-    this.txt = new BMText(text, ChatEntry.style);
+    this.txt = new BMText(`${name.toUpperCase()}: ${text}`, ChatEntry.style);
     this.addChild(this.txt);
 
+    UI.makeButton(this.txt, () => navigator.clipboard.writeText(text));
+
     this.setWordWrap(Global.base.UI?.sidebar?.width);
-    
+
     let links = text.match(ChatEntry.linkRegex);
     if(links) links.forEach(link => {
       if(this.children.length >= 5) return;
