@@ -48,6 +48,7 @@ class Game {
     loader
       .add('Nokia', './Assets/fonts/Nokia.fnt')
       .add('Visitor', './Assets/fonts/Visitor.fnt')
+      .add('Tahoma', './Assets/fonts/Tahoma.fnt')
       .load(this.init);
   }
 
@@ -60,7 +61,7 @@ class Game {
 
     Global.stage.sortableChildren = true;
 
-    Global.base.state = new PlayState(100, 100, 2, 'Untitled World', {by: 'unknown', plays: 1, favorites: 0, likes: 0});
+    Global.base.state = new PlayState(400, 200, 2, 'Untitled World', {by: 'unknown', plays: 1, favorites: 0, likes: 0});
 
     Global.base.UI = new UI();
     Global.base.UI.zIndex = 1;

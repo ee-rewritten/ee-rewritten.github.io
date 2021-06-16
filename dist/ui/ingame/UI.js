@@ -172,7 +172,7 @@ class UI extends Container {
     this.sidebar.addChild(this.userlist);
 
     let top = this.userlist.y + 100;
-    this.chat = new ScrollContainer(this.sidebar.width, this.sidebar.height - top, ChatEntry.padding/2, true, 25);
+    this.chat = new ScrollContainer(this.sidebar.width, this.sidebar.height - top, 0, true, 25);
     this.chat.sendMessage = (name, text) => {
       this.chat.addChild(new ChatEntry(name, text));
     }

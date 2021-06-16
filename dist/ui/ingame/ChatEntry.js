@@ -1,25 +1,52 @@
-class ChatEntry extends Text {
+class ChatEntry extends BMText {
   static padding = 8;
+  // static style = {
+  //   fill: 0x888888,
+  //   fontSize: 8,
+  //   fontFamily: ['Tahoma', 'Times New Roman', 'Arial'],
+  //   wordWrap: true,
+  //   breakWords: true,
+  // }
   static style = {
-    fill: 0x888888,
-    fontSize: 9,
-    fontFamily: ['Tahoma', 'Times New Roman', 'Arial'],
-    wordWrap: true,
-    breakWords: true,
+    tint: 0x888888,
+    fontSize: 12,
+    fontName: 'Tahoma',
   }
+  static linkRegex = /([a-zA-Z0-9.\-/]+\.[A-Za-z]{2,4})/g;
   constructor(name, text) {
     text = text.replace(/\n/g, '\\n');
-    super(`${name.toUpperCase()}: ${text}`, ChatEntry.style);
+    super(name.toUpperCase(), ChatEntry.style);
+    this.tint = Player.getNameColour(name);
 
-    let nameTxt = new Text(name.toUpperCase() + ': ', ChatEntry.style);
-    nameTxt.style.fill = Player.getNameColour(name);
-    this.addChild(nameTxt);
+    text = `${name.toUpperCase()}: ${text}`;
+    this.txt = new BMText(text, ChatEntry.style);
+    this.addChild(this.txt);
 
     this.setWordWrap(Global.base.UI?.sidebar?.width);
+    
+    let links = text.match(ChatEntry.linkRegex);
+    if(links) links.forEach(link => {
+      if(this.children.length >= 5) return;
+
+      if(this.txt.text.charAt(this.txt.text.indexOf(link)-1) == '\\') {
+        this.txt.text = this.txt.text.replace('\\' + link, link);
+        return;
+      }
+
+      link = `https://${link}`;
+      let linkTxt = new BMText(link, ChatEntry.style);
+      linkTxt.tint = 0x3366BB;
+      linkTxt.x += ChatEntry.padding;
+      linkTxt.y = this.height;
+      this.addChild(linkTxt);
+
+      UI.makeButton(linkTxt, () => window.open(link, '_blank'));
+    });
   }
 
   setWordWrap(width) {
     this.x = ChatEntry.padding;
-    if(Global.base.UI) this.style.wordWrapWidth = width - ChatEntry.padding * 2;
+    if(Global.base.UI) this.maxWidth = this.txt.maxWidth = width - ChatEntry.padding * 2;
+    this.dirty=true;
   }
 }
