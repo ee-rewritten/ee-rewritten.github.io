@@ -17,6 +17,13 @@ PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
 PIXI.DisplayObject.prototype.getAttr = function(name) { if (!this.attrs) return; return this.attrs[name] };
 PIXI.DisplayObject.prototype.setAttr = function(name, value) { if (!this.attrs) this.attrs = {}; this.attrs[name] = value; };
 
+function getMinimapCanvas() {
+  return Global.base.UI.minimap.ctx.canvas;
+}
+function setMinimapWindow(w) {
+  Global.base.UI.minimapWindow = w;
+}
+
 // http://thenewcode.com/895/JavaScript-Rounding-Recipes
 // http://www.timdown.co.uk/
 Math.gaussRound = function(num, decimalPlaces) {

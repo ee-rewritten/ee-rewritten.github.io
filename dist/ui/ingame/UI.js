@@ -10,7 +10,7 @@ class UI extends Container {
   sidebar; worldName; worldInfo;
   userlist;
   chat; chatInput;
-  minimap;
+  minimap; minimapWindow;
 
   hotbar;
   hotbarSmiley;
@@ -536,7 +536,8 @@ class UI extends Container {
   enterFrame() {
     this.updateDebugMenu();
     this.updateSidebar();
-    if(this.menus['map'].visible) this.minimap.updatePlayerTrails();
+    if(this.menus['map'].visible || this.minimapWindow && !this.minimapWindow.closed)
+      this.minimap.updatePlayerTrails();
     else this.minimap.clearPlayerTrails();
   }
 
@@ -555,10 +556,14 @@ class UI extends Container {
           break;
         }
 
-
         case 'debug':
         case 'fps': {
           this.showDebug = !this.showDebug;
+          break;
+        }
+
+        case 'map': {
+          this.minimapWindow = window.open('./minimap.html', 'minimap', 'width=500,height=300');
           break;
         }
       }

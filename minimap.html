@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>EE: Rewritten (Minimap)</title>
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: black;
+
+      width: 100vw;
+      height: 100vh;
+
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    canvas {
+      image-rendering: pixelated;
+    }
+  </style>
+
+  <script>
+    let canvas;
+
+    function init() {
+      opener.setMinimapWindow(window);
+      canvas = opener.getMinimapCanvas();
+      document.body.appendChild(canvas);
+      window.onresize = resize;
+
+      let top = window.outerHeight - window.innerHeight,
+        side = window.outerWidth - window.innerWidth;
+      window.resizeTo(canvas.width + side, canvas.height + top);
+    }
+
+    function resize() {
+      canvas.style.width = '100vw'
+      if (parseInt(getComputedStyle(canvas).height) > window.innerHeight) {
+        canvas.style.width = 100 * canvas.width / canvas.height + 'vh';
+      }
+    }
+  </script>
+</head>
+
+<body onload="init()"></body>
+
+</html>
