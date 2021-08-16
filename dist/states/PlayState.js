@@ -110,6 +110,10 @@ class PlayState extends State {
 
     if(Input.isKeyJustPressed(13)) // enter
       Global.base.UI.showUI(Global.base.UI.menus['chat'], true);
+    if(Input.isKeyJustPressed(191)) { // /
+      Global.base.UI.showUI(Global.base.UI.menus['chat'], true);
+      Global.base.UI.chatInput.text = '/';
+    }
 
     if(Input.isKeyJustPressed(27)) // esc
       Global.base.UI.hideUI();

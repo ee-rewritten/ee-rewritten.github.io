@@ -566,6 +566,11 @@ class UI extends Container {
           this.minimapWindow = window.open('./minimap.html', 'minimap', 'width=500,height=300');
           break;
         }
+
+        default: { // remove when server added
+          this.chat.sendMessage('* system', `unknown command '${cmd[0]}'`);
+          break;
+        }
       }
     }
     else {
