@@ -68,7 +68,8 @@ class Game {
     Global.stage.addChild(Global.base.UI);
 
     Global.base.time = performance.now();
-    setInterval(Global.base.enterFrame, 1000/60);
+    //setInterval(Global.base.enterFrame, 1000/60);
+    requestAnimationFrame(Global.base.enterFrame);
   }
 
   time = 0;
@@ -94,6 +95,8 @@ class Game {
       }
       Global.base.state.enterFrame();
       Global.base.UI.enterFrame();
+
+      requestAnimationFrame(Global.base.enterFrame);
     }
   }
 }
