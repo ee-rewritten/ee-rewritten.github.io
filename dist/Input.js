@@ -21,7 +21,7 @@ class Input {
   static init() {
     if(this.inited) throw new Error('Input is already initialised.');
     window.addEventListener('keydown', e => {
-      if(this.isGameInFocus && this.allowInput) {
+      if(this.isGameInFocus && this.allowInput && (e.keyCode < 112 || e.keyCode > 143)) {
         if(!this.keys[e.keyCode]) {
           this.justPressedKeys[e.keyCode] = true;
           this.keys[e.keyCode] = true;
