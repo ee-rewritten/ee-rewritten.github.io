@@ -12,7 +12,7 @@ class Player extends Container {
   id = 0;
   name = '';
   playstate;
-  x = 0; y = 0;
+  // x = 0; y = 0;
 
   _isInGodMode = false;
   _layer = null;
@@ -47,10 +47,12 @@ class Player extends Container {
 
     let godmodeTexture = new Texture(ItemManager.godmodeBMD, new Rectangle(Config.godmodeSize,0,Config.godmodeSize,Config.godmodeSize));
     this.godmodeSprite = new Sprite(godmodeTexture);
+    this.godmodeSprite.position.set(Player.godmodeOffset, Player.godmodeOffset);
     this.addChild(this.godmodeSprite);
 
     let smileyTexture = new Texture(ItemManager.smileysBMD, new Rectangle(0,0,Config.smileySize,Config.smileySize));
     this.smileySprite = new Sprite(smileyTexture);
+    this.smileySprite.position.set(Player.smileyOffset, Player.smileyOffset);
     this.addChild(this.smileySprite);
 
     this.nameText = UI.createShadowText(name, 'Visitor');
@@ -115,15 +117,23 @@ class Player extends Container {
   }
 
   enterFrame() {
-    this.smileySprite.position.set(
-      Math.round(this.x+Player.smileyOffset),
-      Math.round(this.y+Player.smileyOffset));
-    this.godmodeSprite.position.set(
-      Math.round(this.x+Player.godmodeOffset),
-      Math.round(this.y+Player.godmodeOffset));
+    if( (this.x + Config.blockSize/2) + Config.godmodeSize/2 < this.playstate.camera.x
+      ||(this.y + Config.blockSize/2) + Config.godmodeSize/2 < this.playstate.camera.y
+      ||(this.x + Config.blockSize/2) - Config.godmodeSize/2 > this.playstate.camera.x + Config.gameWidth
+      ||(this.x + Config.blockSize/2) - Config.godmodeSize/2 > this.playstate.camera.y + Config.gameHeight) {
+      this.nameText.visible = this.visible = false;
+      return;
+    }
+    else {
+      this.visible = true;
+    }
+
+    //name has its own position setting
+    //it is rendered in a different layer, so can't be child of the player
     this.nameText.position.set(
       Math.round(this.x+Config.blockSize/2-this.nameText.get('width')/2 + 2),
       Math.round(this.y+Config.blockSize+2));
+
     if(this.playstate.target)
       this.nameText.visible = !this.playstate.target.moving || Input.isKeyDown(16);
   }
