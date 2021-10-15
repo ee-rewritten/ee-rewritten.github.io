@@ -8,6 +8,7 @@ class Global {
   static report;
 
   static _isFullscreen = false;
+  static _enterFullscreen = () => {Global.resize(window.innerWidth, window.innerHeight)}
   static scale = 1;
 
   static isMobile = false;
@@ -17,49 +18,28 @@ class Global {
 
   static queue = [];
 
-  static set fullscreen(bool) {
-    if(bool == this.fullscreen) return;
-    if(bool) this.goFullscreen();
-    else this.leaveFullscreen();
+  static set fullscreen (bool) {
+    this._isFullscreen = bool;
+
+    let style = this.canvas.style;
+    if(bool) {
+      style.position = 'absolute';
+      style.top = '0px';
+      style.left = '0px';
+      window.onresize = this._enterFullscreen;
+      this.resize(window.innerWidth, window.innerHeight);
+    }
+    else {
+      style.position = style.top = style.left = '';
+      window.onresize = null;
+      this.resize(Config.fullWidth, Config.fullHeight);
+    }
   }
-  static get fullscreen() {
+  static get fullscreen () {
     return this._isFullscreen;
   }
 
-  static goFullscreen() {
-    Input.allowInput = false;
-    this._isFullscreen = true;
-
-    document.getElementById('ee').requestFullscreen().then(
-      () => {
-        let resize = () => setTimeout(() => {
-          this.resize(screen.width, screen.height);
-        }, 1000/60);
-        screen.orientation.lock('landscape').then(resize, resize);
-        Input.allowInput = true;
-      },
-
-      //fullscreen failed, return input to player
-      () => Input.allowInput = true);
-  }
-
-  static leaveFullscreen() {
-    Input.allowInput = false;
-    this._isFullscreen = false;
-
-    let onExit = () => {
-      this.resize(Config.fullWidth, Config.fullHeight);
-      Input.allowInput = true;
-    }
-
-    document.exitFullscreen().then(onExit, onExit);
-  }
-
   static resize(width, height) {
-    // subtracting for div border
-    width -= 2;
-    height -= 2;
-
     this.app.renderer.resize(width/height * Config.fullHeight, Config.fullHeight);
 
     // https://stackoverflow.com/a/50915858

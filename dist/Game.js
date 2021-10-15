@@ -34,10 +34,6 @@ class Game {
       Global.canvas.style.marginBottom = "-5px";
       //Add the canvas that Pixi automatically created for you to the HTML document
       document.getElementById('ee').appendChild(Global.canvas);
-      document.addEventListener('fullscreenchange', () => {
-        //fullscreen was left via esc/f11 without pressing the in-game button
-        if(document.fullscreenElement == null) Global.fullscreen = false;
-      });
     }
 
     //moved adding assets into ItemManager because that just makes sense

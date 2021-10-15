@@ -1,0 +1,12 @@
+{
+  "short_name": "EE: Rewritten",
+  "name": "EE: Rewritten",
+  "icons": [
+    {
+      "src": "favicon.ico"
+    }
+  ],
+  "start_url": "/Client/index.html",
+  "display": "fullscreen",
+  "orientation": "landscape"
+}

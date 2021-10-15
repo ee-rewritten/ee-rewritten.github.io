@@ -279,11 +279,7 @@ class UI extends Container {
 
   repositionMenu(key, others = true) {
     let menu = this.menus[key];
-
-    let bottomY = (Global.canvas.parentElement.offsetHeight-2)/Global.scale>>0;
-    if(bottomY != parseInt(Global.canvas.style.height)/Global.scale>>0)
-      menu.y = bottomY - menu.height + 1;
-    else menu.y = this.hotbar.y - menu.height + 1;
+    menu.y = this.hotbar.y - menu.height + 1;
 
     let button = this.hotbar.buttons[key];
     if(!button) return;
@@ -382,10 +378,6 @@ class UI extends Container {
     this.chatInput.on('keydown', keycode => {
       if(keycode == 13) Global.queue.push(this.sendChat.bind(this));
     });
-
-    window.onresize = () => {
-      this.repositionMenu('chat', false);
-    };
 
     let sendBtn = UI.createText('send', 'Visitor');
     UI.makeButton(sendBtn, this.sendChat.bind(this));

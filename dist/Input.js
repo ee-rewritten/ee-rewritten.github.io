@@ -21,7 +21,7 @@ class Input {
   static init() {
     if(this.inited) throw new Error('Input is already initialised.');
     window.addEventListener('keydown', e => {
-      if(this.isGameInFocus && this.allowInput || e.keyCode == 122) {
+      if(this.isGameInFocus && this.allowInput) {
         if(!this.keys[e.keyCode]) {
           this.justPressedKeys[e.keyCode] = true;
           this.keys[e.keyCode] = true;
@@ -31,7 +31,7 @@ class Input {
       }
     });
     window.addEventListener('keyup', e => {
-      if(this.keys[e.keyCode] || e.keyCode == 122) {
+      if(this.keys[e.keyCode]) {
         this.justReleasedKeys[e.keyCode] = true;
         delete this.keys[e.keyCode];
       }
