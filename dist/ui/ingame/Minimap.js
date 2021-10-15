@@ -4,6 +4,7 @@ class Minimap {
   pctx;
   playerTrails;
   clearedTrails = false;
+  activePlayerTrails = [];
   world;
 
   constructor() {
@@ -51,13 +52,17 @@ class Minimap {
 
   updatePlayerTrails() {
     // fade
-    for(let x = 0; x < this.world.width; x++)
-      for(let y = 0; y < this.world.height; y++)
-        this.playerTrails.data[(x+y*this.world.width)*4 + 3] -= 3;
+    for(const i in this.activePlayerTrails) {
+      let index = this.activePlayerTrails[i] + 3;
+      this.playerTrails.data[index] -= 3;
+      if(this.playerTrails.data[index] == undefined || this.playerTrails.data[index] <= 0)
+        delete this.activePlayerTrails[index];
+    }
 
     Global.base.state.players.forEach(p => {
       let index = (Math.round(p.x/Config.blockSize) + Math.round(p.y/Config.blockSize) * this.world.width) * 4;
       this.setColour(this.playerTrails, index, p.isme ? 0x00FF00 : 0xFFFFFF);
+      if(this.activePlayerTrails.indexOf(index) == -1) this.activePlayerTrails.push(index);
     });
 
     this.pctx.putImageData(this.playerTrails, 0, 0);
@@ -68,9 +73,10 @@ class Minimap {
   clearPlayerTrails() {
     if(this.clearedTrails) return;
 
-    for(let x = 0; x < this.world.width; x++)
-      for(let y = 0; y < this.world.height; y++)
-        this.playerTrails.data[(x+y*this.world.width)*4 + 3] = 0;
+    for(let index in this.activePlayerTrails)
+      this.playerTrails.data[this.activePlayerTrails[index] + 3] = 0;
+    this.activePlayerTrails = [];
+
     this.pctx.putImageData(this.playerTrails, 0, 0);
 
     this.redraw();
