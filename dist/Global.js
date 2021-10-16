@@ -20,6 +20,7 @@ class Global {
 
   static set fullscreen (bool) {
     this._isFullscreen = bool;
+    Input.preventNextClick = true;
 
     let style = this.canvas.style;
     if(bool) {

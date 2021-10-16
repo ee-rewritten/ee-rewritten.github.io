@@ -60,11 +60,11 @@ class UI extends Container {
   }
   static makeButton(object, callback, ...args) {
     object.interactive = true;
+    object.buttonMode = true;
     object.on('pointerdown', e=>{
+      Input.preventNextClick = true;
       callback(e, ...args);
     });
-    object.on('pointerover', e=>document.body.style.cursor = 'pointer');
-    object.on('pointerout', e=>document.body.style.cursor = '');
   }
 
   constructor() {

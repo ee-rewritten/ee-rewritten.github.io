@@ -12,8 +12,9 @@ class Input {
   static middleMouseJustPressed = false;
 
   static isGameInFocus = false;
+  static preventNextClick = false;
   static allowInput = true;
-  static ouseOnCanvas = false;
+  static mouseOnCanvas = false;
 
   static joystickDirection = '';
 
@@ -40,11 +41,12 @@ class Input {
     window.addEventListener('pointerdown', e => {
       if(e.pointerId == Global.base?.UI?.joystickPointerId || e.buttons & 0b10) return;
       this.isGameInFocus = e.target == Global.canvas;
-      if(this.isGameInFocus && this.allowInput) {
+      if(this.isGameInFocus && this.allowInput && !this.preventNextClick) {
         this.mouseDown = this.mouseJustPressed = true;
         this.mouseX = e.offsetX;
         this.mouseY = e.offsetY;
       }
+      this.preventNextClick = false;
     });
     window.addEventListener('pointermove', e => {
       if(e.pointerId == Global.base?.UI?.joystickPointerId || e.buttons & 0b10) return;
