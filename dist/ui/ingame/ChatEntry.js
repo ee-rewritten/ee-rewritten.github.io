@@ -12,7 +12,9 @@ class ChatEntry extends BMText {
     fontSize: 12,
     fontName: 'Tahoma',
   }
-  static linkRegex = /([a-zA-Z0-9.\-/]+\.[A-Za-z]{2,4})/g;
+  // static linkRegex = /([a-zA-Z0-9.\-/]+\.[A-Za-z]{2,4})/g;
+  //https://stackoverflow.com/a/6927878
+  static linkRegex = /\b((?:(https?:\/\/)|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}\/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))/g;
   constructor(name, text) {
     text = text.replace(/\n/g, '\\n');
     super(name.toUpperCase(), ChatEntry.style);
@@ -21,7 +23,7 @@ class ChatEntry extends BMText {
     this.txt = new BMText(`${name.toUpperCase()}: ${text}`, ChatEntry.style);
     this.addChild(this.txt);
 
-    UI.makeButton(this.txt, () => navigator.clipboard.writeText(text));
+    UI.makeButton(this.txt, () => navigator.clipboard?.writeText(text));
 
     this.setWordWrap(Global.base.UI?.sidebar?.width);
 
@@ -34,7 +36,8 @@ class ChatEntry extends BMText {
         return;
       }
 
-      link = `https://${link}`;
+      if(!link.startsWith('https://') && !link.startsWith('http://'))
+        link = `https://${link}`;
       let linkTxt = new BMText(link, ChatEntry.style);
       linkTxt.tint = 0x3366BB;
       linkTxt.x += ChatEntry.padding;
