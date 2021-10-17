@@ -61,7 +61,6 @@ class Game {
     Global.base.UI.zIndex = 1;
     Global.stage.addChild(Global.base.UI);
 
-    console.log(localStorage.getItem('fullscreen'), !!localStorage.getItem('fullscreen'));
     Global.fullscreen = localStorage.getItem('fullscreen') == '1';
 
     Global.base.time = performance.now();
