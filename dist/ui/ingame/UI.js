@@ -504,6 +504,7 @@ class UI extends Container {
     this.userlist.resize(sideWidth, this.userlist._height);
     this.chat.resize(sideWidth, this.chat._height);
     this.chat.scrollContainer.children.forEach(child => child.setWordWrap(sideWidth));
+    this.chat.sort();
 
     this.repositionMenus();
   }
@@ -544,6 +545,8 @@ class UI extends Container {
     this.showUI(this.menus['chat'], false);
 
     if(!text) return;
+
+    //clientside command handler
     if(text.charAt(0) == '/') {
       let cmd = text.substr(1).split(' ')
       switch(cmd[0]) {

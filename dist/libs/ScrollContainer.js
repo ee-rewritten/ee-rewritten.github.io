@@ -20,9 +20,9 @@ class ScrollContainer extends Container {
 
     if(this.scrollContainer.height >= this._height && this.scrollToBottom)
       this.scrollContainer.y = this._height - this.scrollContainer.height - this.padding;
+    else this.scrollContainer.y = 0;
 
     if(this.maxChildren && this.scrollContainer.children.length > this.maxChildren) {
-      this.scrollContainer.y = 0;
       this.scrollContainer.children.shift();
       this.sort();
     }
