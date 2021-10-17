@@ -59,20 +59,6 @@ function bresenhamsLine(x0, y0, x1, y1) {
 }
 
 // https://vanillajstoolkit.com/polyfills/
-if (!document.fullscreenElement) {
-	Object.defineProperty(document, 'fullscreenElement', {
-		get: () => document.mozFullScreenElement || document.msFullscreenElement || document.webkitFullscreenElement
-	});
-	Object.defineProperty(document, 'fullscreenEnabled', {
-		get: () => document.mozFullScreenEnabled || document.msFullscreenEnabled || document.webkitFullscreenEnabled
-	});
-}
-if (!document.exitFullscreen) {
-	document.exitFullscreen = document.mozExitFullscreen || document.webkitExitFullscreen || document.msExitFullscreen;
-}
-if (!Element.prototype.requestFullscreen) {
-	Element.prototype.requestFullscreen = Element.prototype.mozRequestFullscreen || Element.prototype.webkitRequestFullscreen || Element.prototype.msRequestFullscreen;
-}
 
 // http://detectmobilebrowsers.com/
 window.mobileCheck = function() {

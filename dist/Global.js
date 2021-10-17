@@ -21,6 +21,7 @@ class Global {
   static set fullscreen (bool) {
     this._isFullscreen = bool;
     Input.preventNextClick = true;
+    localStorage.setItem('fullscreen', bool ? '1' : '0');
 
     let style = this.canvas.style;
     if(bool) {

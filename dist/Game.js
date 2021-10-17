@@ -21,8 +21,6 @@ class Game {
       Global.canvas = Global.app.view;
       Global.stage = Global.app.stage;
 
-      Global.canvas.style.height = `${Config.fullHeight}px`;
-
       //https://github.com/pixijs/pixi.js/issues/7407#issuecomment-820444887
       const interaction = Global.app.renderer.plugins.interaction;
       interaction.removeEvents();
@@ -62,6 +60,9 @@ class Game {
     Global.base.UI = new UI();
     Global.base.UI.zIndex = 1;
     Global.stage.addChild(Global.base.UI);
+
+    console.log(localStorage.getItem('fullscreen'), !!localStorage.getItem('fullscreen'));
+    Global.fullscreen = localStorage.getItem('fullscreen') == '1';
 
     Global.base.time = performance.now();
     //setInterval(Global.base.enterFrame, 1000/60);
