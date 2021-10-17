@@ -108,6 +108,12 @@ class Input {
       return this.isKeyJustReleased(key.keyCode);
     }
   }
+  static releaseKey(keyCode) {
+    if(this.keys[keyCode]) {
+      this.justReleasedKeys[keyCode] = true;
+      delete this.keys[keyCode];
+    }
+  }
 
   static get isMouseDown() {
     return this.mouseDown;

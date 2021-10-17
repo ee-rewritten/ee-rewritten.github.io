@@ -137,7 +137,13 @@ class UI extends Container {
     // buttons on the right
     this.createMinimap();
     this.hotbar.addTextureButton('map', null, 29, 28, 0, true, 31);
-    this.hotbar.onClick('map', ()=>this.showUI(this.menus['map']), true, true);
+    this.hotbar.onClick('map', ()=>{
+      if(Input.isKeyDown(17)) {
+        this.minimap.openPopupMap();
+        Input.releaseKey(17);
+      }
+      else this.showUI(this.menus['map']);
+    }, true);
 
     // useless buttons but on the right
     this.hotbar.addTextureButton('favlike', null, 43, 28, 0, true, 43);
@@ -528,7 +534,7 @@ class UI extends Container {
   enterFrame() {
     this.updateDebugMenu();
     this.updateSidebar();
-    if(this.menus['map'].visible || this.minimapWindow && !this.minimapWindow.closed)
+    if(this.menus['map'].visible)
       this.minimap.updatePlayerTrails();
     else this.minimap.clearPlayerTrails();
   }
@@ -555,7 +561,7 @@ class UI extends Container {
         }
 
         case 'map': {
-          this.minimapWindow = window.open('./minimap.html', 'minimap', 'width=500,height=300');
+          this.minimap.openPopupMap();
           break;
         }
 

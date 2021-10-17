@@ -36,6 +36,11 @@ class PlayState extends State {
     this.enterFrame();
   }
 
+  moveCameraTo(x, y) {
+    this.camera.x = x - Config.gameWidthCeil/2;
+    this.camera.y = y - Config.gameHeightCeil/2;
+  }
+
   movePlayer(p) {
     if(p.layer != null) {
       this.playerContainers[p.layer].removeChild(p);
@@ -118,7 +123,15 @@ class PlayState extends State {
     if(Input.isKeyJustPressed(72))
       this.addFakePlayer();
 
-    if(Input.isMouseDown && Global.base.UI.isMouseInGame) {
+    if(Input.isKeyDown(86)) {
+      if(Input.isMouseJustPressed) {
+        let pos = this.world.toLocal({x: Input.mouseX, y: Input.mouseY}, Global.stage);
+        let x = Math.floor(pos.x/Config.blockSize), y = Math.floor(pos.y/Config.blockSize);
+        this.player.teleport(x*Config.blockSize, y*Config.blockSize, false)
+      }
+    }
+
+    else if(Input.isMouseDown && Global.base.UI.isMouseInGame) {
       let id = Global.base.UI.selectedBlock;
       let pos = this.world.toLocal({x: Input.mouseX, y: Input.mouseY}, Global.stage);
       let x = Math.floor(pos.x/Config.blockSize), y = Math.floor(pos.y/Config.blockSize);
@@ -134,11 +147,9 @@ class PlayState extends State {
         this.lastPlacedX = x; this.lastPlacedY = y;
       }
 
-      if(x == this.lastPlacedX && y == this.lastPlacedY) this.world.setTile(id, x, y);
-      else {
-        let coords = bresenhamsLine(this.lastPlacedX, this.lastPlacedY, x, y)
-        coords.forEach(coord => this.world.setTile(id, coord[0], coord[1]));
-      }
+      let coords = bresenhamsLine(this.lastPlacedX, this.lastPlacedY, x, y)
+      coords.forEach(coord => this.world.setTile(id, coord[0], coord[1]));
+      
       this.lastPlacedX = x; this.lastPlacedY = y;
     }
     else this.lastPlacedX = this.lastPlacedY = null;

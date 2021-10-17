@@ -13,6 +13,8 @@ class Player extends Container {
   name = '';
   playstate;
   // x = 0; y = 0;
+  thisFrameX = 0; thisFrameY = 0;
+  lastFrameX = 0; lastFrameY = 0;
 
   _isInGodMode = false;
   _layer = null;
@@ -41,8 +43,7 @@ class Player extends Container {
     this.isme = isme;
     this.id = id;
     this.name = name;
-    this.x = x;
-    this.y = y;
+    this.teleport(x, y);
     if(!nameColour) nameColour = Player.getNameColour(name);
 
     let godmodeTexture = new Texture(ItemManager.godmodeBMD, new Rectangle(Config.godmodeSize,0,Config.godmodeSize,Config.godmodeSize));
@@ -117,6 +118,10 @@ class Player extends Container {
   }
 
   enterFrame() {
+    //storing position for this frame and last frame for minimap purposes
+    this.lastFrameX = this.thisFrameX; this.lastFrameY = this.thisFrameY;
+    this.thisFrameX = this.x; this.thisFrameY = this.y;
+
     if( (this.x + Config.blockSize/2) + Config.godmodeSize/2 < this.playstate.camera.x
       ||(this.y + Config.blockSize/2) + Config.godmodeSize/2 < this.playstate.camera.y
       ||(this.x + Config.blockSize/2) - Config.godmodeSize/2 > this.playstate.camera.x + Config.gameWidth
@@ -136,6 +141,12 @@ class Player extends Container {
 
     if(this.playstate.target)
       this.nameText.visible = !this.playstate.target.moving || Input.isKeyDown(16);
+  }
+
+  teleport(x, y, snapCamera = true) {
+    this.lastFrameX = this.thisFrameX = this.x = x;
+    this.lastFrameY = this.thisFrameY = this.y = y;
+    if(snapCamera) this.playstate.moveCameraTo(x, y);
   }
 
   tick() {

@@ -18,7 +18,7 @@ PIXI.DisplayObject.prototype.getAttr = function(name) { if (!this.attrs) return;
 PIXI.DisplayObject.prototype.setAttr = function(name, value) { if (!this.attrs) this.attrs = {}; this.attrs[name] = value; };
 
 function getMinimapCanvas() {
-  return Global.base.UI.minimap.ctx.canvas;
+  return Global.base.UI.minimap.popupCtx.canvas;
 }
 function setMinimapWindow(w) {
   Global.base.UI.minimapWindow = w;

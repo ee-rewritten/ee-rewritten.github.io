@@ -1,30 +1,29 @@
 class Minimap {
-  ctx;
+  mapCtx;
   mapData; mapSprite;
-  pctx;
+  trailCtx;
   playerTrails;
   clearedTrails = false;
   activePlayerTrails = [];
   world;
+  popupCtx;
 
   constructor() {
     this.world = Global.base.state.world;
 
     let canvas = document.createElement('canvas');
-    canvas.width = this.world.width;
-    canvas.height = this.world.height;
+    canvas.width = this.world.width; canvas.height = this.world.height;
+    this.mapCtx = canvas.getContext('2d');
+    this.mapData = this.mapCtx.createImageData(this.world.width, this.world.height);
 
-    this.ctx = canvas.getContext('2d');
-    this.mapData = this.ctx.createImageData(this.world.width, this.world.height);
+    let trailCanvas = document.createElement('canvas');
+    trailCanvas.width = this.world.width; trailCanvas.height = this.world.height;
+    this.trailCtx = trailCanvas.getContext('2d');
+    this.playerTrails = this.trailCtx.createImageData(this.world.width, this.world.height);
 
-
-    let pcanvas = document.createElement('canvas');
-    pcanvas.width = this.world.width;
-    pcanvas.height = this.world.height;
-
-    this.pctx = pcanvas.getContext('2d');
-    this.playerTrails = this.pctx.createImageData(this.world.width, this.world.height);
-
+    let popupcanvas = document.createElement('canvas');
+    popupcanvas.width = this.world.width; popupcanvas.height = this.world.height;
+    this.popupCtx = popupcanvas.getContext('2d');
 
     this.mapSprite = Sprite.from(canvas);
     this.mapSprite.x = -2; this.mapSprite.y = -6;
@@ -56,16 +55,22 @@ class Minimap {
       let index = this.activePlayerTrails[i] + 3;
       this.playerTrails.data[index] -= 3;
       if(this.playerTrails.data[index] == undefined || this.playerTrails.data[index] <= 0)
-        delete this.activePlayerTrails[index];
+        delete this.activePlayerTrails[i];
     }
 
     Global.base.state.players.forEach(p => {
-      let index = (Math.round(p.x/Config.blockSize) + Math.round(p.y/Config.blockSize) * this.world.width) * 4;
-      this.setColour(this.playerTrails, index, p.isme ? 0x00FF00 : 0xFFFFFF);
-      if(this.activePlayerTrails.indexOf(index) == -1) this.activePlayerTrails.push(index);
+      let coords = bresenhamsLine(
+        Math.round(p.lastFrameX/Config.blockSize), Math.round(p.lastFrameY/Config.blockSize),
+        Math.round(p.thisFrameX/Config.blockSize), Math.round(p.thisFrameY/Config.blockSize));
+
+      coords.forEach(coord => {
+        let index = (coord[0] + coord[1] * this.world.width) * 4;
+        this.setColour(this.playerTrails, index, p.isme ? 0x00FF00 : 0xFFFFFF);
+        if(this.activePlayerTrails.indexOf(index) == -1) this.activePlayerTrails.push(index);
+      });
     });
 
-    this.pctx.putImageData(this.playerTrails, 0, 0);
+    this.trailCtx.putImageData(this.playerTrails, 0, 0);
     this.redraw();
 
     this.clearedTrails = false;
@@ -77,7 +82,7 @@ class Minimap {
       this.playerTrails.data[this.activePlayerTrails[index] + 3] = 0;
     this.activePlayerTrails = [];
 
-    this.pctx.putImageData(this.playerTrails, 0, 0);
+    this.trailCtx.putImageData(this.playerTrails, 0, 0);
 
     this.redraw();
 
@@ -85,9 +90,11 @@ class Minimap {
   }
 
   redraw() {
-    this.ctx.putImageData(this.mapData, 0, 0);
-    this.ctx.drawImage(this.pctx.canvas, 0, 0);
+    this.mapCtx.putImageData(this.mapData, 0, 0);
+    this.mapCtx.drawImage(this.trailCtx.canvas, 0, 0);
     this.mapSprite.texture.baseTexture.update();
+
+    this.popupCtx.putImageData(this.mapData, 0, 0);
   }
 
   setColour(data, index, colour, alpha = 255) {
@@ -95,5 +102,9 @@ class Minimap {
     data.data[index+1] = (colour & 0x00FF00) >> 8; // green
     data.data[index+2] = (colour & 0x0000FF); // blue
     data.data[index+3] = alpha;
+  }
+
+  openPopupMap() {
+    window.open('./minimap.html', 'minimap', 'width=500,height=300');
   }
 }
