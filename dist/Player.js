@@ -120,7 +120,7 @@ class Player extends Container {
     if( (this.x + Config.blockSize/2) + Config.godmodeSize/2 < this.playstate.camera.x
       ||(this.y + Config.blockSize/2) + Config.godmodeSize/2 < this.playstate.camera.y
       ||(this.x + Config.blockSize/2) - Config.godmodeSize/2 > this.playstate.camera.x + Config.gameWidth
-      ||(this.x + Config.blockSize/2) - Config.godmodeSize/2 > this.playstate.camera.y + Config.gameHeight) {
+      ||(this.y + Config.blockSize/2) - Config.godmodeSize/2 > this.playstate.camera.y + Config.gameHeight) {
       this.nameText.visible = this.visible = false;
       return;
     }
