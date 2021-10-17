@@ -2,6 +2,7 @@ class Config {
   static blockSize = 16;
   static smileySize = 26;
   static godmodeSize = 64;
+  static blockPadding = 1;
 
   static fontVisitorSize = 8;
   static fontNokiaSize = 13;

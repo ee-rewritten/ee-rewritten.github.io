@@ -57,8 +57,10 @@ class ItemBlock {
   }
 
   generateFrame(artOffset, yOffset) {
-    return new Rectangle(artOffset*Config.blockSize, yOffset*Config.blockSize,
-    Config.blockSize, Config.blockSize)
+    return new Rectangle(
+      artOffset*(Config.blockSize + 2*Config.blockPadding) + Config.blockPadding,
+      yOffset*(Config.blockSize + 2*Config.blockPadding) + Config.blockPadding,
+      Config.blockSize, Config.blockSize)
   }
 
   get frame() {
