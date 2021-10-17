@@ -120,9 +120,6 @@ class PlayState extends State {
     if(Input.isKeyJustPressed(27)) // esc
       Global.base.UI.hideUI();
 
-    if(Input.isKeyJustPressed(72))
-      this.addFakePlayer();
-
     if(Input.isKeyDown(86)) {
       if(Input.isMouseJustPressed) {
         let pos = this.world.toLocal({x: Input.mouseX, y: Input.mouseY}, Global.stage);
@@ -149,7 +146,7 @@ class PlayState extends State {
 
       let coords = bresenhamsLine(this.lastPlacedX, this.lastPlacedY, x, y)
       coords.forEach(coord => this.world.setTile(id, coord[0], coord[1]));
-      
+
       this.lastPlacedX = x; this.lastPlacedY = y;
     }
     else this.lastPlacedX = this.lastPlacedY = null;

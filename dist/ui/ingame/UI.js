@@ -568,6 +568,14 @@ class UI extends Container {
           break;
         }
 
+        case 'summon': {
+          let limit = +(cmd[1]) ? +(cmd[1]) : 1;
+          for (let i = 0; i < limit; i++) {
+            Global.base.state.addFakePlayer();
+          }
+          break;
+        }
+
         default: { // remove when server added
           this.chat.sendMessage('* system', `unknown command '${cmd[0]}'`);
           break;
