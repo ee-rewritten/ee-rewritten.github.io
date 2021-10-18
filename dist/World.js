@@ -162,26 +162,29 @@ class World extends Container {
       for (let i = 0; i < blockContainer.children.length; i++) {
         let block = blockContainer.children[i];
         let pos = block.getGlobalPosition();
+        let blockX = block.x/Config.blockSize, blockY = block.y/Config.blockSize;
 
         let offscreen = pos.x <= -Config.blockSize || pos.x > Config.gameWidthCeil
                      || pos.y <= -Config.blockSize || pos.y > Config.gameHeightCeil;
 
         let id;
         if(!offscreen) {
-          id = this.getRenderTile(renderLayer, block.x/Config.blockSize, block.y/Config.blockSize);
+          id = this.getRenderTile(renderLayer, blockX, blockY);
         }
 
-        if(offscreen || force && (x == null && y == null || x == block.x/Config.blockSize && y == block.y/Config.blockSize)
+        if(offscreen || force && (x == null && y == null || x == blockX && y == blockY)
           || ItemManager.blocks[id] && ItemManager.blocks[id].requiresUpdate(block, this)) {
           if(offscreen) {
             if(pos.x <= -Config.blockSize) block.x += Config.gameWidthCeil + Config.blockSize;
             if(pos.x > Config.gameWidthCeil) block.x -= Config.gameWidthCeil + Config.blockSize;
             if(pos.y <= -Config.blockSize) block.y += Config.gameHeightCeil + Config.blockSize;
             if(pos.y > Config.gameHeightCeil) block.y -= Config.gameHeightCeil + Config.blockSize;
+
+            blockX = block.x/Config.blockSize; blockY = block.y/Config.blockSize;
           }
 
-          if(offscreen && !id && id !== 0) {
-            id = this.getRenderTile(renderLayer, block.x/Config.blockSize, block.y/Config.blockSize);
+          if(offscreen && id == undefined) {
+            id = this.getRenderTile(renderLayer, blockX, blockY);
           }
 
           let blockData = ItemManager.blocks[id];
@@ -190,7 +193,7 @@ class World extends Container {
             continue;
           }
 
-          blockData.draw(block, this);
+          blockData.draw(block, this.offset, blockX, blockY);
         }
       }
     }
@@ -215,7 +218,11 @@ class World extends Container {
 
         if(player.isInGodMode && id != ItemManager.blockVoid[ItemLayer.BELOW].id) continue;
         if(id == 0) continue;
-        if(!ItemManager.blocks[id].mightCollide) continue;
+
+        let block = ItemManager.blocks[id];
+        if(!block.mightCollide) continue;
+        if(!block.collides(player, blockX, blockY, this.offset)) continue;
+
         // if(!this.intersects(player.x*Config.blockSize, player.y*Config.blockSize, blockX, blockY)) continue;
 
         return true;

@@ -3,42 +3,50 @@ class ItemBlock {
   layer;
   _frames = [];
   speed = 1;
-  draw;
+  draw; getFrame;
   requiresUpdate;
   physics; returnPhysics;
   minimapColour;
-  mightCollide;
+  mightCollide; collides;
 
   vars = {};
 
-  static drawDefault = function(block, world) {
-    block.texture.frame = this.frame;
-  }
-  static drawDefaultAnim = function(block, world) {
-    block.texture.frame = this._frames[
-      ((world.offset*this.speed >> 0) + block.x/Config.blockSize + block.y/Config.blockSize)
-      %this._frames.length
-    ];
-  }
-  static updateDefault = function(block, world) { return false; }
-  static updateDefaultAnim = function(block, world) {
-    let newFrame = world.offset*this.speed >> 0, lastFrame = block.getAttr('lastFrame');
-    block.setAttr('lastFrame', newFrame);
-    return newFrame !== lastFrame;
+  static default = {
+    getFrame: function (offset, x, y) {
+      return offset*this.speed + x + y;
+    },
+
+    draw: function(block) {
+      block.texture.frame = this.frame;
+    },
+    drawAnim: function(block, offset, x, y) {
+      block.texture.frame = this._frames[(this.getFrame(offset, x, y) >> 0)%this._frames.length];
+    },
+
+    requiresUpdate: function(offset, x, y) { return false; },
+    requiresUpdateAnim: function(offset, x, y) {
+      return (this.getFrame(offset, x, y) >> 0) !== (this.getFrame(offset - 0.3, x, y));
+    },
+
+    returnPhysics: {
+      modX: 0,
+      modY: Config.physics.gravity,
+    },
+    physics: function(info) {
+      return this.returnPhysics;
+    },
+
+    collides: function(player, x, y) {
+      return true;
+    }
   }
 
-  static returnPhysicsDefault = {
-    modX: 0,
-    modY: Config.physics.gravity,
-  };
-  static physicsDefault = function(info) {
-    return this.returnPhysics;
-  }
-
-  constructor(id, layer, artOffset, yOffset, mightCollide = true, frames = 1, speed = 1) {
+  constructor(id, layer, artOffset, yOffset, mightCollide = true, frames = 1, speed = 1, displayFrame = 0) {
     this.id = id;
     this.layer = layer;
     this.speed = speed;
+
+    if(displayFrame != 0) Object.defineProperty(this, 'frame', {get: function() {return this._frames[displayFrame]}})
 
     let anim = false;
     if(Array.isArray(frames)) {
@@ -57,13 +65,15 @@ class ItemBlock {
 
     this.minimapColour = this.generateMapColour();
 
-    this.draw = anim ? ItemBlock.drawDefaultAnim : ItemBlock.drawDefaultAnim;
-    this.requiresUpdate = anim ? ItemBlock.updateDefaultAnim : ItemBlock.updateDefault;
+    this.draw = anim ? ItemBlock.default.drawAnim : ItemBlock.default.draw;
+    this.requiresUpdate = anim ? ItemBlock.default.requiresUpdateAnim : ItemBlock.default.requiresUpdate;
+    this.getFrame = ItemBlock.default.getFrame;
 
-    this.returnPhysics = ItemBlock.returnPhysicsDefault;
-    this.physics = ItemBlock.physicsDefault;
+    this.returnPhysics = ItemBlock.default.returnPhysics;
+    this.physics = ItemBlock.default.physics;
 
     this.mightCollide = mightCollide;
+    this.collides = ItemBlock.default.collides;
   }
 
   generateFrame(artOffset, yOffset) {

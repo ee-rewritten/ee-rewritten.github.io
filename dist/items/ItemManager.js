@@ -97,6 +97,18 @@ class ItemManager {
     pack.addGenericBlock(ItemLayer.BELOW, 4, false).returnPhysics = {modX: 0, modY: 0, queue: 2};
     pack.addGenericBlock(ItemLayer.BELOW, 5, false).returnPhysics = {modX: 0, modY: 0, queue: 2, drag: Config.physics.climbable_drag};
 
+    this.lastYOffset = 67;
+    pack = this.createBlockPack('timedoor');
+
+    block = pack.addGenericBlock(ItemLayer.BELOW, 0, true, 10);
+    block.getFrame = function(offset) { return offset/0.3 / 100 }
+    block.collides = function(player, x, y, offset) { return (offset/0.3 / 100)%10 >= 5 }
+
+    block = pack.addGenericBlock(ItemLayer.BELOW, 0, true, 10, null, 5);
+    block.getFrame = function(offset) { return offset/0.3 / 100 + 5 }
+    block.collides = function(player, x, y, offset) { return (offset/0.3 / 100)%10 < 5 }
+    // block.displayFrame = 5;
+
 
     this._addingToTab = ItemTab.BACKGROUND;
     this.lastYOffset = 135;
