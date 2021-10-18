@@ -32,6 +32,7 @@ class Config {
     ice_drag: Math.pow(.9998, 10) * 1.00016093,
     //Multiplyer when not applying force by userkeys
     no_modifier_drag: Math.pow(.9900, 10) * 1.00016093,
+    climbable_drag: Math.pow(.9900, 10) * 1.00016093,
     water_drag: Math.pow(.9950, 10) * 1.00016093,
     mud_drag: Math.pow(.9750, 10) * 1.00016093,
     lava_drag: Math.pow(.9800, 10) * 1.00016093,

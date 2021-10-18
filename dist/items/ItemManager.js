@@ -43,7 +43,7 @@ class ItemManager {
     for(let key in ItemAuraColour.colours)
       this.createAuraColour(key);
 
-    let pack;
+    let pack, block;
 
     this._addingToTab = ItemTab.BLOCKS;
 
@@ -86,6 +86,16 @@ class ItemManager {
     // pack.addGenericBlock(ItemLayer.BELOW, 0, 9, 1/10, function(block, world) {
     //   block.texture.frame = this._frames[Global.randomInt(0, this._frames.length-1)];
     // });
+
+    this._addingToTab = ItemTab.ACTION;
+    this.lastYOffset = 54;
+    pack = this.createBlockPack('gravity');
+    pack.addGenericBlock(ItemLayer.BELOW, 0, false).returnPhysics = {modX: -Config.physics.gravity, modY: 0};
+    pack.addGenericBlock(ItemLayer.BELOW, 1, false).returnPhysics = {modX: 0, modY: -Config.physics.gravity};
+    pack.addGenericBlock(ItemLayer.BELOW, 2, false).returnPhysics = {modX: Config.physics.gravity, modY: 0};
+    pack.addGenericBlock(ItemLayer.BELOW, 3, false).returnPhysics = {modX: 0, modY: Config.physics.gravity};
+    pack.addGenericBlock(ItemLayer.BELOW, 4, false).returnPhysics = {modX: 0, modY: 0, queue: 2};
+    pack.addGenericBlock(ItemLayer.BELOW, 5, false).returnPhysics = {modX: 0, modY: 0, queue: 2, drag: Config.physics.climbable_drag};
 
 
     this._addingToTab = ItemTab.BACKGROUND;

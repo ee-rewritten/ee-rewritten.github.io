@@ -26,6 +26,8 @@ class Player extends Container {
   lastJump = -1; jumpCount = 0; maxJumps = 1;
   lastMoved = -1;
 
+  physicsQueue = Array(2);
+
   ticks = 0;
 
   static smileyOffset = Math.round(-(Config.smileySize-Config.blockSize)/2);
@@ -199,18 +201,31 @@ class Player extends Container {
     let blockX = Math.round(this.x/Config.blockSize);
     let blockY = Math.round(this.y/Config.blockSize);
 
-    let origModX = 0, origModY = 0;
-    let modX = 0, modY = 0;
-    let modifierX = 0, modifierY = 0;
-
     let isFlying = this.isInGodMode;
-    if(!isFlying) {
-      origModX = 0;
-      origModY = Config.physics.gravity;
 
-      modX = 0;
-      modY = Config.physics.gravity;
+    this.current = {
+      id: this.playstate.world.getTile(ItemLayer.FG, blockX, blockY),
+      x: blockX,
+      y: blockY,
+      flying: isFlying,
+    };
+    let currentPhysics = ItemManager.blocks[this.current.id].physics(this.current);
+
+    let delayed;
+    //handles special cases like dots/climbables that for some reason double-shift the queue
+    for (var i = 0; i < (currentPhysics.queue || 1); i++) {
+      delayed = this.physicsQueue.shift();
+      this.physicsQueue.push(this.current);
     }
+    if(delayed == null) delayed = this.current;
+
+    let delayedPhysics = ItemManager.blocks[delayed.id].physics(delayed);
+
+    let origModX = currentPhysics.modX, origModY = currentPhysics.modY;
+    let modX = delayedPhysics.modX, modY = delayedPhysics.modY;
+
+    if(isFlying)
+      modX = origModX = modY = origModY = 0;
 
     let movementX = 0, movementY = 0;
 
@@ -231,16 +246,17 @@ class Player extends Container {
     modX *= this.gravityMult;
     modY *= this.gravityMult;
 
-    modifierX = (modX + movementX) / Config.physics.variable_multiplyer;
-    modifierY = (modY + movementY) / Config.physics.variable_multiplyer;
+    let modifierX = (modX + movementX) / Config.physics.variable_multiplyer;
+    let modifierY = (modY + movementY) / Config.physics.variable_multiplyer;
 
     if(this.speedX || modifierX) {
       this.speedX += modifierX;
 
       this.speedX *= Config.physics.base_drag;
-      if((!movementX && modY) || (this.speedX < 0 && movementX > 0) || (this.speedX > 0 && movementX < 0)) {
+      if((!movementX && modY) || (this.speedX < 0 && movementX > 0) || (this.speedX > 0 && movementX < 0))
         this.speedX *= Config.physics.no_modifier_drag;
-      }
+      else if(!isFlying && currentPhysics.drag != null)
+        this.speedX *= currentPhysics.drag;
 
       if(this.speedX > 16) {
         this.speedX = 16;
@@ -255,9 +271,10 @@ class Player extends Container {
       this.speedY += modifierY;
 
       this.speedY *= Config.physics.base_drag;
-      if((!movementY && modX) || (this.speedY < 0 && movementY > 0) || (this.speedY > 0 && movementY < 0)) {
+      if((!movementY && modX) || (this.speedY < 0 && movementY > 0) || (this.speedY > 0 && movementY < 0))
         this.speedY *= Config.physics.no_modifier_drag;
-      }
+      else if(!isFlying && currentPhysics.drag != null)
+        this.speedY *= currentPhysics.drag;
 
       if(this.speedY > 16) {
         this.speedY = 16;

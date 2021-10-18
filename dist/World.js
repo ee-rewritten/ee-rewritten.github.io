@@ -215,6 +215,7 @@ class World extends Container {
 
         if(player.isInGodMode && id != ItemManager.blockVoid[ItemLayer.BELOW].id) continue;
         if(id == 0) continue;
+        if(!ItemManager.blocks[id].mightCollide) continue;
         // if(!this.intersects(player.x*Config.blockSize, player.y*Config.blockSize, blockX, blockY)) continue;
 
         return true;

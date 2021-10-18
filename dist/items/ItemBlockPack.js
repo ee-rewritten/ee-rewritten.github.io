@@ -80,7 +80,9 @@ class ItemBlockPack extends Container {
 
   addGenericBlock(layer, artOffset, ...rest) {
     let id = ItemManager.calculateId(this.tab, this.packId, this.blocks.length);
-    this.pushBlock(new ItemBlock(id, layer, artOffset, this.yOffset, ...rest));
+    let block = new ItemBlock(id, layer, artOffset, this.yOffset, ...rest)
+    this.pushBlock(block);
+    return block;
   }
 
   addStaticBlock(layer, artOffset = null) {

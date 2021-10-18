@@ -3,9 +3,11 @@ class ItemBlock {
   layer;
   _frames = [];
   speed = 1;
-  requiresUpdate;
   draw;
+  requiresUpdate;
+  physics; returnPhysics;
   minimapColour;
+  mightCollide;
 
   vars = {};
 
@@ -25,7 +27,15 @@ class ItemBlock {
     return newFrame !== lastFrame;
   }
 
-  constructor(id, layer, artOffset, yOffset, frames = 1, speed = 1, draw = null, update = null) {
+  static returnPhysicsDefault = {
+    modX: 0,
+    modY: Config.physics.gravity,
+  };
+  static physicsDefault = function(info) {
+    return this.returnPhysics;
+  }
+
+  constructor(id, layer, artOffset, yOffset, mightCollide = true, frames = 1, speed = 1) {
     this.id = id;
     this.layer = layer;
     this.speed = speed;
@@ -47,13 +57,13 @@ class ItemBlock {
 
     this.minimapColour = this.generateMapColour();
 
-    if(draw == null)
-      draw = anim ? ItemBlock.drawDefaultAnim : ItemBlock.drawDefaultAnim;
-    this.draw = draw;
+    this.draw = anim ? ItemBlock.drawDefaultAnim : ItemBlock.drawDefaultAnim;
+    this.requiresUpdate = anim ? ItemBlock.updateDefaultAnim : ItemBlock.updateDefault;
 
-    if(update == null)
-      update = anim ? ItemBlock.updateDefaultAnim : ItemBlock.updateDefault;
-    this.requiresUpdate = update;
+    this.returnPhysics = ItemBlock.returnPhysicsDefault;
+    this.physics = ItemBlock.physicsDefault;
+
+    this.mightCollide = mightCollide;
   }
 
   generateFrame(artOffset, yOffset) {
