@@ -183,13 +183,16 @@ class UI extends Container {
 
     let top = this.userlist.y + 100 + ChatEntry.padding;
     this.chat = new ScrollContainer(this.sidebar.width, this.sidebar.height - top, 0, true, 25);
+    this.chat.y = top;
+    this.sidebar.addChild(this.chat);
+
     this.chat.sendMessage = (id, text) => {
       let p = Global.base.state.players[id];
+      if(!p) return;
       this.chat.addChild(new ChatEntry(p.name, text));
       p.showChat(text);
     }
-    this.chat.y = top;
-    this.sidebar.addChild(this.chat);
+    this.chat.systemSay = text => this.chat.addChild(new ChatEntry('* system', text));
 
 
     // top left debug info
@@ -558,19 +561,16 @@ class UI extends Container {
       switch(cmd[0]) {
         case 'help':
         case 'cmds':
-        case 'commands': {
-          this.chat.sendMessage('* system', 'nothing can help you now.');
+        case 'commands':
+        case '?': {
+          this.chat.systemSay('nothing can help you now.');
           break;
         }
 
         case 'debug':
+        case 'info':
         case 'fps': {
           this.showDebug = !this.showDebug;
-          break;
-        }
-
-        case 'map': {
-          this.minimap.openPopupMap();
           break;
         }
 
@@ -583,7 +583,7 @@ class UI extends Container {
         }
 
         default: { // remove when server added
-          this.chat.sendMessage('* system', `unknown command '${cmd[0]}'`);
+          this.chat.systemSay(`unknown command '${cmd[0]}'`);
           break;
         }
       }
