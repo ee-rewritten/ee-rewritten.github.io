@@ -43,9 +43,9 @@ class World extends Container {
     }
     for (let i = 0; i < playstate.playerContainers.length; i++) {
       this.addChild(playstate.playerContainers[i]);
-      this.addChild(playstate.nameContainers[i]);
+      this.addChild(playstate.socialContainers[i]);
       playstate.playerContainers[i].zIndex = ItemLayer.PLAYER_LAYERS[i];
-      playstate.nameContainers[i].zIndex = ItemLayer.NAME_LAYERS[i];
+      playstate.socialContainers[i].zIndex = ItemLayer.SOCIAL_LAYERS[i];
     }
 
     //init realmap

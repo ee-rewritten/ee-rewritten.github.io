@@ -2,7 +2,7 @@ class PlayState extends State {
   target;
   world; worldName; worldInfo;
   player; players = [];
-  playerContainers; nameContainers;
+  playerContainers; socialContainers;
 
   layerlock = 0;
   lastPlacedX = null; lastPlacedY = null;
@@ -15,13 +15,13 @@ class PlayState extends State {
     super();
 
     this.playerContainers = new Array(ItemLayer.PLAYER_LAYERS.length);
-    this.nameContainers = new Array(ItemLayer.NAME_LAYERS.length);
+    this.socialContainers = new Array(ItemLayer.SOCIAL_LAYERS.length);
     for (let i = 0; i < this.playerContainers.length; i++) {
       this.playerContainers[i] = new Container();
-      this.nameContainers[i] = new Container();
+      this.socialContainers[i] = new Container();
 
       this.playerContainers[i].sortableChildren = true;
-      this.nameContainers[i].sortableChildren = true;
+      this.socialContainers[i].sortableChildren = true;
     }
 
     this.world = new World(this, width, height, depth);
@@ -44,17 +44,17 @@ class PlayState extends State {
   movePlayer(p) {
     if(p.layer != null) {
       this.playerContainers[p.layer].removeChild(p);
-      this.nameContainers[p.layer].removeChild(p.nameText);
+      this.socialContainers[p.layer].removeChild(p.socialText);
     }
     p.layer = p.isInGodMode ? 1 : 0;
     this.playerContainers[p.layer].addChild(p);
-    this.nameContainers[p.layer].addChild(p.nameText);
+    this.socialContainers[p.layer].addChild(p.socialText);
   }
   deletePlayer(p) {
     Global.base.UI.userlist.removeChild(p.userlistItem);
 
     this.playerContainers[p.layer].removeChild(p);
-    this.nameContainers[p.layer].removeChild(p.nameText);
+    this.socialContainers[p.layer].removeChild(p.socialText);
     delete this.players[p.id];
   }
 

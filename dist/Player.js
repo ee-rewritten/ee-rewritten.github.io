@@ -1,7 +1,9 @@
 class Player extends Container {
   userlistItem;
 
-  nameText;
+  socialText;
+  chatBubbles = Array(3); chatBubbleTimes = Array(3);
+  chatMiniSprite;
   smileySprite;
   _smileyRow = 0;
   _smiley = 0;
@@ -56,10 +58,18 @@ class Player extends Container {
     this.smileySprite.position.set(Player.smileyOffset, Player.smileyOffset);
     this.addChild(this.smileySprite);
 
-    this.nameText = UI.createShadowText(name, 'Visitor');
-    this.nameText.bmtext.tint = nameColour;
+    this.socialText = new Container();
+    let nameText = UI.createShadowText(name, 'Visitor');
+    nameText.bmtext.tint = nameColour;
+    nameText.x = Config.blockSize/2-nameText.get('width')/2 + 2;
+    nameText.y = Config.blockSize+2;
+    this.socialText.addChild(nameText);
 
-    this.zIndex = this.nameText.zIndex = (isme ? 0 : -id);
+    this.chatMiniSprite = new Sprite(new Texture(ItemManager.baseTexture('chatbubble_mini')));
+    this.chatMiniSprite.position.set(8, -5);
+    this.addChild(this.chatMiniSprite);
+
+    this.zIndex = this.socialText.zIndex = (isme ? 0 : -id);
 
     playstate.players[id] = this;
 
@@ -117,36 +127,61 @@ class Player extends Container {
     return this._isInGodMode;
   }
 
+  teleport(x, y, snapCamera = true) {
+    this.lastFrameX = this.thisFrameX = this.x = x;
+    this.lastFrameY = this.thisFrameY = this.y = y;
+    if(snapCamera) this.playstate.moveCameraTo(x, y);
+  }
+
+  showChat(text) {
+    this.socialText.removeChild(this.chatBubbles.shift());
+    this.chatBubbleTimes.shift();
+
+    let newBubble = new ChatBubble(text);
+    this.chatBubbles.forEach(bubble => bubble.y -= newBubble.height-5);
+
+    this.socialText.addChild(newBubble);
+    this.chatBubbles.push(newBubble);
+    this.chatBubbleTimes.push(this.ticks);
+  }
+
   enterFrame() {
     //storing position for this frame and last frame for minimap purposes
     this.lastFrameX = this.thisFrameX; this.lastFrameY = this.thisFrameY;
     this.thisFrameX = this.x; this.thisFrameY = this.y;
 
+    let chatting = false;
+    this.chatBubbleTimes.forEach((time, i) => {
+      chatting = true;
+      if(this.ticks > time + 1500) {
+        this.socialText.removeChild(this.chatBubbles[i]);
+        delete this.chatBubbles[i];
+        delete this.chatBubbleTimes[i];
+      }
+      else if(this.ticks > time + 1400)
+        this.chatBubbles[i].alpha = 1 + (time+1400 - this.ticks)/100;
+    });
+
     if( (this.x + Config.blockSize/2) + Config.godmodeSize/2 < this.playstate.camera.x
       ||(this.y + Config.blockSize/2) + Config.godmodeSize/2 < this.playstate.camera.y
       ||(this.x + Config.blockSize/2) - Config.godmodeSize/2 > this.playstate.camera.x + Config.gameWidth
       ||(this.y + Config.blockSize/2) - Config.godmodeSize/2 > this.playstate.camera.y + Config.gameHeight) {
-      this.nameText.visible = this.visible = false;
+      this.socialText.visible = this.visible = false;
       return;
     }
     else {
       this.visible = true;
     }
 
-    //name has its own position setting
-    //it is rendered in a different layer, so can't be child of the player
-    this.nameText.position.set(
-      Math.round(this.x+Config.blockSize/2-this.nameText.get('width')/2 + 2),
-      Math.round(this.y+Config.blockSize+2));
+    //name/ChatBubble have their own position setting
+    //they're rendered in a different layer, so can't be child of the player
+    this.socialText.position.set(Math.round(this.x), Math.round(this.y));
 
-    if(this.playstate.target)
-      this.nameText.visible = !this.playstate.target.moving || Input.isKeyDown(16);
-  }
-
-  teleport(x, y, snapCamera = true) {
-    this.lastFrameX = this.thisFrameX = this.x = x;
-    this.lastFrameY = this.thisFrameY = this.y = y;
-    if(snapCamera) this.playstate.moveCameraTo(x, y);
+    if(this.playstate.target) {
+      this.socialText.visible = !this.playstate.target.moving || Input.isKeyDown(16);
+    }
+    else this.socialText.visible = true;
+    this.chatMiniSprite.visible = chatting && !this.socialText.visible;
   }
 
   tick() {

@@ -42,6 +42,10 @@ class UI extends Container {
       .add('moreless', './Assets/UI/moreless.png')
 
       .add('selector', './Assets/UI/selector.png')
+
+      .add('chatbubble', './Assets/chatbubble.png') //8
+      .add('chatbubble_bottom', './Assets/chatbubble_bottom.png')
+      .add('chatbubble_mini', './Assets/chatbubble_mini.png')
   }
 
   static createNineSlice(name, borders = 1) {
@@ -179,8 +183,10 @@ class UI extends Container {
 
     let top = this.userlist.y + 100 + ChatEntry.padding;
     this.chat = new ScrollContainer(this.sidebar.width, this.sidebar.height - top, 0, true, 25);
-    this.chat.sendMessage = (name, text) => {
-      this.chat.addChild(new ChatEntry(name, text));
+    this.chat.sendMessage = (id, text) => {
+      let p = Global.base.state.players[id];
+      this.chat.addChild(new ChatEntry(p.name, text));
+      p.showChat(text);
     }
     this.chat.y = top;
     this.sidebar.addChild(this.chat);
@@ -583,7 +589,7 @@ class UI extends Container {
       }
     }
     else {
-      this.chat.sendMessage('seb135', text);
+      this.chat.sendMessage(Global.base.state.player.id, text);
     }
   }
 

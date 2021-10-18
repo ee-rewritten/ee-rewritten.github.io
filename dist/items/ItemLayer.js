@@ -4,8 +4,8 @@ class ItemLayer {
   static BELOW = 1;
   static ABOVE = 2;
 
-  static PLAYER_LAYERS = [1.5, 2.5]; 
-  static NAME_LAYERS = [2.25, 3.25];
+  static PLAYER_LAYERS = [1.5, 2.5];
+  static SOCIAL_LAYERS = [2.25, 3.25];
 
   static NUM_LAYERS = 3;
   static BLAYER_TO_RLAYER = [[this.BELOW, this.ABOVE], [this.BACKGROUND]];
